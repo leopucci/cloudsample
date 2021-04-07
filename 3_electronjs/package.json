@@ -1,0 +1,76 @@
+{
+  "name": "prompty",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./electron/main.js",
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "author": "Prompty Technologies",
+  "devDependencies": {
+    "@testing-library/jest-dom": "^4.2.4",
+    "@testing-library/react": "^9.5.0",
+    "@testing-library/user-event": "^7.2.1",
+    "customize-cra": "^0.9.1",
+    "electron": "^12.0.2",
+    "electron-builder": "^22.6.0",
+    "electron-is-dev": "^1.2.0",
+    "gh-pages": "^2.2.0",
+    "lint-staged": "^10.0.8",
+    "prettier": "^2.0.1",
+    "prop-types": "^15.7.2",
+    "react": "^16.13.1",
+    "react-app-rewired": "^2.1.8",
+    "react-dom": "^16.13.1",
+    "react-router-dom": "^5.2.0",
+    "react-scripts": "3.4.1",
+    "wait-on": "^5.0.0",
+    "webpack-bundle-analyzer": "^3.6.1",
+    "worker-loader": "^2.0.0"
+  },
+  "dependencies": {
+    "@material-ui/core": "^4.9.7",
+    "@material-ui/icons": "^4.9.1",
+    "@material-ui/lab": "^4.0.0-alpha.46",
+    "classnames": "^2.2.6",
+    "concurrently": "^6.0.1",
+    "emoji-mart": "^3.0.0",
+    "emoji-regex": "^8.0.0",
+    "i18next": "^19.3.3",
+    "iframe-resizer": "^4.2.10",
+    "notistack": "^0.9.14",
+    "opus-media-recorder": "^0.8.0",
+    "qr-code-styling": "^1.0.1",
+    "react": "^16.12.0",
+    "react-cropper": "^2.0.0",
+    "react-dom": "^16.12.0",
+    "react-i18next": "^11.3.4",
+    "react-router-dom": "^5.0.0",
+    "react-scripts": "^3.1.1",
+    "react-transition-group": "^4.3.0",
+    "tdweb": "^1.7.2"
+  },
+  "lint-staged": {
+    "src/**/*.{js,jsx,json,css}": [
+      "prettier --print-width 120 --tab-width 4 --single-quote --jsx-single-quote --jsx-bracket-same-line --bracket-spacing --write",
+      "git add"
+    ]
+  },
+  "scripts": {
+    "dev": "concurrently \"react-app-rewired start\" \"wait-on http://localhost:3000 && electron .\"",
+    "precommit": "lint-staged",
+    "start": "react-app-rewired start",
+    "build": "react-app-rewired build && sw-precache-cra --config sw-config.js --no-minify",
+    "test": "react-app-rewired test --env=jsdom",
+    "eject": "react-scripts eject",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
+    "stats": "react-app-rewired build --bundle-report && npx webpack-bundle-analyzer ./build/bundle-stats.json"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
+}
