@@ -48,7 +48,7 @@ class TdLibController extends EventEmitter {
             mode: 'wasm'
         };
 
-        this.disableLog = true;
+        this.disableLog = false;
         this.streaming = true;
         this.calls = false;
 
@@ -174,7 +174,7 @@ class TdLibController extends EventEmitter {
         }
 
         if (!this.disableLog) {
-            console.log('send', request);
+            console.log('send tdweb', request);
 
             return this.client
                 .send(request)

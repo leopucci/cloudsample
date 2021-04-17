@@ -307,6 +307,9 @@ class TelegramApp extends Component {
         const { t, theme } = this.props;
         const { inactive, nativeMobile, fatalError } = this.state;
         let { authorizationState: state, prevAuthorizationState, changePhone } = this.state;
+        if (state) {
+        console.log("STATAE :" + state['@type'])
+        }
         if (changePhone) {
             state = { '@type': 'authorizationStateWaitPhoneNumber' };
         } else if (!state ||
@@ -340,6 +343,9 @@ class TelegramApp extends Component {
                 case 'authorizationStateReady': {
                     break;
                 }
+                //Estes sao os estados do login. 
+                //Pro meu caso vao ser 2. 
+                //
                 case 'authorizationStateWaitOtherDeviceConfirmation':
                 case 'authorizationStateWaitCode':
                 case 'authorizationStateWaitRegistration':

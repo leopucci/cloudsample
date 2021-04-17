@@ -318,13 +318,17 @@ class Phone extends React.Component {
     };
 
     handleDone = () => {
-        const { phone } = this.state;
-        if (!isValidPhoneNumber(phone)) {
-            this.setState({ error: { code: 'InvalidPhoneNumber' } });
-            return;
-        }
+        const { email,password, phone } = this.state;
+        //aqui eu vou tratar e-mail invalido e senha em branco.. 
+        //usando este error como exemplo.. 
+
+        //if (!isValidPhoneNumber(phone)) {
+        //    this.setState({ error: { code: 'InvalidPhoneNumber' } });
+        //    return;
+       // }
 
         this.setState({ error: null, loading: true });
+        console.log("tentando conexao")
         TdLibController.clientUpdate({
             '@type': 'clientUpdateSetPhone',
             phone
@@ -415,7 +419,7 @@ class Phone extends React.Component {
 
     render() {
         const { data, i18n, t } = this.props;
-        const { connecting, loading, error, suggestedLanguage, keep, phone, country } = this.state;
+        const { connecting, loading, error, suggestedLanguage, keep, email, password, phone, country } = this.state;
 
         let errorString = '';
         if (error) {
@@ -442,49 +446,42 @@ class Phone extends React.Component {
                 <Typography variant='body1' className='auth-subtitle' style={{ width: 264 }}>
                     {t('StartText')}
                 </Typography>
-                <Autocomplete
-                    debug={false}
-                    id='country-select'
-                    noOptionsText={t('NoResult')}
-                    options={data || []}
-                    disabled={loading}
-                    autoHighlight
-                    getOptionLabel={option => option.name}
-                    renderOption={option => <Country name={option.name} emoji={option.emoji} phone={option.phone} />}
-                    renderInput={params => (
-                        <TextField
-                            classes={{ root: 'auth-input' }}
-                            {...params}
-                            label={t('Country')}
-                            variant='outlined'
-                            inputProps={{
-                                ...params.inputProps
-                            }}
-                            fullWidth
-                            autoComplete='off'
-                        />
-                    )}
-                    filterOptions={this.handleFilterOptions}
-                    value={country}
-                    onChange={this.handleCountryChange}
-                />
                 <TextField
-                    id='phoneNumber'
+                    id='email'
                     classes={{ root: 'auth-input' }}
                     inputRef={this.phoneInputRef}
                     variant='outlined'
                     color='primary'
-                    label={t('PhoneNumber')}
+                    label={t('E-mail')}
+                    disabled={loading}
+                    error={Boolean(errorString)}
+                    helperText={errorString}
+                    fullWidth
+                    autoFocus
+                    autoComplete='on'
+                    value={email}
+                    //onChange={this.handlePhoneChange}
+                    //onKeyPress={this.handleKeyPress}
+                    //onPaste={this.handlePaste}
+                />
+                <TextField
+                    id='password'
+                    type="password"
+                    classes={{ root: 'auth-input' }}
+                    inputRef={this.phoneInputRef}
+                    variant='outlined'
+                    color='primary'
+                    label={t('Password')}
                     disabled={loading}
                     error={Boolean(errorString)}
                     helperText={errorString}
                     fullWidth
                     autoFocus
                     autoComplete='off'
-                    value={phone}
-                    onChange={this.handlePhoneChange}
-                    onKeyPress={this.handleKeyPress}
-                    onPaste={this.handlePaste}
+                    value={password}
+                    //onChange={this.handlePhoneChange}
+                    //onKeyPress={this.handleKeyPress}
+                    //onPaste={this.handlePaste}
                 />
                 <div className='sign-in-keep'>
                     <Checkbox color='primary' checked={keep} disabled={loading} onChange={this.handleKeepChange} />
@@ -500,18 +497,7 @@ class Phone extends React.Component {
                     onClick={this.handleDone}>
                     {t('Next')}
                 </Button>
-                <Typography className='sign-in-continue-on'>
-                    <Link onClick={this.handleQRCode}>
-                        {t('LogInViaQR')}
-                    </Link>
-                </Typography>
-                { !!nextLanguage && (
-                    <Typography className='sign-in-continue-on'>
-                        <Link onClick={this.handleChangeLanguage}>
-                            {t('ContinueOnThisLanguage', { lng: nextLanguage })}
-                        </Link>
-                    </Typography>
-                )}
+
             </form>
         );
     }
