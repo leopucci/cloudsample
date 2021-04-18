@@ -66,3 +66,17 @@ https://pub.dev/packages/background_fetch
 https://pub.dev/packages/rich_alert
 https://pub.dev/packages/vibration
 https://pub.dev/packages/watcher
+https://pub.dev/packages/flutter_offline
+
+https://firebase.flutter.dev/docs/messaging/overview/  Add the firebase_messaging dependency to your projects pubspec.yaml file:
+
+https://flutter.dev/docs/cookbook/persistence/sqlite
+https://stackoverflow.com/questions/27312005/way-to-update-ui-after-database-change-has-occured/27312400
+https://pub.dev/packages/sqflite_hooks
+
+
+Isto aqui eh uma junção do rabbitmq com o nodejs, neste caso ele esta mandando as mensagens da fila direto
+pro fcm, isto aqui dá uma possivel ideia de como conectar com websocket e mandar mensagem pro rabbit.. a ligação entre os 2. 
+https://medium.com/@giwa208/push-notification-system-with-rabbitmq-google-firebase-cloud-messaging-and-nodejs-c0eafbd6652e
+
+
