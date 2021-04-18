@@ -51,3 +51,18 @@ estes dois aqui sao um começo com autenticacao,
 pra eu me livrar do firebase e ter que pagar. 
 https://www.youtube.com/watch?v=2D_76lkyF1c
 https://github.com/rajayogan/flutterauth-MongoDB
+
+
+eu ja vou ter que ter uma api, 
+queria algum formato que o cliente do rabbit/amqp/mqtt ja caisse na frente da mesma coisa. 
+sao conceitos diferentes. 
+o http ele bate volta. 
+as filas voce manda a mensagem, sem retorno. alguem tem que processar a fila, e devolver depois. notificações... chat... coisa online... na banco..
+
+entao o banco fica atras da expressjs, vou usar sockjs? nao sei. http ja faz reuso. entao nao preciso do online.. 
+Aplicação android:
+https://pub.dev/packages/flutter_local_notifications
+https://pub.dev/packages/background_fetch
+https://pub.dev/packages/rich_alert
+https://pub.dev/packages/vibration
+https://pub.dev/packages/watcher
