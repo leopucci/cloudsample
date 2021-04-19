@@ -80,3 +80,8 @@ pro fcm, isto aqui dá uma possivel ideia de como conectar com websocket e manda
 https://medium.com/@giwa208/push-notification-system-with-rabbitmq-google-firebase-cloud-messaging-and-nodejs-c0eafbd6652e
 
 
+este aqui eh um proxy pro s3, que é o que eu vou acabar usando.. independente se for amazon ou nao. 
+https://www.npmjs.com/package/s3proxy
+
+
+
