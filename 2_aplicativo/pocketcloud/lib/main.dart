@@ -1,8 +1,14 @@
+import 'dart:convert';
+
+import 'package:apple_sign_in/apple_sign_in.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'Widgets/FormCard.dart';
 import 'Widgets/SocialIcons.dart';
 import 'CustomIcons.dart';
+import 'package:flutter_facebook_login/flutter_facebook_login.dart';
+import 'package:http/http.dart' as http;
+import 'package:flutter_signin_button/flutter_signin_button.dart';
 
 void main() => runApp(MaterialApp(
       home: MyApp(),
@@ -15,12 +21,87 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  static final FacebookLogin facebookSignIn = new FacebookLogin();
   bool _isSelected = false;
 
   void _radio() {
     setState(() {
       _isSelected = !_isSelected;
     });
+  }
+
+  String _message = 'Log in/out by pressing the buttons below.';
+  void _showMessage(String message) {
+    setState(() {
+      _message = message;
+    });
+  }
+
+  Future<Null> _facebookLogout() async {
+    await facebookSignIn.logOut();
+    _showMessage('Logged out.');
+  }
+
+  Future<Null> _appleLogin() async {
+    print('APPLE LOGIN');
+
+    if (await AppleSignIn.isAvailable()) {
+      final AuthorizationResult result = await AppleSignIn.performRequests([
+        AppleIdRequest(requestedScopes: [Scope.email, Scope.fullName])
+      ]);
+      switch (result.status) {
+        case AuthorizationStatus.authorized:
+          print(result.credential.user); //All the required credentials
+          break;
+        case AuthorizationStatus.error:
+          print("Sign in failed: ${result.error.localizedDescription}");
+          break;
+        case AuthorizationStatus.cancelled:
+          print('User cancelled');
+          break;
+      }
+    }
+  }
+
+  Future<Null> _facebookLogin() async {
+    final FacebookLoginResult result = await facebookSignIn.logIn(['email']);
+
+    switch (result.status) {
+      case FacebookLoginStatus.loggedIn:
+        final FacebookAccessToken accessToken = result.accessToken;
+        var queryParameters = {
+          'fields': 'name,first_name,last_name,email,picture.type(large)',
+          'access_token': '${accessToken.token}',
+        };
+        var uri = Uri.https('graph.facebook.com', '/v2.12/me', queryParameters);
+        final graphResponse = await http.get(uri);
+        final profile = jsonDecode(graphResponse.body);
+        print('''
+         Logged in!
+         
+         Token: ${accessToken.token}
+         User id: ${accessToken.userId}
+         Expires: ${accessToken.expires}
+         Permissions: ${accessToken.permissions}
+         Declined permissions: ${accessToken.declinedPermissions}
+
+         NAME: ${profile['name']}
+         FIRST_NAME: ${profile['first_name']}
+         LAST_NAME: ${profile['last_name']}
+         EMAIL: ${profile['email']}
+         ID: ${profile['id']}
+         PICTURE: ${profile['picture']}
+         PICTURE URL: ${profile['picture']['data']['url']}
+         ''');
+        break;
+      case FacebookLoginStatus.cancelledByUser:
+        _showMessage('Login cancelled by the user.');
+        break;
+      case FacebookLoginStatus.error:
+        _showMessage('Something went wrong with the login process.\n'
+            'Here\'s the error Facebook gave us: ${result.errorMessage}');
+        break;
+    }
   }
 
   Widget radioButton(bool isSelected) => Container(
@@ -183,7 +264,10 @@ class _MyAppState extends State<MyApp> {
                           Color(0xFF00eaf8),
                         ],
                         iconData: CustomIcons.facebook,
-                        onPressed: () {},
+                        onPressed: () {
+                          print("Clicou Facebook");
+                          _facebookLogin();
+                        },
                       ),
                       SocialIcon(
                         colors: [
@@ -193,12 +277,22 @@ class _MyAppState extends State<MyApp> {
                         iconData: CustomIcons.googlePlus,
                         onPressed: () {},
                       ),
-                      SocialIcon(
-                        colors: [
-                          Color(0xFF17ead9),
-                          Color(0xFF6078ea),
-                        ],
-                        iconData: CustomIcons.twitter,
+                      // SocialIcon(
+                      //   colors: [
+                      //     Color(0xFF17ead9),
+                      //     Color(0xFF6078ea),
+                      //   ],
+                      //   iconData: CustomIcons.twitter,
+                      //   onPressed: () {},
+                      // ),
+                      // AppleSignInButton(
+                      //   //style: ButtonStyle.black,
+                      //   type: ButtonType.signIn,
+                      //   onPressed: _appleLogin,
+                      // ),
+                      SignInButton(
+                        Buttons.Apple,
+                        mini: true,
                         onPressed: () {},
                       ),
                       SocialIcon(
@@ -228,6 +322,29 @@ class _MyAppState extends State<MyApp> {
                                 color: Color(0xFF5d74e3),
                                 fontFamily: "Poppins-Bold")),
                       )
+                    ],
+                  ),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SignInButton(
+                        Buttons.Apple,
+                        onPressed: () {},
+                      ),
+                      Divider(),
+                      SignInButton(
+                        Buttons.Google,
+                        onPressed: () {
+                          // _showButtonPressDialog(context, 'Google');
+                        },
+                      ),
+                      Divider(),
+                      SignInButtonBuilder(
+                        text: 'Sign in with Email',
+                        icon: Icons.email,
+                        onPressed: () {},
+                        backgroundColor: Colors.blueGrey.shade700,
+                      ),
                     ],
                   )
                 ],
