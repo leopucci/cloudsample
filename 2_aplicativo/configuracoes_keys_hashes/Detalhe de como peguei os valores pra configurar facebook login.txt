@@ -1,0 +1,43 @@
+Gerando keystore release (eu gerei o debug igual, so o nome que mudou, entao deixei so esta conf)
+keytool -genkey -v -keystore keystoreRelease.jks -storetype JKS -keyalg RSA -keysize 2048 -validity 1000000 -alias key
+
+Leo@SRVPUBSHARE MINGW64 /c/dropbox-like/2_aplicativo/configuracoes_keys_hashes (main)
+$ keytool -genkey -v -keystore keystore.jks -storetype JKS -keyalg RSA -keysize 2048 -validity 1000000 -alias key
+Informe a senha da �rea de armazenamento de chaves:
+A senha da �rea de armazenamento de chaves � muito curta - ela deve ter, no m�nimo, 6 caracteres
+Informe a senha da �rea de armazenamento de chaves:  8ejf0j2j
+Informe novamente a nova senha: 8ejf0j2j
+Qual � o seu nome e o seu sobrenome?
+  [Unknown]:  Pocket.Cloud
+Qual � o nome da sua unidade organizacional?
+  [Unknown]:  Pocket
+Qual � o nome da sua empresa?
+  [Unknown]:  Pocket.Cloud
+Qual � o nome da sua Cidade ou Localidade?
+  [Unknown]:
+Qual � o nome do seu Estado ou Munic�pio?
+  [Unknown]:
+Quais s�o as duas letras do c�digo do pa�s desta unidade?
+  [Unknown]:
+CN=Pocket.Cloud, OU=Pocket, O=Pocket.Cloud, L=Unknown, ST=Unknown, C=Unknown Est� correto?
+  [n�o]:  y
+Qual � o seu nome e o seu sobrenome?
+  [Pocket.Cloud]:
+Qual � o nome da sua unidade organizacional?
+  [Pocket]:
+Qual � o nome da sua empresa?
+  [Pocket.Cloud]:
+Qual � o nome da sua Cidade ou Localidade?
+  [Unknown]:
+Qual � o nome do seu Estado ou Munic�pio?
+  [Unknown]:
+Quais s�o as duas letras do c�digo do pa�s desta unidade?
+  [Unknown]:
+CN=Pocket.Cloud, OU=Pocket, O=Pocket.Cloud, L=Unknown, ST=Unknown, C=Unknown Est� correto?
+  [n�o]:  sim
+
+Gerando o par de chaves RSA de 2.048 bit e o certificado autoassinado (SHA256withRSA) com uma validade de 1.000.000 dias
+        para: CN=Pocket.Cloud, OU=Pocket, O=Pocket.Cloud, L=Unknown, ST=Unknown, C=Unknown
+Informar a senha da chave de <key>
+        (RETURN se for igual � senha da �rea do armazenamento de chaves): EU DEI RETURN, EH A MESMA SENHA
+[Armazenando keystore.jks]

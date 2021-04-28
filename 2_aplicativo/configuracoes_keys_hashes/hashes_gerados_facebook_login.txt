@@ -1,0 +1,5 @@
+keytool -exportcert -alias key -keystore "C:\dropbox-like\2_aplicativo\configuracoes_keys_hashes\keystoreDebug.jks" | openssl sha1 -binary | openssl base64
+L7x5JPmaOnNewbfZFXWKfYzHrCE=
+
+keytool -exportcert -alias key -keystore "C:\dropbox-like\2_aplicativo\configuracoes_keys_hashes\keystoreRelease.jks" | openssl sha1 -binary | openssl base64
+fC7PMFqK1QybeUGULunqwKse3Pg=
