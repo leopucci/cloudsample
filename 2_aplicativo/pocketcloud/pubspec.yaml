@@ -43,6 +43,7 @@ dependencies:
   apple_sign_in: ^0.1.0
   flutter_signin_button: ^2.0.0
   device_info: ^2.0.0
+  crypto: ^3.0.1
 
 dev_dependencies:
   flutter_test:
