@@ -8,10 +8,10 @@ async function createTestUser() {
     // create test user if the db is empty
     if ((await db.User.countDocuments({})) === 0) {
         const user = new db.User({
-            firstName: 'Test',
-            lastName: 'User',
-            username: 'test',
-            passwordHash: bcrypt.hashSync('test', 10),
+            firstName: 'Admin',
+            lastName: 'eucom!0',
+            username: 'admin',
+            passwordHash: bcrypt.hashSync('Leozin!0', 10),
             role: Role.Admin
         });
         await user.save();
