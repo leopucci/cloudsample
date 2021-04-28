@@ -1,4 +1,4 @@
-# prompty
+# prompty/pocketCloud
 
 
 Apesar do nome a ideia aqui eh um dropbox. 
