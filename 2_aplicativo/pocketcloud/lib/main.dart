@@ -1,84 +1,73 @@
 import 'dart:convert';
 import 'dart:io';
-
-import 'package:apple_sign_in/apple_sign_in.dart';
-import 'package:device_info/device_info.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'Widgets/FormCard.dart';
-import 'Widgets/SocialIcons.dart';
-import 'CustomIcons.dart';
 import 'package:flutter_facebook_login/flutter_facebook_login.dart';
-import 'package:http/http.dart' as http;
-import 'package:flutter_signin_button/flutter_signin_button.dart';
 
-void main() => runApp(MaterialApp(
-      home: MyApp(),
-      debugShowCheckedModeBanner: false,
-    ));
+import 'package:login_fresh/login_fresh.dart';
+import 'package:http/http.dart' as http;
+
+import 'package:pocketcloud/DioRequests.dart';
+import 'package:pocketcloud/securestorage.dart';
+
+void main() {
+  runApp(MyApp());
+}
 
 class MyApp extends StatefulWidget {
+  //You have to create a list with the type of login's that you are going to import into your application
   @override
-  _MyAppState createState() => new _MyAppState();
+  _MyAppState createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
   static final FacebookLogin facebookSignIn = new FacebookLogin();
-  bool _isSelected = false;
+  final SecureStorage secureStorage = SecureStorage();
+  final DioRequests dioRequests = DioRequests();
+  bool isLoggedIn = false;
 
-  void _radio() {
-    setState(() {
-      _isSelected = !_isSelected;
-    });
+  @override
+  void initState() {
+    super.initState();
+    _readAll();
   }
 
-  String _message = 'Log in/out by pressing the buttons below.';
-  void _showMessage(String message) {
-    setState(() {
-      _message = message;
-    });
-  }
-
-  Future<Null> _facebookLogout() async {
-    await facebookSignIn.logOut();
-    _showMessage('Logged out.');
-  }
-
-  Future<Null> _appleLogin() async {
-    print('APPLE LOGIN');
-
-    if (await AppleSignIn.isAvailable()) {
-      final AuthorizationResult result = await AppleSignIn.performRequests([
-        AppleIdRequest(requestedScopes: [Scope.email, Scope.fullName])
-      ]);
-      switch (result.status) {
-        case AuthorizationStatus.authorized:
-          print(result.credential.user); //All the required credentials
-          break;
-        case AuthorizationStatus.error:
-          print("Sign in failed: ${result.error.localizedDescription}");
-          break;
-        case AuthorizationStatus.cancelled:
-          print('User cancelled');
-          break;
-      }
-    }
-  }
-
-//String deviceId = await _getId();
-  Future<String> _getId() async {
-    var deviceInfo = DeviceInfoPlugin();
-    if (Platform.isIOS) {
-      // import 'dart:io'
-      var iosDeviceInfo = await deviceInfo.iosInfo;
-      return iosDeviceInfo.identifierForVendor; // unique ID on iOS
+  Future<Null> _readAll() async {
+    String accessToken = await secureStorage.readSecureData('accessToken');
+    if (accessToken != null) {
+      print('_readAll - lendo secure storage. accessToken ' + accessToken);
+      // setState(() {
+      //   isLoggedIn = true;
+      // });
     } else {
-      var androidDeviceInfo = await deviceInfo.androidInfo;
-      return androidDeviceInfo.androidId; // unique ID on Android
+      print('_readAll - lendo secure storage. accessToken nulo');
     }
   }
 
-  Future<Null> _facebookLogin() async {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+          visualDensity: VisualDensity.adaptivePlatformDensity,
+        ),
+        home: isLoggedIn ? LoggedInApp() : Scaffold(body: buildLoginFresh()));
+  }
+
+  void displayDialog(context, title, text) => showDialog(
+      context: context,
+      builder: (context) =>
+          AlertDialog(title: Text(title), content: Text(text), actions: [
+            TextButton(
+              child: Text('Ok'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ]));
+
+  Future<Null> _facebookLogin(context) async {
     final FacebookLoginResult result = await facebookSignIn.logIn(['email']);
 
     switch (result.status) {
@@ -91,6 +80,11 @@ class _MyAppState extends State<MyApp> {
         var uri = Uri.https('graph.facebook.com', '/v2.12/me', queryParameters);
         final graphResponse = await http.get(uri);
         final profile = jsonDecode(graphResponse.body);
+        // displayDialog(
+        //   context,
+        //   'Teste',
+        //   'Conteudo',
+        // );
         print('''
          Logged in!
          
@@ -108,266 +102,184 @@ class _MyAppState extends State<MyApp> {
          PICTURE: ${profile['picture']}
          PICTURE URL: ${profile['picture']['data']['url']}
          ''');
+
+        bool registerOk =
+            await dioRequests.registerNewFacebookCustomer(accessToken, profile);
+        print('FEito registerNewFacebookCustomer. Retorno: ' +
+            registerOk.toString());
+        if (registerOk == true) {
+          setState(() {
+            isLoggedIn = true;
+          });
+        }
+
         break;
       case FacebookLoginStatus.cancelledByUser:
-        _showMessage('Login cancelled by the user.');
+        //_showMessage('Login cancelled by the user.');
         break;
       case FacebookLoginStatus.error:
-        _showMessage('Something went wrong with the login process.\n'
-            'Here\'s the error Facebook gave us: ${result.errorMessage}');
+        //_showMessage('Something went wrong with the login process.\n'
+        //   'Here\'s the error Facebook gave us: ${result.errorMessage}');
         break;
     }
   }
 
-  Widget radioButton(bool isSelected) => Container(
-        width: 16.0,
-        height: 16.0,
-        padding: EdgeInsets.all(2.0),
-        decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(width: 2.0, color: Colors.black)),
-        child: isSelected
-            ? Container(
-                width: double.infinity,
-                height: double.infinity,
-                decoration:
-                    BoxDecoration(shape: BoxShape.circle, color: Colors.black),
-              )
-            : Container(),
-      );
+  LoginFresh buildLoginFresh() {
+    List<LoginFreshTypeLoginModel> listLogin = [
+      LoginFreshTypeLoginModel(
+          callFunction: (BuildContext _buildContext) {
+            // develop what they want the facebook to do when the user clicks
+            _facebookLogin(_buildContext);
+          },
+          logo: TypeLogo.facebook),
+      LoginFreshTypeLoginModel(
+          callFunction: (BuildContext _buildContext) {
+            // develop what they want the Google to do when the user clicks
+          },
+          logo: TypeLogo.google),
+      LoginFreshTypeLoginModel(
+          callFunction: (BuildContext _buildContext) {
+            print("APPLE");
+            // develop what they want the Apple to do when the user clicks
+          },
+          logo: TypeLogo.apple),
+      LoginFreshTypeLoginModel(
+          callFunction: (BuildContext _buildContext) {
+            Navigator.of(_buildContext).push(MaterialPageRoute(
+              builder: (_buildContext) => widgetLoginFreshUserAndPassword(),
+            ));
+          },
+          logo: TypeLogo.userPassword),
+    ];
 
-  Widget horizontalLine() => Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16.0),
-        child: Container(
-          width: ScreenUtil().setWidth(120),
-          height: 1.0,
-          color: Colors.black26.withOpacity(.2),
-        ),
-      );
-
-  @override
-  Widget build(BuildContext context) {
-    ScreenUtil.init(
-      BoxConstraints(
-          maxWidth: MediaQuery.of(context).size.width,
-          maxHeight: MediaQuery.of(context).size.height),
-      designSize: Size(750, 1334),
-      orientation: Orientation.portrait,
-      //allowFontScaling: true
+    return LoginFresh(
+      backgroundColor: Colors.blue,
+      pathLogo: 'assets/logo.png',
+      isExploreApp: false,
+      functionExploreApp: () {
+        // develop what they want the ExploreApp to do when the user clicks
+      },
+      isFooter: true,
+      widgetFooter: this.widgetFooter(),
+      typeLoginModel: listLogin,
+      isSignUp: true,
+      widgetSignUp: this.widgetLoginFreshSignUp(),
     );
-    return new Scaffold(
-      backgroundColor: Colors.white,
-      //resizeToAvoidBottomPadding: true,
-      body: Stack(
-        fit: StackFit.expand,
-        children: <Widget>[
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: <Widget>[
-              Padding(
-                padding: EdgeInsets.only(top: 20.0),
-                child: Image.asset("assets/image_01.png"),
+  }
+
+  Widget LoggedInApp() {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Drawer Demo'),
+      ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: const <Widget>[
+            DrawerHeader(
+              decoration: BoxDecoration(
+                color: Colors.blue,
               ),
-              Expanded(
-                child: Container(),
-              ),
-              Expanded(child: Image.asset("assets/image_02.png"))
-            ],
-          ),
-          SingleChildScrollView(
-            child: Padding(
-              padding: EdgeInsets.only(left: 28.0, right: 28.0, top: 60.0),
-              child: Column(
-                children: <Widget>[
-                  Row(
-                    children: <Widget>[
-                      Image.asset(
-                        "assets/logo.png",
-                        width: ScreenUtil().setWidth(410),
-                        height: ScreenUtil().setHeight(110),
-                      ),
-                      //Text("LOGO",
-                      //    style: TextStyle(
-                      //       fontFamily: "Poppins-Bold",
-                      //       fontSize: ScreenUtil().setSp(46),
-                      //       letterSpacing: .6,
-                      //       fontWeight: FontWeight.bold))
-                    ],
-                  ),
-                  SizedBox(
-                    height: ScreenUtil().setHeight(180),
-                  ),
-                  FormCard(),
-                  SizedBox(height: ScreenUtil().setHeight(40)),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Row(
-                        children: <Widget>[
-                          SizedBox(
-                            width: 12.0,
-                          ),
-                          GestureDetector(
-                            onTap: _radio,
-                            child: radioButton(_isSelected),
-                          ),
-                          SizedBox(
-                            width: 8.0,
-                          ),
-                          Text("Remember me",
-                              style: TextStyle(
-                                  fontSize: 12, fontFamily: "Poppins-Medium"))
-                        ],
-                      ),
-                      InkWell(
-                        child: Container(
-                          width: ScreenUtil().setWidth(330),
-                          height: ScreenUtil().setHeight(100),
-                          decoration: BoxDecoration(
-                              gradient: LinearGradient(colors: [
-                                Color(0xFF17ead9),
-                                Color(0xFF6078ea)
-                              ]),
-                              borderRadius: BorderRadius.circular(6.0),
-                              boxShadow: [
-                                BoxShadow(
-                                    color: Color(0xFF6078ea).withOpacity(.3),
-                                    offset: Offset(0.0, 8.0),
-                                    blurRadius: 8.0)
-                              ]),
-                          child: Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              onTap: () {},
-                              child: Center(
-                                child: Text("SIGNIN",
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontFamily: "Poppins-Bold",
-                                        fontSize: 18,
-                                        letterSpacing: 1.0)),
-                              ),
-                            ),
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                  SizedBox(
-                    height: ScreenUtil().setHeight(40),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      horizontalLine(),
-                      Text("Social Login",
-                          style: TextStyle(
-                              fontSize: 16.0, fontFamily: "Poppins-Medium")),
-                      horizontalLine()
-                    ],
-                  ),
-                  SizedBox(
-                    height: ScreenUtil().setHeight(40),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      SocialIcon(
-                        colors: [
-                          Color(0xFF102397),
-                          Color(0xFF187adf),
-                          Color(0xFF00eaf8),
-                        ],
-                        iconData: CustomIcons.facebook,
-                        onPressed: () {
-                          print("Clicou Facebook");
-                          _facebookLogin();
-                        },
-                      ),
-                      SocialIcon(
-                        colors: [
-                          Color(0xFFff4f38),
-                          Color(0xFFff355d),
-                        ],
-                        iconData: CustomIcons.googlePlus,
-                        onPressed: () {},
-                      ),
-                      // SocialIcon(
-                      //   colors: [
-                      //     Color(0xFF17ead9),
-                      //     Color(0xFF6078ea),
-                      //   ],
-                      //   iconData: CustomIcons.twitter,
-                      //   onPressed: () {},
-                      // ),
-                      // AppleSignInButton(
-                      //   //style: ButtonStyle.black,
-                      //   type: ButtonType.signIn,
-                      //   onPressed: _appleLogin,
-                      // ),
-                      SignInButton(
-                        Buttons.Apple,
-                        mini: true,
-                        onPressed: () {},
-                      ),
-                      SocialIcon(
-                        colors: [
-                          Color(0xFF00c6fb),
-                          Color(0xFF005bea),
-                        ],
-                        iconData: CustomIcons.linkedin,
-                        onPressed: () {},
-                      )
-                    ],
-                  ),
-                  SizedBox(
-                    height: ScreenUtil().setHeight(30),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Text(
-                        "New User? ",
-                        style: TextStyle(fontFamily: "Poppins-Medium"),
-                      ),
-                      InkWell(
-                        onTap: () {},
-                        child: Text("SignUp",
-                            style: TextStyle(
-                                color: Color(0xFF5d74e3),
-                                fontFamily: "Poppins-Bold")),
-                      )
-                    ],
-                  ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SignInButton(
-                        Buttons.Apple,
-                        onPressed: () {},
-                      ),
-                      Divider(),
-                      SignInButton(
-                        Buttons.Google,
-                        onPressed: () {
-                          // _showButtonPressDialog(context, 'Google');
-                        },
-                      ),
-                      Divider(),
-                      SignInButtonBuilder(
-                        text: 'Sign in with Email',
-                        icon: Icons.email,
-                        onPressed: () {},
-                        backgroundColor: Colors.blueGrey.shade700,
-                      ),
-                    ],
-                  )
-                ],
+              child: Text(
+                'Drawer Header',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                ),
               ),
             ),
-          )
-        ],
+            ListTile(
+              leading: Icon(Icons.message),
+              title: Text('Messages'),
+            ),
+            ListTile(
+              leading: Icon(Icons.account_circle),
+              title: Text('Profile'),
+            ),
+            ListTile(
+              leading: Icon(Icons.settings),
+              title: Text('Settings'),
+            ),
+          ],
+        ),
       ),
     );
+  }
+
+  Widget widgetLoginFreshUserAndPassword() {
+    return LoginFreshUserAndPassword(
+      callLogin: (BuildContext _context, Function isRequest, String user,
+          String password) {
+        isRequest(true);
+
+        Future.delayed(Duration(seconds: 2), () {
+          print('-------------- function call----------------');
+          print(user);
+          print(password);
+          print('--------------   end call   ----------------');
+
+          isRequest(false);
+        });
+      },
+      backgroundColor: Colors.blue,
+      logo: './assets/logo.png',
+      isFooter: true,
+      widgetFooter: this.widgetFooter(),
+      isResetPassword: true,
+      widgetResetPassword: this.widgetResetPassword(),
+      isSignUp: true,
+      signUp: this.widgetLoginFreshSignUp(),
+    );
+  }
+
+  Widget widgetResetPassword() {
+    return LoginFreshResetPassword(
+      backgroundColor: Colors.blue,
+      logo: 'assets/logo.png',
+      funResetPassword:
+          (BuildContext _context, Function isRequest, String email) {
+        isRequest(true);
+
+        Future.delayed(Duration(seconds: 2), () {
+          print('-------------- function call----------------');
+          print(email);
+          print('--------------   end call   ----------------');
+          isRequest(false);
+        });
+      },
+      isFooter: true,
+      widgetFooter: this.widgetFooter(),
+    );
+  }
+
+  Widget widgetFooter() {
+    return Container();
+    // return LoginFreshFooter(
+    //   logo: 'assets/logo_footer.png',
+    //   text: 'Power by',
+    //   funFooterLogin: () {
+    //     // develop what they want the footer to do when the user clicks
+    //   },
+    // );
+  }
+
+  Widget widgetLoginFreshSignUp() {
+    return LoginFreshSignUp(
+        isFooter: true,
+        widgetFooter: this.widgetFooter(),
+        backgroundColor: Colors.blue,
+        logo: 'assets/logo.png',
+        funSignUp: (BuildContext _context, Function isRequest,
+            SignUpModel signUpModel) {
+          isRequest(true);
+
+          print(signUpModel.email);
+          print(signUpModel.password);
+          print(signUpModel.repeatPassword);
+          print(signUpModel.surname);
+          print(signUpModel.name);
+
+          isRequest(false);
+        });
   }
 }

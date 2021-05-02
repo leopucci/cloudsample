@@ -44,6 +44,9 @@ dependencies:
   flutter_signin_button: ^2.0.0
   device_info: ^2.0.0
   crypto: ^3.0.1
+  login_fresh: ^1.0.8
+  dio: ^4.0.0
+  flutter_secure_storage: ^4.2.0
 
 dev_dependencies:
   flutter_test:
