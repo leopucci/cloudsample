@@ -1,6 +1,8 @@
 ﻿require('rootpath')();
 const express = require('express');
+var morgan = require('morgan');  
 const app = express();
+app.use(morgan('dev')); 
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
@@ -9,9 +11,10 @@ const errorHandler = require('_middleware/error-handler');
 // create test user in db on startup if required
 const createTestUser = require('_helpers/create-test-user');
 createTestUser();
-
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+app.use(express.json());
+app.use(express.urlencoded({
+  extended: false
+}));
 app.use(cookieParser());
 
 // allow cors requests from any origin and with credentials

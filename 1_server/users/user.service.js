@@ -3,8 +3,12 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const crypto = require("crypto");
 const db = require('_helpers/db');
-
+const https = require('https');
+//const FB = require('fb');
+const FBGraphAPI = require('fb-graph-api');
+const fetch = require("node-fetch");
 module.exports = {
+    createOrassociateFacebookAccount,
     authenticate,
     refreshToken,
     revokeToken,
@@ -12,6 +16,203 @@ module.exports = {
     getById,
     getRefreshTokens
 };
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function createOrassociateFacebookAccount({ deviceId,
+    accessToken,
+    expires,
+    permissions,
+    declinedPermissions,
+    name,
+    first_name,
+    last_name,
+    email,
+    profileId,
+    pictureUrl, ipAddress }) {
+
+
+
+
+    const response = await fetch('https://graph.facebook.com/me?access_token=' + accessToken + '&fields=name,first_name,last_name,email,picture.type(large)');
+    const data = await response.json();
+    //Token invalido
+    if (typeof data['id'] === 'undefined') {
+        return {
+            ErrorMsg: 'Error 195',
+            ErrorCode: '195',
+        };
+    }
+    console.dir(data);
+    //Token bateu, mas o profile que mandou eh diferente do que foi verificado
+    if (data.id != profileId) {
+        return {
+            ErrorMsg: 'Error 196',
+            ErrorCode: '196',
+        };
+
+    }
+    if (data.email != email) {
+        return {
+            ErrorMsg: 'Error 197',
+            ErrorCode: '197',
+        };
+
+    }
+    if (data.id == profileId && data.email == email) {
+        console.log('FOI' + data.id);
+
+        let user = await db.User.findOne({ email: email });
+
+        //Uma conta só ativa por email.. 
+        //Se o cara trocar o email da conta dele no face, 
+        //na hora que eu autenticar uma conta, eu desautentico a outra. 
+        if (user == undefined) {
+            return {
+                ErrorMsg: 'Error 124',
+                ErrorCode: '124',
+            };
+
+        }
+
+
+
+        if (user) {
+            console.log('Encontrada conta para ' + email + 'vamos associar a conta...');
+            var cadastroFeito = false;
+            //desativo todas as outras contas, e deixo só uma ativa. 
+
+            const tamanho = user.facebookAccounts.length;
+            for (var i = 0; i < tamanho; i++) {
+                //            console.log('Loop:' + i)
+                //Se tiver alguma ativa tenho que desativar la na sdk do face
+                if (user.facebookAccounts[i].expired == false) {
+                    console.log('Existe conta ativa, vou desativar o token');
+                    // ESTA DANDO ESTE RETORNO
+                    //{
+                    //     message: '(#803) Some of the aliases you requested do not exist: logout',
+                    //     type: 'OAuthException',
+                    //     code: 803,
+                    //     fbtrace_id: 'A3qA5epifjTqG5i0g27nJYw'
+                    //   }
+                    // await FB.api('logout', {
+                    //     //client_id: 'app_id',
+                    //     access_token: user.facebookAccounts[i].accessToken,
+                    // }, function (res) {
+                    //     if (!res || res.error) {
+                    //         console.log(!res ? 'Erro fazendo logout do facebook' : res.error);
+                    //         return;
+                    //     }
+                    //     console.log('FEito' + res);
+                    // });
+                    console.log('Funcao de desativaçao de conta executada');
+                    user.facebookAccounts[i].expired = true;
+
+                    //Se a conta ja existir dentro do usuario, vou só atualizar os dados. 
+
+                    if (profileId == user.facebookAccounts[i].profileId) {
+                        console.log('ja existe a conta do face, vou atualizar os dados');
+                        user.facebookAccounts[i].profileId = profileId;
+                        user.facebookAccounts[i].profileName = name;
+                        user.facebookAccounts[i].profileFirstName = first_name;
+                        user.facebookAccounts[i].profileLastName = last_name;
+                        user.facebookAccounts[i].pictureUrl = pictureUrl;
+                        user.facebookAccounts[i].accessToken = accessToken;
+                        user.facebookAccounts[i].expires = expires;
+                        user.facebookAccounts[i].authDate = Date.now();
+
+                        user.facebookAccounts[i].expired = false;
+                        cadastroFeito = true;
+                    }
+
+                }
+
+
+                if (cadastroFeito == false) {
+                    console.log('cadastro ainda nao foi feito.. fazendo..');
+                    var novoCadastro = {
+                        profileId: profileId,
+                        profileName: name,
+                        profileFirstName: first_name,
+                        profileLastName: last_name,
+                        pictureUrl: pictureUrl,
+                        accessToken: accessToken,
+                        expires: expires,
+                        authDate: Date.now()
+                    };
+                    // await sleep(2000);
+                    console.log('Vai dar o push');
+                    user.facebookAccounts.push(novoCadastro);
+                    console.log('FEz o push');
+                }
+
+
+
+
+            }
+            console.log('Vai salvar...');
+            user.save();
+            console.log('Salvou');
+        } else {
+            console.log('Nao tem conta de email para ' + email + 'vamos criar uma');
+            novoUsuario = new db.User();
+            novoUsuario.email = email;
+            novoUsuario.firstName = first_name;
+            novoUsuario.lastName = last_name;
+
+            var novoCadastroFb = {
+                profileId: profileId,
+                profileName: name,
+                profileFirstName: first_name,
+                profileLastName: last_name,
+                pictureUrl: pictureUrl,
+                accessToken: accessToken,
+                expires: expires,
+                authDate: Date.now()
+            };
+            novoUsuario.facebookAccounts.push(novoCadastroFb);
+            novoUsuario.save();
+            user = novoUsuario;
+        }
+
+        // authentication successful so generate jwt and refresh tokens
+        const jwtToken = generateJwtToken(user);
+        const refreshToken = generateRefreshToken(user, ipAddress);
+        console.log('refreshToken: ' + refreshToken.token);
+        const refresh = refreshToken.token;
+        // save refresh token
+        await refreshToken.save();
+
+        // return basic details and tokens
+        return {
+            ...basicDetails(user),
+            email: email,
+            jwtToken,
+            refreshToken: refresh
+        };
+    }
+    console.log('Caiu aqui');
+    // const FB = new FBGraphAPI({
+    //     clientID: '237674398093898',
+    //     clientSecret: '4a496c3b9a503afaea59915051b10a87'
+    //     //appAccessToken: '...' // Optional
+    return {
+        ErrorMsg: 'Error 288',
+        ErrorCode: '288',
+    };
+    // });
+
+
+    // FB.isValid(accessToken)
+    //     .then(valid => {
+    //         console.log('Token eh valido', valid); // true or false
+    //     })
+    //     .catch(e => console.log('e', e));
+
+
+}
 
 async function authenticate({ username, password, ipAddress }) {
     const user = await db.User.findOne({ username });
@@ -28,7 +229,7 @@ async function authenticate({ username, password, ipAddress }) {
     await refreshToken.save();
 
     // return basic details and tokens
-    return { 
+    return {
         ...basicDetails(user),
         jwtToken,
         refreshToken: refreshToken.token
@@ -51,7 +252,7 @@ async function refreshToken({ token, ipAddress }) {
     const jwtToken = generateJwtToken(user);
 
     // return basic details and tokens
-    return { 
+    return {
         ...basicDetails(user),
         jwtToken,
         refreshToken: newRefreshToken.token
@@ -111,7 +312,7 @@ function generateRefreshToken(user, ipAddress) {
     return new db.RefreshToken({
         user: user.id,
         token: randomTokenString(),
-        expires: new Date(Date.now() + 7*24*60*60*1000),
+        expires: new Date(Date.now() + 5 * 365 * 24 * 60 * 60 * 1000),
         createdByIp: ipAddress
     });
 }
@@ -124,3 +325,4 @@ function basicDetails(user) {
     const { id, firstName, lastName, username, role } = user;
     return { id, firstName, lastName, username, role };
 }
+
