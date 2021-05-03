@@ -7,6 +7,7 @@ const https = require('https');
 //const FB = require('fb');
 const FBGraphAPI = require('fb-graph-api');
 const fetch = require("node-fetch");
+const AWS = require('aws-sdk');
 module.exports = {
     createOrassociateFacebookAccount,
     authenticate,
@@ -21,6 +22,42 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+function getBucketName(email) {
+
+    var name = email.substring(0, email.lastIndexOf("@"));
+    var domain = email.substring(email.lastIndexOf("@") + 1);
+
+    return 'pocketcloud-' + name + '-' + domain;
+}
+function createBucket(email) {
+
+    var credentials = new AWS.SharedIniFileCredentials({ profile: 'b2' });
+    AWS.config.credentials = credentials;
+    var ep = new AWS.Endpoint('s3.us-west-000.backblazeb2.com');
+    var s3 = new AWS.S3({ endpoint: ep });
+
+    var bucketName = 'node-sdk-sample-';
+    var keyName = 'hello_world.txt';
+
+    s3.createBucket({ Bucket: bucketName, ObjectLockEnabledForBucket: true }, function(err, data) {
+        if (err) {
+          console.log("Error", err);
+        } else {
+          console.log("Success", data.Location);
+        }
+      });
+
+        // var params = { Bucket: bucketName, Key: keyName, Body: 'Hello World!' };
+        // s3.putObject(params, function (err, data) {
+        //     if (err)
+        //         console.log(err)
+        //     else
+        //         console.log("Successfully uploaded data to " + bucketName + "/" + keyName);
+        // });
+    
+
+
+}
 async function createOrassociateFacebookAccount({ deviceId,
     accessToken,
     expires,
@@ -62,24 +99,14 @@ async function createOrassociateFacebookAccount({ deviceId,
 
     }
     if (data.id == profileId && data.email == email) {
-        console.log('FOI' + data.id);
+        console.log('Ids e e-mail bateu, vou procurar se existe conta' + data.id);
 
         let user = await db.User.findOne({ email: email });
 
         //Uma conta só ativa por email.. 
         //Se o cara trocar o email da conta dele no face, 
         //na hora que eu autenticar uma conta, eu desautentico a outra. 
-        if (user == undefined) {
-            return {
-                ErrorMsg: 'Error 124',
-                ErrorCode: '124',
-            };
-
-        }
-
-
-
-        if (user) {
+        if (user != undefined) {
             console.log('Encontrada conta para ' + email + 'vamos associar a conta...');
             var cadastroFeito = false;
             //desativo todas as outras contas, e deixo só uma ativa. 
@@ -140,7 +167,8 @@ async function createOrassociateFacebookAccount({ deviceId,
                         pictureUrl: pictureUrl,
                         accessToken: accessToken,
                         expires: expires,
-                        authDate: Date.now()
+                        authDate: Date.now(),
+                        bucket_name: getBucketName(email),
                     };
                     // await sleep(2000);
                     console.log('Vai dar o push');
@@ -157,6 +185,7 @@ async function createOrassociateFacebookAccount({ deviceId,
             console.log('Salvou');
         } else {
             console.log('Nao tem conta de email para ' + email + 'vamos criar uma');
+            await createBucket(email);
             novoUsuario = new db.User();
             novoUsuario.email = email;
             novoUsuario.firstName = first_name;
@@ -170,7 +199,8 @@ async function createOrassociateFacebookAccount({ deviceId,
                 pictureUrl: pictureUrl,
                 accessToken: accessToken,
                 expires: expires,
-                authDate: Date.now()
+                authDate: Date.now(),
+                bucket_name: getBucketName(email),
             };
             novoUsuario.facebookAccounts.push(novoCadastroFb);
             novoUsuario.save();

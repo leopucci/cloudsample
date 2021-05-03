@@ -14,6 +14,8 @@
     "dependencies": {
         "@hapi/joi": "^17.1.1",
         "@types/mongoose": "^5.10.5",
+        "aws-sdk": "^2.897.0",
+        "backblaze-b2": "^1.6.0",
         "bcryptjs": "^2.4.3",
         "body-parser": "^1.19.0",
         "cookie-parser": "^1.4.5",
@@ -23,6 +25,7 @@
         "fb": "^2.0.0",
         "fb-graph-api": "^1.0.13",
         "jsonwebtoken": "^8.5.1",
+        "minio": "^7.0.18",
         "mongodb": "^3.5.7",
         "mongoose": "^5.12.6",
         "morgan": "^1.10.0",
