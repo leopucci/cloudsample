@@ -137,12 +137,12 @@ class _MyAppState extends State<MyApp> {
             // develop what they want the Google to do when the user clicks
           },
           logo: TypeLogo.google),
-      LoginFreshTypeLoginModel(
-          callFunction: (BuildContext _buildContext) {
-            print("APPLE");
-            // develop what they want the Apple to do when the user clicks
-          },
-          logo: TypeLogo.apple),
+      // LoginFreshTypeLoginModel(
+      //     callFunction: (BuildContext _buildContext) {
+      //       print("APPLE");
+      //       // develop what they want the Apple to do when the user clicks
+      //     },
+      //     logo: TypeLogo.apple),
       LoginFreshTypeLoginModel(
           callFunction: (BuildContext _buildContext) {
             Navigator.of(_buildContext).push(MaterialPageRoute(
