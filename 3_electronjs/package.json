@@ -1,7 +1,7 @@
 {
-  "name": "electron-lessons",
-  "version": "1.0.1",
-  "description": "A sample Electron (JS) project for Medium lessons.",
+  "name": "pocketCloud",
+  "version": "0.1",
+  "description": "Pocket Cloud client for the cloud",
   "main": "app/index.js",
   "scripts": {
     "start": "electron .",
@@ -17,11 +17,11 @@
   },
   "keywords": [],
   "author": {
-    "name": "Uday Hiwarale",
-    "email": "thatisuday@gmail.com",
-    "url": "https://thatisuday.com"
+    "name": "Pocket Cloud",
+    "email": "pocket@pocket.com",
+    "url": "https://site.com"
   },
-  "license": "MIT",
+  "license": "Private",
   "bugs": {
     "url": "https://github.com/course-one/electron-lessons/issues"
   },
@@ -29,10 +29,10 @@
   "devDependencies": {
     "electron": "^11.1.1",
     "electron-builder": "^22.11.1",
-    "electron-updater": "^4.3.5",
     "node-sass": "^5.0.0"
   },
   "dependencies": {
+	"electron-updater": "^4.3.5",
     "chokidar": "^3.4.3",
     "drag-drop": "^6.1.0",
     "fs-extra": "^9.0.1",
