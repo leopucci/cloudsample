@@ -1,7 +1,7 @@
 {
-    "appId": "com.thatisuday.fileio",
-    "productName": "Electron File IO",
-    "copyright": "THATISUDAY TECH PVT. LTD.",
+    "appId": "cloud.pocket.pocketcloud",
+    "productName": "Pocket Cloud",
+    "copyright": "Pocket Cloud Ltd.",
     "directories": {
         "app": ".",
         "output": "out",
@@ -45,8 +45,8 @@
     },
     "publish": {
         "provider": "github",
-        "owner": "course-one",
-        "repo": "electron-lessons",
+        "owner": "leopucci",
+        "repo": "pktreleases",
         "releaseType": "release"
     }
 }
