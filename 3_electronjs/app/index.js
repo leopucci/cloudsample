@@ -1,7 +1,7 @@
-const { app, BrowserWindow, ipcMain, dialog,Tray ,Menu} = require( 'electron' );
+const { app, BrowserWindow, ipcMain, systemPreferences, dialog,Tray ,Menu} = require( 'electron' );
 const path = require( 'path' );
 const { autoUpdater } = require( 'electron-updater' );
-
+const Positioner = require('electron-positioner');
 // local dependencies
 const io = require( './main/io' );
 
@@ -10,6 +10,17 @@ autoUpdater.checkForUpdatesAndNotify();
 let mainWindow;
 let tray = null;
 let isDialog = false;
+
+// Check if Windows or Mac
+const isWinOS = process.platform === 'win32';
+const isMacOS = process.platform === 'darwin';
+
+if (isMacOS) {
+  darkMode = systemPreferences.isDarkMode();
+} else if (isWinOS) {
+  darkMode = systemPreferences.isInvertedColorScheme();
+}
+
 // open a window
 const openWindow = () => {
     const win = new BrowserWindow( {
@@ -18,11 +29,19 @@ const openWindow = () => {
         webPreferences: {
             nodeIntegration: true,
         },
+		title: 'Now',
+		show: false,
+		fullscreenable: false,
+		maximizable: false,
+		minimizable: false,
 		transparent: true,
+		frame: false,
         resizable: false,
+		 movable: false,
 		//autoHideMenuBar: true,
         //center: true,
         thickFrame: true,
+		backgroundColor: darkMode ? '#1f1f1f' : '#ffffff',
     } );
 
     // load `index.html` file
@@ -48,6 +67,7 @@ const openWindow = () => {
 
 function createTray() {
     let appIcon = new Tray(path.join(__dirname, './resources/paper.png'));
+	
     const contextMenu = Menu.buildFromTemplate([
         {
             label: 'Show', click: function () {
@@ -65,6 +85,16 @@ function createTray() {
     appIcon.on('double-click', function (event) {
         mainWindow.show();
     });
+	appIcon.on('click', (e, bounds) => {
+      if ( mainWindow.isVisible() ) {
+        mainWindow.hide();
+      } else {
+        let positioner = new Positioner(mainWindow);
+        positioner.move('trayBottomCenter', bounds)
+
+        mainWindow.show();
+      }
+	  });
     appIcon.setToolTip('Tray Tutorial');
     appIcon.setContextMenu(contextMenu);
     return appIcon;

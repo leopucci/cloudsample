@@ -32,9 +32,10 @@
     "node-sass": "^5.0.0"
   },
   "dependencies": {
-	"electron-updater": "^4.3.5",
     "chokidar": "^3.4.3",
     "drag-drop": "^6.1.0",
+    "electron-positioner": "^4.1.0",
+    "electron-updater": "^4.3.5",
     "fs-extra": "^9.0.1",
     "open": "^7.3.0"
   }
