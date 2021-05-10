@@ -1,6 +1,6 @@
 {
   "name": "pocketCloud",
-  "version": "0.1",
+  "version": "1.0.0",
   "description": "Pocket Cloud client for the cloud",
   "main": "app/index.js",
   "scripts": {

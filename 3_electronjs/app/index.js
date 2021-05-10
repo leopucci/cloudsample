@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, dialog } = require( 'electron' );
+const { app, BrowserWindow, ipcMain, dialog,Tray ,Menu} = require( 'electron' );
 const path = require( 'path' );
 const { autoUpdater } = require( 'electron-updater' );
 
@@ -7,7 +7,9 @@ const io = require( './main/io' );
 
 // check for updates
 autoUpdater.checkForUpdatesAndNotify();
-
+let mainWindow;
+let tray = null;
+let isDialog = false;
 // open a window
 const openWindow = () => {
     const win = new BrowserWindow( {
@@ -16,22 +18,65 @@ const openWindow = () => {
         webPreferences: {
             nodeIntegration: true,
         },
+		transparent: true,
+        resizable: false,
+		//autoHideMenuBar: true,
+        //center: true,
+        thickFrame: true,
     } );
 
     // load `index.html` file
     win.loadFile( path.resolve( __dirname, 'render/html/index.html' ) );
 
     /*-----*/
-    
+	
+	tray = createTray();
+	
+    win.on('minimize', function (event) {
+        event.preventDefault();
+        win.hide();
+        
+    });
+
+    win.on('restore', function (event) {
+        win.show();
+        //tray.destroy();
+    });
+	
     return win; // return window
 };
 
+function createTray() {
+    let appIcon = new Tray(path.join(__dirname, './resources/paper.png'));
+    const contextMenu = Menu.buildFromTemplate([
+        {
+            label: 'Show', click: function () {
+                mainWindow.show();
+            }
+        },
+        {
+            label: 'Exit', click: function () {
+                app.isQuiting = true;
+                app.quit();
+            }
+        }
+    ]);
+
+    appIcon.on('double-click', function (event) {
+        mainWindow.show();
+    });
+    appIcon.setToolTip('Tray Tutorial');
+    appIcon.setContextMenu(contextMenu);
+    return appIcon;
+}
+
+
 // when app is ready, open a window
 app.on( 'ready', () => {
-    const win = openWindow();
+    mainWindow = openWindow();
 
     // watch files
-    io.watchFiles( win );
+    io.watchFiles( mainWindow );
 } );
 
 // when all windows are closed, quit the app
@@ -44,10 +89,27 @@ app.on( 'window-all-closed', () => {
 // when app activates, open a window
 app.on( 'activate', () => {
     if( BrowserWindow.getAllWindows().length === 0 ) {
-        openWindow();
+        mainWindow = openWindow();
     }
 } );
 
+app.on('browser-window-focus', () => {
+    if (mainWindow) {
+        console.log('browser-window-focus');
+
+       
+    }
+});
+
+app.on('browser-window-blur', () => {
+    console.log('browser-window-blur');
+    if (mainWindow) {
+		if (!isDialog){
+		mainWindow.hide();	
+		}
+        isDialog = false;
+    }
+});
 /************************/
 
 // return list of files
@@ -62,6 +124,7 @@ ipcMain.handle( 'app:on-file-add', ( event, files = [] ) => {
 
 // open filesystem dialog to choose files
 ipcMain.handle( 'app:on-fs-dialog-open', ( event ) => {
+	isDialog = true;
     const files = dialog.showOpenDialogSync( {
         properties: [ 'openFile', 'multiSelections' ],
     } );
