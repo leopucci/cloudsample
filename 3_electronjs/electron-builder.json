@@ -18,8 +18,9 @@
         "window": {
             "width": "400",
             "height": "300"
-        },
+		},
         "contents": [
+        
             {
                 "x": 100,
                 "y": 100
@@ -38,6 +39,11 @@
     },
     "win": {
         "target": "nsis"
+    },
+	"nsis": {
+      "oneClick" : false , 
+      "allowToChangeInstallationDirectory": true, 
+      "perMachine" : true 
     },
     "linux": {
         "target": "AppImage",
