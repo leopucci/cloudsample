@@ -37,6 +37,7 @@ dragDrop( '#uploader', ( files ) => {
 
 // open filesystem dialog
 window.openDialog = () => {
+	console.log('calling ipc to open dialog ');
     ipcRenderer.invoke( 'app:on-fs-dialog-open' ).then( () => {
         ipcRenderer.invoke( 'app:get-files' ).then( ( files = [] ) => {
             dom.displayFiles( files );

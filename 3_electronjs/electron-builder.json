@@ -1,7 +1,9 @@
 {
     "appId": "cloud.pocket.pocketcloud",
-    "productName": "Pocket Cloud",
+    "productName": "Pocket.Cloud",
     "copyright": "Pocket Cloud Ltd.",
+	"npmRebuild": true,
+	"buildDependenciesFromSource": true,
     "directories": {
         "app": ".",
         "output": "out",
@@ -41,8 +43,15 @@
         "target": "nsis"
     },
 	"nsis": {
-      "perMachine" : true 
+      "perMachine" : true,
+	  "deleteAppDataOnUninstall": true
     },
+	"protocols": [{
+      "name": "pocketcloud",
+      "schemes": [
+        "pocketcloud"
+      ]
+    }],
     "linux": {
         "target": "AppImage",
         "category": "Utility"
