@@ -38,6 +38,8 @@
     "electron-positioner": "^4.1.0",
     "electron-updater": "^4.3.8",
     "fs-extra": "^9.1.0",
-    "open": "^7.4.2"
+    "open": "^7.4.2",
+    "sqlite3": "^5.0.2",
+    "workerpool": "^6.1.4"
   }
 }
