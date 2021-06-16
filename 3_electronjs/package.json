@@ -32,14 +32,20 @@
     "node-sass": "^5.0.0"
   },
   "dependencies": {
+    "@felipebutcher/node-os-info": "^0.0.5",
     "better-sqlite3-sqleet": "^7.1.2",
     "chokidar": "^3.5.1",
     "drag-drop": "^6.1.0",
+    "electron-is-dev": "^2.0.0",
     "electron-positioner": "^4.1.0",
+    "electron-push-receiver": "^2.1.3",
     "electron-updater": "^4.3.8",
     "fs-extra": "^9.1.0",
+    "loadavg-windows": "^1.1.1",
+    "node-machine-id": "^1.1.12",
     "open": "^7.4.2",
-    "sqlite3": "^5.0.2",
+    "uuid": "^3.4.0",
+    "winston": "^3.3.3",
     "workerpool": "^6.1.4"
   }
 }

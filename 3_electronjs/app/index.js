@@ -1,33 +1,169 @@
 const { app, BrowserWindow, ipcMain, systemPreferences, dialog, Tray, Menu } = require('electron');
 const path = require('path');
+const os = require('os');
+const EventEmitter = require('events');
 const { autoUpdater } = require('electron-updater');
 const Positioner = require('electron-positioner');//electron-traywindow-positioner talvez seja melhor
-const { isMainThread, parentPort, Worker } = require('worker_threads');
+
+const uuidv4 = require('uuid');
 // local dependencies
 const io = require('./main/io');
 const chokidar = require('chokidar');
-const sqlite3 = require('sqlite3').verbose();
+const sqlite3 = require('better-sqlite3-sqleet');
 const workerpool = require('workerpool');
 // One-liner for current directory
 var fs = require('fs');
-var dbFile = './database.sqlite';
-var dbExists = fs.existsSync(dbFile);
 var currentTasks = [];
+var initialScanEnded = false;
+const winston = require('winston');
+// Check if Windows or Mac
+const isWinOS = process.platform === 'win32';
+const isMacOS = process.platform === 'darwin';
+const machineIdSync  = require('node-machine-id');
+//Todo: fazer crash report online https://www.thorsten-hans.com/electron-crashreporter-stay-up-to-date-if-your-app-fucked-up/
 
-//####################### MIGRACAO  #################################
-
-if (!dbExists) {
-    console.log('banco nao existe');
-    fs.openSync(dbFile, 'w');
+if (isWinOS) {
+    syncDir = app.getPath('home') + '\\PocketCloud\\';
+    dbDir = app.getPath("userData") + '\\app\\misc';
+    dbFile = dbDir + '\\misc.data'
+    dbExists = fs.existsSync(dbFile);
 } else {
-    console.log('banco existe');
+    syncDir = app.getPath('home') + '/PocketCloud/';
+    dbDir = app.getPath("userData") + '/app/misc';
+    dbFile = dbDir + '/misc.data'
+    dbExists = fs.existsSync(dbFile);
 }
 
-var db = new sqlite3.Database(dbFile);
+
+const chokidarLogger = winston.createLogger({
+    level: 'info',
+    format: winston.format.json(),
+    defaultMeta: { service: 'user-service' },
+    transports: [
+        //
+        // - Write all logs with level `error` and below to `error.log`
+        // - Write all logs with level `info` and below to `combined.log`
+        //
+        //new winston.transports.File({ filename: 'error.log', level: 'error' }),
+        //new winston.transports.File({ filename: 'combined.log' }),
+        new winston.transports.Http({ host: 'localhost', port: 8080, level: 'error' })
+    ],
+});
+
+const sqliteLogger = winston.createLogger({
+    level: 'info',
+    format: winston.format.json(),
+    defaultMeta: { service: 'user-service' },
+    transports: [
+        //
+        // - Write all logs with level `error` and below to `error.log`
+        // - Write all logs with level `info` and below to `combined.log`
+        //
+        //new winston.transports.File({ filename: 'error.log', level: 'error' }),
+        //new winston.transports.File({ filename: 'combined.log' }),
+        new winston.transports.Http({ host: 'localhost', port: 8080, level: 'error' })
+    ],
+});
+
+const workerPoolLogger = winston.createLogger({
+    level: 'info',
+    format: winston.format.json(),
+    defaultMeta: { service: 'user-service' },
+    transports: [
+        //
+        // - Write all logs with level `error` and below to `error.log`
+        // - Write all logs with level `info` and below to `combined.log`
+        //
+        //new winston.transports.File({ filename: 'error.log', level: 'error' }),
+        //new winston.transports.File({ filename: 'combined.log' }),
+        new winston.transports.Http({ host: 'localhost', port: 8080, level: 'error' })
+    ],
+});
+
+const isDev = require('electron-is-dev');
+
+let alignColorsAndTimeSqlite = winston.format.combine(
+    winston.format.colorize({
+        all: true
+    }),
+    winston.format.label({
+        label: '[SQLITE]'
+    }),
+    winston.format.timestamp({
+        format: "YY-MM-DD HH:MM:SS"
+    }),
+    winston.format.printf(
+        info => ` ${info.label}  ${info.timestamp}  ${info.level} : ${info.message}`
+    )
+);
+
+let alignColorsAndTimeWorkerPool = winston.format.combine(
+    winston.format.colorize({
+        all: true
+    }),
+    winston.format.label({
+        label: '[WORKERPOOL]'
+    }),
+    winston.format.timestamp({
+        format: "YY-MM-DD HH:MM:SS"
+    }),
+    winston.format.printf(
+        info => ` ${info.label}  ${info.timestamp}  ${info.level} : ${info.message}`
+    )
+);
+
+let alignColorsAndTimeChokidar = winston.format.combine(
+    winston.format.colorize({
+        all: true
+    }),
+    winston.format.label({
+        label: '[CHOKIDAR]'
+    }),
+    winston.format.timestamp({
+        format: "YY-MM-DD HH:MM:SS"
+    }),
+    winston.format.printf(
+        info => ` ${info.label}  ${info.timestamp}  ${info.level} : ${info.message}`
+    )
+);
+
+if (isDev) {
+    chokidarLogger.add(new winston.transports.Console({
+        format: winston.format.combine(winston.format.colorize(), alignColorsAndTimeChokidar),
+    }));
+    sqliteLogger.add(new winston.transports.Console({
+        format: winston.format.combine(winston.format.colorize(), alignColorsAndTimeSqlite),
+    }));
+    workerPoolLogger.add(new winston.transports.Console({
+        format: winston.format.combine(winston.format.colorize(), alignColorsAndTimeWorkerPool),
+    }));
+} else {
+    console.log('Running in production');
+}
 
 if (!dbExists) {
-    db.run('CREATE TABLE `files` ( `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, `fileName` TEXT, `path` TEXT, `status` TEXT, `hash` TEXT)');
-    db.close();
+    sqliteLogger.info('banco nao existe');
+    fs.mkdirSync(dbDir, { recursive: true })
+    //fs.openSync(dbFile, 'w');
+} else {
+    sqliteLogger.info('banco existe');
+}
+
+var db = new sqlite3(dbFile, { verbose: console.log }); // fileName,internalDir,Status,FullFileHash,Status
+
+if (!dbExists) {
+    //Esta funcao vai inicializar tudo. 
+    //Criar pasta tambem se nao existir
+    //Mandar uma mensagem pro servidor dizendo que é o primeiro download e baixar toda a listagem de arquivos que tem lá. 
+    //A partir dai baixar todos. 
+    db.exec('CREATE TABLE `instalation` ( `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,  `instalationId` TEXT, `machineId` TEXT )');
+    const stmt = db.prepare(`INSERT INTO instalation(instalationId,machineId) VALUES(?,?)`);
+    let machineId = machineIdSync.machineIdSync({ original: true })
+    info = stmt.run(uuidv4(),machineId);
+    db.exec('CREATE TABLE `files` ( `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,  `internalPath` TEXT, `fileName` TEXT, `internalDir` TEXT, `status` TEXT,`delayedHashTobeDone` INTEGER,`startupFileCount` INTEGER,`size` TEXT, `fullFileHash` TEXT)');
+    //numa primeira execução, a idéia é baixar tudo do servidor. 
+    //entao a pasta vai ser criada e movida caso exista arquivos... na hora da desinstalaçao. só pra garantir que nao havera cagada.
+    //entao pro SW eu sempre vou considerar a pasta vazia? pq ele vai criar e rodar. tenho que por o sw pra rodar ao instalar, dae nao tem furo. 
 }
 
 
@@ -35,12 +171,48 @@ const pool = workerpool.pool(__dirname + '/worker.js', { maxWorkers: 900000, wor
 
 
 
+//ATENCAO - Esta funcao esta sendo executada apos 30 segundos da inicialização do aplicativo. 
+//Vai ficar de butuca pra hashear todos os arquivos de novo, de forma lenta. 
+//Chokidar vai listar todos os arquivos na pasta, antes de começar a monitorar. 
+//Esta lista de arquivos vai ser salva em um array? acho que eu posso usar o banco.. 
+//verifico se ja esta cadastrado no banco e se o tamanho bate. 
+//se nao bater, espero 30 segundos e faço hash?
+//se bater, vai pro hash lento 
+//acho que o jeito eh hashear pedaços, igual eu fiz no python. 
+//faço hash só pra arquivo grande que eu faço hash parcial.. vou pensar isto agora, mas nao vou implementar tudo. 
+//
+
+//o ponto de atençao são os arquivos que mudaram o tamanho. 
+//se mudou o tamanho, dae eu vou fazer hash prioritario. 
+function delayedHashAoIniciar() {
+
+    //loopar no banco pegando arquivos que nao foram encontrados e testar o acesso no filesystem..
+    //nao achou no filesystem, marco deletedo no banco e gero evento. 
+
+
+    //eu tenho que esperar o chokidar ter iniciado por completo.. 
+    if (initialScanEnded) {
+        //ja terminou de escanear tudo.. 
+        //ja terminou de iniciar o sistema? //https://www.npmjs.com/package/loadavg-windows
+        //dae eu meto hash na veia.. 
+
+        //ver
+    } else {
+        //nao terminou de escanear os diretorios iniciais.. 
+        //vou gerar novo timer, e esperar mais tempo
+        setTimeout(delayedHashAoIniciar, 30000);
+    }
+    //funçao que faz hash prioritario, 
+    //loopa no banco pegando da tabela os arquivos que mudaram de tamanho. 
+}
+
 function isHashBeingDone(id) {
     return currentTasks.findIndex(task => task.pathId === id);
 }
-var syncDir = app.getPath('home') + '/PocketCloud/';
 
-console.log("Watching " + syncDir);
+
+
+chokidarLogger.info("Watching " + syncDir);
 const watcher = chokidar.watch(syncDir, {
     awaitWriteFinish: true
 
@@ -58,54 +230,187 @@ const watcher = chokidar.watch(syncDir, {
 
 
 watcher
-    .on('add', path => {
-        //console.log(`File ${path} has been addedAAA`);
-        // db.run(`INSERT INTO files(fileName,path,type,) VALUES(?)`, ['C'], function (err) {
-        //    if (err) {
-        //   return console.log(err.message);
-        //   }
-        //  });
+    .on('add', (path, stats) => {
+        chokidarLogger.info(`File ${path} has been added: ` + stats.size + 'bytes');
+        var fileIndex = '';
+        var fileName = '';
+        var filePureName = '';
+        var filePureType = '';
+        var internalPath = '';
+        var internalDir = '';
+        if (isWinOS) {
+            internalPath = path.substr(syncDir.length);
+            fileIndex = internalPath.lastIndexOf('\\') + 1;
+            internalDir = internalPath.substring(0, fileIndex - 1);
+            fileName = internalPath.substr(fileIndex);
+            filePureName = fileName.split('.')[0];
+            filePureType = fileName.split('.')[1];
+        } else {
+            internalPath = path.substr(syncDir.length);
+            fileIndex = path.lastIndexOf('/') + 1;
+            internalDir = internalPath.substring(0, fileIndex - 1);
+            fileName = path.substr(fileIndex);
+            filePureName = fileName.split('.')[0];
+            filePureType = fileName.split('.')[1];
+        }
 
 
-        startOrRestartHashingThread(syncDir, path);
+        //File C: \Users\Leo\PocketCloud\Nova pasta\Novo Documento de Texto - Copia.txt has been added 6bytes
+        chokidarLogger.info(`File ${path} has been added: ` + stats.size + 'bytes');
+        chokidarLogger.info('syncDir.length:  ' + syncDir.length); //syncDir.length  25
+        chokidarLogger.info('fileIndex: ' + fileIndex);  //fileIndex 11
+        chokidarLogger.info('internalPath: ' + internalPath); //internalPath Nova pasta\Novo Documento de Texto - Copia.txt
+        chokidarLogger.info('internalDir: ' + internalDir);//internalDir Nova pasta
+        chokidarLogger.info('fileName: ' + fileName);//fileName Novo Documento de Texto - Copia.txt
+        chokidarLogger.info('filePureName: ' + filePureName);//filePureName Novo Documento de Texto - Copia
+        chokidarLogger.info('filePureType: ' + filePureType);//filePureType txt
+        var status = 'Incluso';
+        //'Hasheado'
+        //'Uploading'
+        //'Sincronizado'
+        //eu estou inserindo, mas nao estou verificando. 
+        //path completo pode ser primary key.
+        //se ja existir, e for 
+        var resultadoConsulta = undefined;
+        try {
+            const stmt = db.prepare('SELECT id, internalPath, fileName,size FROM files WHERE internalPath  = ?');
+            resultadoConsulta = stmt.get(internalPath);
+        } catch (error) {
+            sqliteLogger.error('Erro: ' + error);
+        }
+        if (resultadoConsulta == undefined) {
+            console.log(`Nao consegui encontrar no banco um internalPath = ` + internalPath);
 
+        }
+
+        //Se ja tiver iniciado o monitoramento da pasta, entao age normalmente. 
+        if (initialScanEnded) {
+            chokidarLogger.info('Ja terminou o scan inicial. initialScanEnded = TRUE');
+            //se tiver resultado, faz update e faz hash
+            if (resultadoConsulta) {
+                var info;
+                try {
+                    const stmt = db.prepare(`UPDATE files SET size = ? WHERE id = ?`);
+                    info = stmt.run(stats.size, resultadoConsulta.id);
+                    sqliteLogger.info(`Row(s) updated: ${info.changes}`);
+                } catch (error) {
+                    sqliteLogger.error('Erro: ' + error);
+                    return;
+                }
+            } else {
+                var info;
+                try {
+                    info = db.prepare(`INSERT INTO files(internalPath,fileName,internalDir,status,size) VALUES(?,?,?,?,?)`)
+                        .run(internalPath, fileName, internalDir, status, stats.size);
+                } catch (error) {
+                    sqliteLogger.error('Erro: ' + error);
+                    return;
+                }
+                sqliteLogger.info(`Row(s) inserted: ${info.changes}`);
+
+            }
+            startOrRestartHashingThread(syncDir, path);
+        } else {//initialScanEnded == false
+            chokidarLogger.info('Startup do chokidar... initialScanEnded = FALSE');
+            //initialScanEnded == false quando inicia o sistema
+            //Todos os chamados que tiverem false, eu tenho que dar delay.. 
+            //vai dar delay por causa da inicialização do sistema. 
+            //entao eu coloco numa fila, e só vou hashear a fila depois de 30 segundos, quando o 
+            //sistema ja tiver iniciado.
+            if (resultadoConsulta == undefined) {
+                chokidarLogger.info('Nao existe a linha do arquivo no banco, adicionando e fazendo hash');
+                //Nao existe a linha, insere e faz hash na hora.
+                var info;
+                try {
+                    info = db.prepare(`INSERT INTO files(internalPath,fileName,internalDir,status,size,startupFileCount) VALUES(?,?,?,?,?,?)`)
+                        .run(internalPath, fileName, internalDir, status, stats.size, 1);
+                } catch (error) {
+                    sqliteLogger.error('Erro: ' + error);
+                    return;
+                }
+                sqliteLogger.info(`Row(s) inserted: ${info.changes}`);
+                startOrRestartHashingThread(syncDir, path);
+            } else {
+                //Existe a linha e o tamanho bate, vai fazer hash com delay. salva no banco a flag.
+                if (resultadoConsulta.size == stats.size) {
+                    chokidarLogger.info('Existe a linha e o tamanho bate, vai fazer hash com delay. salva no banco a flag.');
+                    var info;
+                    try {
+                        const stmt = db.prepare(`UPDATE files SET delayedHashTobeDone = 1, startupFileCount = 1 WHERE id = ?`);
+                        info = stmt.run(resultadoConsulta.id);
+                    } catch (error) {
+                        sqliteLogger.error('Erro: ' + error);
+                        return;
+                    }
+                    sqliteLogger.info(`Row(s) updated: ${info.changes}`);
+
+                } else {
+                    //Existe a linha e o tamanho nao bate, vai fazer update e hash na hora.
+                    chokidarLogger.info('Existe a linha e o tamanho nao bate, vai fazer hash na hora.');
+                    var info;
+                    try {
+                        const stmt = db.prepare(`UPDATE files SET size = ?, startupFileCount = 1 WHERE id = ?`);
+                        info = stmt.run(stats.size, resultadoConsulta.id);
+                    } catch (error) {
+                        sqliteLogger.error('Erro: ' + error);
+                        return;
+                    }
+                    sqliteLogger.info(`Row(s) updated: ${info.changes}`);
+                    startOrRestartHashingThread(syncDir, path);
+                }
+            }
+        }
     });
 
-watcher.on('change', path => {
+watcher.on('change', (path, stats) => {
     startOrRestartHashingThread(syncDir, path);
 
-    console.log(`File ${path} has been changed`)
+    chokidarLogger.info(`File ${path} has been changed ` + stats.size + 'bytes')
 });
 watcher.on('unlink', path => {
-    console.log(`File ${path} has been removed`)
+    chokidarLogger.info(`File ${path} has been removed `)
 });
 
 // More possible events.
-watcher.on('addDir', path => {
-    console.log(`Directory ${path} has been added`)
+watcher.on('addDir', (path, stats) => {
+    chokidarLogger.info(`Directory ${path} has been added ` + stats.size + 'bytes')
 });
 watcher.on('unlinkDir', path => {
-    console.log(`Directory ${path} has been removed2`)
+    chokidarLogger.info(`Directory ${path} has been removed2`)
 });
 watcher.on('error', error => {
-    console.log(`Watcher error: ${error}`)
+    chokidarLogger.info(`Watcher error: ${error}`)
 });
 watcher.on('ready', () => {
     //Aqui eu tenho que re-escanear o diretorio todo, e bater com o banco.
-    console.log('Initial scan complete. Ready for changes')
+    chokidarLogger.info('Initial scan complete. Ready for changes');
+    initialScanEnded = true;
+    //Funcao que vai hashear com delay, os arquivos da pasta. 
+    setTimeout(delayedHashAoIniciar, 3000);
 });
 //watcher.on('raw', (event, path, details) => { // internal
-//  console.log('Raw event info:', event, path, details);
+//  chokidarLogger.info('Raw event info:', event, path, details);
 //});
 
+function executaTaskNaThread(path, pathId, syncDir, prioridadeStartup) {
+    const task = {
+        prioridadeStartup: prioridadeStartup,
+        fullPath: path,
+        pathId: pathId,
+        promise: pool.exec('fileHasherThread', [
+            { fullPath: path, pathId: pathId, syncDir: syncDir }
+        ])
+    };
+    currentTasks.push(task);
+}
 function startOrRestartHashingThread(syncDir, path) {
 
-    pathId = path.split(syncDir);
+    pathId = path.split(syncDir)[1];
     if (isHashBeingDone(pathId) != -1) {
         cancelTaskInProcess(pathId);
     }
 
-    console.log(
+    workerPoolLogger.info(
         `HASH SERVICE: CREATING NEW Hasher for ${path} `
     );
 
@@ -115,14 +420,9 @@ function startOrRestartHashingThread(syncDir, path) {
     // in currentTasksHandler()
 
     // create a new task for the queue containing the id and the promise
-    const task = {
-        fullPath: path,
-        pathId: pathId,
-        promise: pool.exec('fileHasherThread', [
-            { fullPath: path, pathId: pathId, syncDir: syncDir }
-        ])
-    };
-    currentTasks.push(task);
+
+    executaTaskNaThread(path, pathId, syncDir, false);
+
 
     // Run the promise handler
     currentTasksHandler(pathId);
@@ -130,17 +430,17 @@ function startOrRestartHashingThread(syncDir, path) {
 }
 function cancelTaskInProcess(path) {
     let index = isHashBeingDone(path);
-    console.log(
+    workerPoolLogger.info(
         `HASH SERVICE: Hasher for ${path} already running`
     );
     currentTasks[index].promise.cancel(); // cancel promise
     currentTasks.splice(index, 1); // remove from array
-    console.log('Hash SERVICE: Cancelled hasher for this ID');
-    //console.log(currentTasks);
+    workerPoolLogger.info('Hash SERVICE: Cancelled hasher for this ID');
+    //workerPoolLogger.info(currentTasks);
 }
 var contador = 0;
 function currentTasksHandler(id) {
-    //console.log(currentTasks);
+    //workerPoolLogger.info(currentTasks);
     //  const TIMEOUT = 30000;
     currentTasks[currentTasks.length - 1].promise
         // .timeout(TIMEOUT)
@@ -151,27 +451,27 @@ function currentTasksHandler(id) {
                 case 'COMPLETED_OK':
                     contador = contador + 1;
 
-                    console.log("PROMISE FINALIZADA: tipo: " + result.tipo + " Path: " + result.path + " Tempo: " + result.timeSpent + " segundos Hash: " + result.hash);
+                    workerPoolLogger.info("PROMISE FINALIZADA: tipo: " + result.tipo + " Path: " + result.path + " Tempo: " + result.timeSpent + " segundos Hash: " + result.hash);
                     break;
                 case 'ERROR_EBUSY':
-                    console.log("PROMISE FINALIZADA: tipo: " + result.tipo + " Tempo: " + result.timeSpent + " segundos Path: " + result.path);
+                    workerPoolLogger.info("PROMISE FINALIZADA: tipo: " + result.tipo + " Tempo: " + result.timeSpent + " segundos Path: " + result.path);
                     break;
                 case 'ERROR_UNKNOWN':
-                    console.log("PROMISE FINALIZADA: tipo: " + result.tipo + " Tempo: " + result.timeSpent + " segundos Name: " + result.name + " Message: " + result.message);
+                    workerPoolLogger.info("PROMISE FINALIZADA: tipo: " + result.tipo + " Tempo: " + result.timeSpent + " segundos Name: " + result.name + " Message: " + result.message);
                     break;
 
                 default:
-                    console.log(`Erro mensagem nao reconhecida`);
+                    workerPoolLogger.info(`Erro mensagem nao reconhecida`);
             }
 
-            console.log(pool.stats());
+            workerPoolLogger.info(pool.stats());
 
             // remove finished task from runningTasks queue array
             const index = currentTasks.findIndex(
                 task => (task.pathId = id)
             );
             currentTasks.splice(index, 1);
-            console.log(
+            workerPoolLogger.info(
                 `HASH SERVICE WORKERPOOL: Hashing finished for ${id}`
             );
 
@@ -180,43 +480,24 @@ function currentTasksHandler(id) {
 
         })
         .catch(err => {
-            console.error('HASH SERVICE WORKERPOOL ERROR:', err);
-            console.log(pool.stats());
+            workerPoolLogger.error('HASH SERVICE WORKERPOOL ERROR:', err);
+            workerPoolLogger.info(pool.stats());
         })
         // WorkerPool seems to terminate its process by itself when all jobs have finished,
         // pool becomes null, so after all training jobs have completed, we have to instantiate pool again
         .then(function () {
-            console.log('HASH SERVICE WORKERPOOL: All workers finished.');
-            console.log('Contador = ' + contador);
+            workerPoolLogger.info('HASH SERVICE WORKERPOOL: All workers finished.');
+            workerPoolLogger.info('Contador = ' + contador);
             if (pool == null) {
                 pool.terminate();
-                pool = workerpool.pool(__dirname + '/worker.js', { maxWorkers: 9, workerType: 'thread', maxQueueSize: 2000 });
+                pool = workerpool.pool(__dirname + '/worker.js', { maxWorkers: 9, workerType: 'thread', maxQueueSize: 200000 });
             }
 
         });
 }
 
-console.log(app.getPath('home'));
-//esta funcao aqui eh meio o que o chokidar ja faz e nao faz direito.. entao nao adianta.. 
-function checkFileCopyComplete(path, prev) {
-    fs.stat(path, function (err, stat) {
 
-        if (err) {
-            throw err;
-        }
-        if (stat.mtime.getTime() === prev.mtime.getTime()) {
-            logger.info(component + 'File copy complete => beginning processing');
-            //------------------------------------- 
-            // CALL A FUNCTION TO PROCESS FILE HERE
-            //-------------------------------------
-        }
-        else {
-            setTimeout(checkFileCopyComplete, fileCopyDelaySeconds * 1000, path, stat);
-        }
-    });
-}
 
-//####################MIGRACAO END ############################
 
 
 // check for updates
@@ -226,9 +507,6 @@ let tray = null;
 let isDialog = false;
 let deeplinkingUrl;
 let gbounds;
-// Check if Windows or Mac
-const isWinOS = process.platform === 'win32';
-const isMacOS = process.platform === 'darwin';
 
 if (isMacOS) {
     darkMode = systemPreferences.isDarkMode();
@@ -369,6 +647,40 @@ app.on('open-url', function (event, url) {
     // logEverywhere("open-url# " + deeplinkingUrl)
 });
 
+const osInfo = require("@felipebutcher/node-os-info");
+
+setInterval(() => {
+    var idleSeconds;
+    var uptime = os.uptime();
+    //se o uptime for menor que 50 segundos, 
+    //dae eu vou esperar... senao não... 
+
+    //vou largar assim.. chokidar watch chama... 
+    //depois do sync, ele vai setar o ready...
+    //dae ele vai chamar depois de 3 segundos..
+    //aí ele vai remover os arquivos deletados (preciso criar este teste)
+    //depois ele vai hashear os arquivos delayed. 
+    if (uptime < 50) {
+
+    } else {
+        //
+    }
+    if (idleSeconds >= 20) {
+
+    } else {
+        osInfo.cpu(cpu => {
+            var load = Math.round(cpu * 100);
+
+            if (load < 20) {
+                idleSeconds += 1;
+            }
+
+        });
+
+    }
+    console.log("Uptime: " + uptime);
+
+}, 3000);
 
 // when app is ready, open a window
 app.on('ready', () => {
@@ -376,15 +688,25 @@ app.on('ready', () => {
 
     // watch files
     io.watchFiles(mainWindow);
+
+
 });
 
 // when all windows are closed, quit the app
 app.on('window-all-closed', () => {
     // On OS X it is common for applications and their menu bar
     // to stay active until the user quits explicitly with Cmd + Q
+    db.close();
     if (process.platform !== 'darwin') {
         app.quit();
     }
+});
+
+process.on("SIGINT", function () {
+    console.log('Sigint')
+    db.close();
+    process.exit(0)
+
 });
 
 // when app activates, open a window
@@ -467,26 +789,4 @@ ipcMain.on('app:on-file-copy', (event, file) => {
     });
 });
 
-let worker;
-if (isMainThread) {
-    worker = new Worker(__dirname + '/workerthread.js');
-
-    worker.on('message', (data) => {
-        // 'data' contains the parsed JSON sent by worker thread
-        // Do something with data
-    });
-
-    worker.on('error', (error) => {
-        // Logging error caused by worker thread
-        console.log(error.message);
-    });
-
-    worker.on('exit', (code) => {
-        if (code !== 0) {
-            console.error(`worker exited with code ${code}`);
-            //spawn(); //https://github.com/JoshuaWise/better-sqlite3/blob/master/docs/threads.md
-        } else
-            logger.info('Worker stopped ' + code);
-    });
-}
 

@@ -38,7 +38,7 @@ async function fileHasherThread(input) {
 
 
 
-    console.log('WORKERPOOL THREAD: Model ID to train on:', file);
+    console.log('WORKERPOOL THREAD: Executando Hash para: ' +  file);
 
 
 

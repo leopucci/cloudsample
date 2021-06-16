@@ -50,7 +50,9 @@ DeleteRegValue HKLM "Software\Microsoft\Windows\CurrentVersion\Run" "PocketCloud
 ${GETUSERSID} $USERSID $0
 DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\SyncRootManager\PocketCloud!$USERSID!Personal!"
 
-RMDir /R /REBOOTOK $PROFILE\PocketCloud
+!define /date MyTIMESTAMP "%Y-%m-%d-%H-%M-%S"
+;RMDir /R /REBOOTOK $PROFILE\PocketCloud
+Rename "$PROFILE\PocketCloud" "$PROFILE\PocketCloud_${MyTIMESTAMP}_backup"
 !macroend
 
 ;System::Call "advapi32::GetUserName(t .r0, *i ${NSIS_MAX_STRLEN} r1) i.r2"
