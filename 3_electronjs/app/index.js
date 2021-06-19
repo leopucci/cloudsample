@@ -4,23 +4,43 @@ const os = require('os');
 const EventEmitter = require('events');
 const { autoUpdater } = require('electron-updater');
 const Positioner = require('electron-positioner');//electron-traywindow-positioner talvez seja melhor
-
+const { fork, spawn } = require('child_process');
 const uuidv4 = require('uuid');
 // local dependencies
 const io = require('./main/io');
 const chokidar = require('chokidar');
 const sqlite3 = require('better-sqlite3-sqleet');
 const workerpool = require('workerpool');
+var mqtt = require('mqtt')
 // One-liner for current directory
 var fs = require('fs');
-var currentTasks = [];
+var currentTasksForHash = [];
+var currentTasksForDelete = [];
 var initialScanEnded = false;
 const winston = require('winston');
 // Check if Windows or Mac
 const isWinOS = process.platform === 'win32';
 const isMacOS = process.platform === 'darwin';
-const machineIdSync  = require('node-machine-id');
+const isDev = require('electron-is-dev');
+const machineIdSync = require('node-machine-id');
 //Todo: fazer crash report online https://www.thorsten-hans.com/electron-crashreporter-stay-up-to-date-if-your-app-fucked-up/
+
+
+const p = fork(path.join(__dirname, 'child.js'), ['hello'], {
+    stdio: ['pipe', 'pipe', 'pipe', 'ipc'],
+});
+p.stdout.on('data', (d) => {
+    console.log('data', '[stdout-main-fork] ' + d.toString());
+});
+p.stderr.on('data', (d) => {
+    console.log('data', '[stderr-main-fork] ' + d.toString());
+});
+p.send('hello');
+p.on('message', (m) => {
+    console.log('data', '[ipc-main-fork] ' + m);
+});
+
+
 
 if (isWinOS) {
     syncDir = app.getPath('home') + '\\PocketCloud\\';
@@ -80,7 +100,7 @@ const workerPoolLogger = winston.createLogger({
     ],
 });
 
-const isDev = require('electron-is-dev');
+
 
 let alignColorsAndTimeSqlite = winston.format.combine(
     winston.format.colorize({
@@ -144,7 +164,6 @@ if (isDev) {
 if (!dbExists) {
     sqliteLogger.info('banco nao existe');
     fs.mkdirSync(dbDir, { recursive: true })
-    //fs.openSync(dbFile, 'w');
 } else {
     sqliteLogger.info('banco existe');
 }
@@ -159,7 +178,7 @@ if (!dbExists) {
     db.exec('CREATE TABLE `instalation` ( `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,  `instalationId` TEXT, `machineId` TEXT )');
     const stmt = db.prepare(`INSERT INTO instalation(instalationId,machineId) VALUES(?,?)`);
     let machineId = machineIdSync.machineIdSync({ original: true })
-    info = stmt.run(uuidv4(),machineId);
+    info = stmt.run(uuidv4(), machineId);
     db.exec('CREATE TABLE `files` ( `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,  `internalPath` TEXT, `fileName` TEXT, `internalDir` TEXT, `status` TEXT,`delayedHashTobeDone` INTEGER,`startupFileCount` INTEGER,`size` TEXT, `fullFileHash` TEXT)');
     //numa primeira execução, a idéia é baixar tudo do servidor. 
     //entao a pasta vai ser criada e movida caso exista arquivos... na hora da desinstalaçao. só pra garantir que nao havera cagada.
@@ -167,9 +186,56 @@ if (!dbExists) {
 }
 
 
-const pool = workerpool.pool(__dirname + '/worker.js', { maxWorkers: 900000, workerType: 'thread', maxQueueSize: 200000 });
+const HasherPool = workerpool.pool(__dirname + '/worker.js', { maxWorkers: 900000, workerType: 'thread', maxQueueSize: 200000 });
+
+const StartupDeletionPool = workerpool.pool(__dirname + '/worker.js', { maxWorkers: 900000, workerType: 'thread', maxQueueSize: 200000 });
 
 
+//MQTT
+var resultadoConsulta = undefined;
+try {
+    const stmt = db.prepare('SELECT instalationId, machineId FROM instalation WHERE id  = 1');
+    resultadoConsulta = stmt.get();
+} catch (error) {
+    sqliteLogger.error('Erro: ' + error);
+}
+var client = mqtt.connect('mqtt://10.8.0.1', { username: 'usuariodeteste', password: 'leozin10', clientId: resultadoConsulta.instalationId + resultadoConsulta.machineId })
+
+client.on('connect', function () {
+    console.log("mqtt connect")
+    client.subscribe('canaldeteste', function (err) {
+        if (!err) {
+            //client.publish('presence', 'Hello mqtt')
+            console.log("mqtt subscribe")
+        } else {
+            console.log(err)
+        }
+    })
+})
+
+client.on('close', function () {
+    console.log("mqtt disconected")
+})
+
+client.on('offline', function () {
+    console.log("mqtt offline")
+})
+
+client.on('reconnect', function () {
+    console.log("mqtt reconnecting started")
+})
+
+client.on('error', function (error) {
+    console.log("mqtt error: " + error)
+
+})
+
+
+client.on('message', function (topic, message) {
+    // message is Buffer
+    console.log('MQTT MESSAGE ' + message.toString())
+    client.end()
+})
 
 //ATENCAO - Esta funcao esta sendo executada apos 30 segundos da inicialização do aplicativo. 
 //Vai ficar de butuca pra hashear todos os arquivos de novo, de forma lenta. 
@@ -187,29 +253,36 @@ const pool = workerpool.pool(__dirname + '/worker.js', { maxWorkers: 900000, wor
 function delayedHashAoIniciar() {
 
     //loopar no banco pegando arquivos que nao foram encontrados e testar o acesso no filesystem..
-    //nao achou no filesystem, marco deletedo no banco e gero evento. 
-
-
-    //eu tenho que esperar o chokidar ter iniciado por completo.. 
-    if (initialScanEnded) {
-        //ja terminou de escanear tudo.. 
-        //ja terminou de iniciar o sistema? //https://www.npmjs.com/package/loadavg-windows
-        //dae eu meto hash na veia.. 
-
-        //ver
-    } else {
-        //nao terminou de escanear os diretorios iniciais.. 
-        //vou gerar novo timer, e esperar mais tempo
-        setTimeout(delayedHashAoIniciar, 30000);
+    //nao achou no filesystem, marco deletado no banco e gero evento. 
+    var resultadoConsulta = undefined;
+    try {
+        const stmt = db.prepare('SELECT id, internalPath, fileName,size FROM files WHERE startupFileCount = ?');
+        for (const arquivo of stmt.iterate()) {
+            if (fs.existsSync(path)) {
+                //file exists
+            }
+        }
+    } catch (error) {
+        sqliteLogger.error('Erro: ' + error);
     }
+    if (resultadoConsulta == undefined) {
+        console.log(`Nao consegui encontrar no banco um internalPath = ` + internalPath);
+
+    }
+
+
+
     //funçao que faz hash prioritario, 
     //loopa no banco pegando da tabela os arquivos que mudaram de tamanho. 
 }
 
 function isHashBeingDone(id) {
-    return currentTasks.findIndex(task => task.pathId === id);
+    return currentTasksForHash.findIndex(task => task.pathId === id);
 }
 
+function isDeleteBeingDone(id) {
+    return currentTasksForDelete.findIndex(task => task.pathId === id);
+}
 
 
 chokidarLogger.info("Watching " + syncDir);
@@ -386,28 +459,39 @@ watcher.on('ready', () => {
     chokidarLogger.info('Initial scan complete. Ready for changes');
     initialScanEnded = true;
     //Funcao que vai hashear com delay, os arquivos da pasta. 
-    setTimeout(delayedHashAoIniciar, 3000);
+    setTimeout(delayedHashAoIniciar, 5000);
 });
 //watcher.on('raw', (event, path, details) => { // internal
 //  chokidarLogger.info('Raw event info:', event, path, details);
 //});
 
-function executaTaskNaThread(path, pathId, syncDir, prioridadeStartup) {
+function executaHashTaskNaThread(path, pathId, syncDir) {
     const task = {
-        prioridadeStartup: prioridadeStartup,
         fullPath: path,
         pathId: pathId,
-        promise: pool.exec('fileHasherThread', [
+        promise: HasherPool.exec('fileHasherThread', [
             { fullPath: path, pathId: pathId, syncDir: syncDir }
         ])
     };
-    currentTasks.push(task);
+    currentTasksForHash.push(task);
+}
+
+function executaDeleteTaskNaThread(path, syncDir) {
+    const task = {
+        pathId: pathId,
+        promise: StartupDeletionPool.exec('fileDeletionThread', [
+            { db: db, pathId: pathId, syncDir: syncDir }
+        ])
+    };
+    currentTasksForDelete.push(task);
+
+    currentTasksHandlerOfDeletetaks(pathId);
 }
 function startOrRestartHashingThread(syncDir, path) {
 
     pathId = path.split(syncDir)[1];
     if (isHashBeingDone(pathId) != -1) {
-        cancelTaskInProcess(pathId);
+        cancelHashTaskInProcess(pathId);
     }
 
     workerPoolLogger.info(
@@ -421,28 +505,76 @@ function startOrRestartHashingThread(syncDir, path) {
 
     // create a new task for the queue containing the id and the promise
 
-    executaTaskNaThread(path, pathId, syncDir, false);
+    executaHashTaskNaThread(path, pathId, syncDir);
 
 
     // Run the promise handler
     currentTasksHandler(pathId);
 
 }
-function cancelTaskInProcess(path) {
+
+function startOrRestartDeleteThread(syncDir, path) {
+
+    pathId = path.split(syncDir)[1];
+    if (isDeleteBeingDone(pathId) != -1) {
+        cancelDeleteTaskInProcess(pathId);
+    }
+
+    workerPoolLogger.info(
+        `DELETE SERVICE: CREATING NEW Hasher for ${path} `
+    );
+
+    //process.exit(1);
+    // Initialise a training thread
+    // pool.exec returns a promise we will resolve later
+    // in currentTasksHandler()
+
+    // create a new task for the queue containing the id and the promise
+    pathId = 'StartupDelete';
+    executaDeleteTaskNaThread(path, pathId, syncDir);
+
+
+    // Run the promise handler
+    currentTasksHandlerOfDeletetaks(pathId);
+
+}
+
+function cancelHashTaskInProcess(path) {
     let index = isHashBeingDone(path);
     workerPoolLogger.info(
         `HASH SERVICE: Hasher for ${path} already running`
     );
-    currentTasks[index].promise.cancel(); // cancel promise
-    currentTasks.splice(index, 1); // remove from array
+    currentTasksForHash[index].promise.cancel(); // cancel promise
+    currentTasksForHash.splice(index, 1); // remove from array
     workerPoolLogger.info('Hash SERVICE: Cancelled hasher for this ID');
     //workerPoolLogger.info(currentTasks);
 }
+
+function cancelDeleteTaskInProcess(path) {
+    let index = isHashBeingDone(path);
+    workerPoolLogger.info(
+        `DELETE SERVICE: Delete for ${path} already running`
+    );
+    currentTasksForDelete[index].promise.cancel(); // cancel promise
+    currentTasksForDelete.splice(index, 1); // remove from array
+    workerPoolLogger.info('DELETE SERVICE: Cancelled startup for this ID');
+    //workerPoolLogger.info(currentTasks);
+}
+
 var contador = 0;
 function currentTasksHandler(id) {
     //workerPoolLogger.info(currentTasks);
     //  const TIMEOUT = 30000;
-    currentTasks[currentTasks.length - 1].promise
+    //Isto aqui eh uma proteçao, para que o id seja correto. 
+    var position = null;
+    if (currentTasksForHash[currentTasksForHash.length - 1].pathId == id) {
+        position = currentTasksForHash.length - 1;
+    } else {
+        position = currentTasksForHash.reverse().findIndex(
+            task => (task.pathId = id)
+        );
+    }
+    currentTasksForHash[position].promise
         // .timeout(TIMEOUT)
         // when the promise is resolved patch the tokens with 'training': 'uptodate',
         // patch the Model with a new updated date, and then write out the training file
@@ -450,7 +582,6 @@ function currentTasksHandler(id) {
             switch (result.tipo) {
                 case 'COMPLETED_OK':
                     contador = contador + 1;
-
                     workerPoolLogger.info("PROMISE FINALIZADA: tipo: " + result.tipo + " Path: " + result.path + " Tempo: " + result.timeSpent + " segundos Hash: " + result.hash);
                     break;
                 case 'ERROR_EBUSY':
@@ -464,13 +595,13 @@ function currentTasksHandler(id) {
                     workerPoolLogger.info(`Erro mensagem nao reconhecida`);
             }
 
-            workerPoolLogger.info(pool.stats());
+            workerPoolLogger.info(HasherPool.stats());
 
             // remove finished task from runningTasks queue array
-            const index = currentTasks.findIndex(
+            const index = currentTasksForHash.findIndex(
                 task => (task.pathId = id)
             );
-            currentTasks.splice(index, 1);
+            currentTasksForHash.splice(index, 1);
             workerPoolLogger.info(
                 `HASH SERVICE WORKERPOOL: Hashing finished for ${id}`
             );
@@ -481,21 +612,85 @@ function currentTasksHandler(id) {
         })
         .catch(err => {
             workerPoolLogger.error('HASH SERVICE WORKERPOOL ERROR:', err);
-            workerPoolLogger.info(pool.stats());
+            workerPoolLogger.info(HasherPool.stats());
         })
         // WorkerPool seems to terminate its process by itself when all jobs have finished,
         // pool becomes null, so after all training jobs have completed, we have to instantiate pool again
         .then(function () {
             workerPoolLogger.info('HASH SERVICE WORKERPOOL: All workers finished.');
             workerPoolLogger.info('Contador = ' + contador);
-            if (pool == null) {
-                pool.terminate();
-                pool = workerpool.pool(__dirname + '/worker.js', { maxWorkers: 9, workerType: 'thread', maxQueueSize: 200000 });
+            if (HasherPool == null) {
+                HasherPool.terminate();
+                HasherPool = workerpool.pool(__dirname + '/worker.js', { maxWorkers: 9, workerType: 'thread', maxQueueSize: 200000 });
             }
 
         });
 }
 
+function currentTasksHandlerOfDeletetaks(id) {
+    //workerPoolLogger.info(currentTasks);
+    //  const TIMEOUT = 30000;
+    //Isto aqui eh uma proteçao, para que o id seja correto. 
+    var position = null;
+    if (currentTasksForDelete[currentTasksForDelete.length - 1].pathId == id) {
+        position = currentTasksForDelete.length - 1;
+    } else {
+        position = currentTasksForDelete.reverse().findIndex(
+            task => (task.pathId = id)
+        );
+    }
+    currentTasksForDelete[position].promise
+        // .timeout(TIMEOUT)
+        // when the promise is resolved patch the tokens with 'training': 'uptodate',
+        // patch the Model with a new updated date, and then write out the training file
+        .then(result => {
+            switch (result.tipo) {
+                case 'COMPLETED_OK':
+                    contador = contador + 1;
+                    workerPoolLogger.info("PROMISE FINALIZADA: tipo: " + result.tipo + " Path: " + result.path + " Tempo: " + result.timeSpent + " segundos Hash: " + result.hash);
+                    break;
+                case 'ERROR_EBUSY':
+                    workerPoolLogger.info("PROMISE FINALIZADA: tipo: " + result.tipo + " Tempo: " + result.timeSpent + " segundos Path: " + result.path);
+                    break;
+                case 'ERROR_UNKNOWN':
+                    workerPoolLogger.info("PROMISE FINALIZADA: tipo: " + result.tipo + " Tempo: " + result.timeSpent + " segundos Name: " + result.name + " Message: " + result.message);
+                    break;
+
+                default:
+                    workerPoolLogger.info(`Erro mensagem nao reconhecida`);
+            }
+
+            workerPoolLogger.info(StartupDeletionPool.stats());
+
+            // remove finished task from runningTasks queue array
+            const index = currentTasksForDelete.findIndex(
+                task => (task.pathId = id)
+            );
+            currentTasksForDelete.splice(index, 1);
+            workerPoolLogger.info(
+                `STARTUP DELETE SERVICE WORKERPOOL: Startup finished for ${id}`
+            );
+
+            // Logic on successful resolve here
+            // result is a json file which is saved to disk
+
+        })
+        .catch(err => {
+            workerPoolLogger.error('STARTUP DELETE SERVICE WORKERPOOL ERROR:', err);
+            workerPoolLogger.info(StartupDeletionPool.stats());
+        })
+        // WorkerPool seems to terminate its process by itself when all jobs have finished,
+        // pool becomes null, so after all training jobs have completed, we have to instantiate pool again
+        .then(function () {
+            workerPoolLogger.info('STARTUP DELETE SERVICE WORKERPOOL: All workers finished.');
+            workerPoolLogger.info('Contador = ' + contador);
+            if (StartupDeletionPool == null) {
+                StartupDeletionPool.terminate();
+                StartupDeletionPool = workerpool.pool(__dirname + '/worker.js', { maxWorkers: 9, workerType: 'thread', maxQueueSize: 200000 });
+            }
+
+        });
+}
 
 
 
@@ -678,7 +873,7 @@ setInterval(() => {
         });
 
     }
-    console.log("Uptime: " + uptime);
+    //console.log("Uptime: " + uptime);
 
 }, 3000);
 

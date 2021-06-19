@@ -2,9 +2,14 @@
 const workerpool = require('workerpool');
 const crypto = require("crypto");
 const fs = require('fs');
+//const sqlite3 = require('better-sqlite3-sqleet');
+//var db = new sqlite3(dbFile, { verbose: console.log }); 
 var startTime, endTime;
-async function fileHasherThread(input) {
-    file = input.pathId;
+
+
+
+async function fileDeletionThread(input) {
+    file = input.db;
     fullPath = input.fullPath
     syncDir = input.syncDir;
 
@@ -38,11 +43,11 @@ async function fileHasherThread(input) {
 
 
 
-    console.log('WORKERPOOL THREAD: Executando Hash para: ' +  file);
+    console.log('DELETE THREAD: Executando Hash para: ' +  file);
 
 
 
-    var result = await createHashFromFile(file);
+   // var result = await createHashFromFile(file);
 
     return Promise.resolve(result);
 }
@@ -50,5 +55,6 @@ async function fileHasherThread(input) {
 
 // create the worker and register its functions
 workerpool.worker({
-    fileHasherThread: fileHasherThread
+    fileHasherThread: fileHasherThread,
+    fileDeletionThread: fileDeletionThread
 });
