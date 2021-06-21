@@ -794,10 +794,7 @@ const openWindow = () => {
 };
 
 function createTray() {
-    const image = nativeImage.createFromPath(
-        path.join(__dirname, './resources/paper.png')
-    );
-    let appIcon  = new Tray(image.resize({ width: 16, height: 16 }));
+    let appIcon = new Tray(path.join(__dirname, './resources/icon.png'));
 
     const contextMenu = Menu.buildFromTemplate([
         {
@@ -827,7 +824,7 @@ function createTray() {
             mainWindow.show();
         }
     });
-    appIcon.setToolTip('Tray Tutorial');
+    appIcon.setToolTip('Pocket.Cloud');
     appIcon.setContextMenu(contextMenu);
     return appIcon;
 }
