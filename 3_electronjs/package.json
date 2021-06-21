@@ -27,8 +27,8 @@
   },
   "homepage": "https://github.com/course-one/electron-lessons#readme",
   "devDependencies": {
-    "electron": "12.0.7",
-    "electron-builder": "^22.11.2",
+    "electron": "^12.0.7",
+    "electron-builder": "^22.11.7",
     "node-sass": "^5.0.0"
   },
   "dependencies": {
