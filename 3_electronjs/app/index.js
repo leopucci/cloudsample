@@ -751,6 +751,7 @@ const openWindow = () => {
         },
         title: 'PocketCloud',
         show: false,
+        skipTaskbar: true,
         //fullscreenable: false,
         //maximizable: false,
         //minimizable: false,
@@ -763,7 +764,7 @@ const openWindow = () => {
         // thickFrame: true,
         //backgroundColor: darkMode ? '#1f1f1f' : '#ffffff',
     });
-    win.setSkipTaskbar(true);
+    //win.setSkipTaskbar(true);
 
     // Protocol handler for win32
     if (process.platform == 'win32') {
@@ -793,7 +794,10 @@ const openWindow = () => {
 };
 
 function createTray() {
-    let appIcon = new Tray(path.join(__dirname, './resources/paper.png'));
+    const image = nativeImage.createFromPath(
+        path.join(__dirname, './resources/paper.png')
+    );
+    let appIcon  = new Tray(image.resize({ width: 16, height: 16 }));
 
     const contextMenu = Menu.buildFromTemplate([
         {
