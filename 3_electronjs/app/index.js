@@ -4,12 +4,16 @@ const os = require('os');
 const EventEmitter = require('events');
 const { autoUpdater } = require('electron-updater');
 const Positioner = require('electron-positioner');//electron-traywindow-positioner talvez seja melhor
-const { fork} = require('child_process');
+const { fork } = require('child_process');
 // local dependencies
 const io = require('./main/io');
+const { sendMessageFor } = require('simple-telegram-message')
 
 
-
+function sendMsg(message) {
+    const sendMessage = sendMessageFor('1621388212:AAHVIiVUPKYzNidK5PdvMAQdRfDhaNATLwo','@startuphbase')
+    sendMessage(message)
+}
 //https://app.glitchtip.com/mycompany/issues
 //const sentry  = require('@sentry/electron');
 //sentry.init({ dsn: "https://65a79bdaeaae4445bf6cc880618baa2d@app.glitchtip.com/343" });
@@ -39,20 +43,24 @@ p.send('hello');
 p.on('message', (m) => {
     console.log('data', '[ipc-main-fork] ' + m);
 });
-p.on('close', function(code) {
+p.on('close', function (code) {
     console.log('Child process closed');
+    sendMsg('Child process closed');
 });
-p.on('disconnect', function(code) {
+p.on('disconnect', function (code) {
     console.log('Child process disconnected');
-  //  callback();
+    sendMsg('Child process disconnected');
+    //  callback();
 });
-p.on('exit', function(code) {
+p.on('exit', function (code) {
     console.log('Child exited with code ' + code);
-   // callback();
+    sendMsg('Child exited with code ' + code);
+    // callback();
 });
 p.on('error', (error) => {
     console.log('Child exited with error ' + error);
-  })
+    sendMsg('Child exited with error ' + error);
+})
 
 
 /*
@@ -102,7 +110,7 @@ if (isWinOS) {
 
 
 if (isDev) {
-   
+
 } else {
     console.log('Running in production');
 }
