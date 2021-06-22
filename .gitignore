@@ -293,3 +293,4 @@ lib/generated_plugin_registrant.dart
 *.dmg
 3_electronjs/out/Pocket.Cloud-1.0.0.AppImage
 3_electronjs/out/Pocket.Cloud-1.0.0.dmg
+.DS_Store
