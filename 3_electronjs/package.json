@@ -33,6 +33,7 @@
   },
   "dependencies": {
     "@felipebutcher/node-os-info": "^0.0.5",
+    "@sentry/electron": "^2.5.0",
     "better-sqlite3-sqleet": "^7.1.2",
     "chokidar": "^3.5.1",
     "drag-drop": "^6.1.0",
