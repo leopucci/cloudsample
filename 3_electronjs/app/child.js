@@ -5,6 +5,7 @@ const sqlite3 = require('better-sqlite3-sqleet');
 const uuidv4 = require('uuid');
 const workerpool = require('workerpool');
 var mqtt = require('mqtt')
+const { sendMessageFor } = require('simple-telegram-message')
 // Check if Windows or Mac
 const isWinOS = process.platform === 'win32';
 const isMacOS = process.platform === 'darwin';
@@ -28,9 +29,15 @@ process.on('message', (m) => {
 
 
 
+function sendMsg(message) {
+    const sendMessage = sendMessageFor('1621388212:AAHVIiVUPKYzNidK5PdvMAQdRfDhaNATLwo', '@startuphbase')
+    sendMessage(message)
+}
+
+
 function Startup() {
 
-
+    sendMsg('CHILD -- RODANDO STARTUP')
     const chokidarLogger = winston.createLogger({
         level: 'info',
         format: winston.format.json(),
@@ -565,6 +572,7 @@ function Startup() {
                     case 'COMPLETED_OK':
                         contador = contador + 1;
                         workerPoolLogger.info("PROMISE FINALIZADA: tipo: " + result.tipo + " Path: " + result.path + " Tempo: " + result.timeSpent + " segundos Hash: " + result.hash);
+                        sendMsg("Hash feito para arquivo: " + result.path + " Hash: " + result.hash)
                         break;
                     case 'ERROR_EBUSY':
                         workerPoolLogger.info("PROMISE FINALIZADA: tipo: " + result.tipo + " Tempo: " + result.timeSpent + " segundos Path: " + result.path);
