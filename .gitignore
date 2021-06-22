@@ -289,3 +289,5 @@ lib/generated_plugin_registrant.dart
 3_electronjs/out/latest.yml
 3_electronjs/out/Pocket.Cloud Setup 1.0.0.exe.blockmap
 3_electronjs/out/Pocket.Cloud-1.0.0.dmg.blockmap
+*.AppImage
+*.dmg
