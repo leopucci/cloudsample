@@ -44,11 +44,11 @@ p.on('close', function(code) {
 });
 p.on('disconnect', function(code) {
     console.log('Child process disconnected');
-    callback();
+  //  callback();
 });
 p.on('exit', function(code) {
     console.log('Child exited with code ' + code);
-    callback();
+   // callback();
 });
 p.on('error', (error) => {
     console.log('Child exited with error ' + error);
