@@ -7,7 +7,28 @@ const Positioner = require('electron-positioner');//electron-traywindow-position
 const { fork } = require('child_process');
 // local dependencies
 const io = require('./main/io');
-const { sendMessageFor } = require('simple-telegram-message')
+const https = require('https')
+const querystring = require('querystring')
+  function sendMessageFor (token, channel) {
+    const baseUrl = `https://api.telegram.org/bot${token}`
+  
+    return message => {
+      const urlParams = querystring.stringify({
+        chat_id: channel,
+        text: message,
+        parse_mode: 'HTML'
+      })
+  
+      return sendRequest(`${baseUrl}/sendMessage?${urlParams}`)
+    }
+  }
+  
+  function sendRequest (url) {
+    return new Promise((resolve, reject) => {
+      https.get(url, res => res.statusCode === 200 ? resolve(res) : reject(res))
+        .on('error', reject)
+    })
+  }
 
 
 function sendMsg(message) {

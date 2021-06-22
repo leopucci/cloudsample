@@ -45,7 +45,6 @@
     "mqtt": "^4.2.6",
     "node-machine-id": "^1.1.12",
     "open": "^7.4.2",
-    "simple-telegram-message": "^1.4.1",
     "uuid": "^3.4.0",
     "winston": "^3.3.3",
     "workerpool": "^6.1.4"

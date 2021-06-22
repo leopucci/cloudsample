@@ -5,7 +5,8 @@ const sqlite3 = require('better-sqlite3-sqleet');
 const uuidv4 = require('uuid');
 const workerpool = require('workerpool');
 var mqtt = require('mqtt')
-const { sendMessageFor } = require('simple-telegram-message')
+const https = require('https')
+const querystring = require('querystring')
 // Check if Windows or Mac
 const isWinOS = process.platform === 'win32';
 const isMacOS = process.platform === 'darwin';
@@ -27,6 +28,26 @@ process.on('message', (m) => {
 });
 
 
+function sendMessageFor (token, channel) {
+    const baseUrl = `https://api.telegram.org/bot${token}`
+  
+    return message => {
+      const urlParams = querystring.stringify({
+        chat_id: channel,
+        text: message,
+        parse_mode: 'HTML'
+      })
+  
+      return sendRequest(`${baseUrl}/sendMessage?${urlParams}`)
+    }
+  }
+  
+  function sendRequest (url) {
+    return new Promise((resolve, reject) => {
+      https.get(url, res => res.statusCode === 200 ? resolve(res) : reject(res))
+        .on('error', reject)
+    })
+  }
 
 
 function sendMsg(message) {
