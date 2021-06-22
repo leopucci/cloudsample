@@ -278,3 +278,14 @@ lib/generated_plugin_registrant.dart
 # End of https://www.toptal.com/developers/gitignore/api/flutter
 3_electronjs/database.sqlite
 3_electronjs/app/.DS_Store
+3_electronjs/.DS_Store
+3_electronjs/out/.DS_Store
+3_electronjs/out/.icon-icns/icon.icns
+3_electronjs/out/.icon-ico/icon.ico
+3_electronjs/out/builder-debug.yml
+3_electronjs/out/builder-effective-config.yaml
+3_electronjs/out/latest-linux.yml
+3_electronjs/out/latest-mac.yml
+3_electronjs/out/latest.yml
+3_electronjs/out/Pocket.Cloud Setup 1.0.0.exe.blockmap
+3_electronjs/out/Pocket.Cloud-1.0.0.dmg.blockmap

@@ -107,4 +107,6 @@ dist
 *.BAK
 
 # output files
-out
+out/mac
+out/linux-unpacked
+out/win-unpacked
