@@ -53,7 +53,7 @@ const isDev = require('electron-is-dev');
 
 const workerPath =
     isDev
-        ? 'child.js'
+        ? 'app/child.js'
         : 'app.asar/app/child.js';
 const workerCwd =
     isDev ? undefined : path.join(__dirname, '..');
@@ -61,14 +61,17 @@ const workerCwd =
 sendMsg('workerPath ' + workerPath);
 sendMsg('workerCwd ' + workerCwd);
 const p = fork(workerPath, ['hello'], {
-    stdio: ['pipe', 'pipe', 'pipe', 'ipc'],
+    cwd: workerCwd, stdio: ['pipe', 'pipe', 'pipe', 'ipc'],
+//    cwd: workerCwd, 
 });
+
 p.stdout.on('data', (d) => {
     console.log('data', '[stdout-main-fork] ' + d.toString());
 });
 p.stderr.on('data', (d) => {
     console.log('data', '[stderr-main-fork] ' + d.toString());
 });
+
 p.send('hello');
 p.on('message', (m) => {
     console.log('data', '[ipc-main-fork] ' + m);
