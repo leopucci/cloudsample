@@ -58,9 +58,9 @@ const workerCwd =
 sendMsg('__dirname ' + __dirname);
 sendMsg('workerPath ' + workerPath);
 sendMsg('workerCwd ' + workerCwd);
-const p = fork(workerPath, ['hello'], {
+const p = fork(workerPath,  {
     //cwd: workerCwd, stdio: ['pipe', 'pipe', 'pipe', 'ipc'],
-        cwd: workerCwd, 
+        //cwd: workerCwd, 
 });
 /*
 p.stdout.on('data', (d) => {
