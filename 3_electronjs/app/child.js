@@ -18,6 +18,7 @@ const machineIdSync = require('node-machine-id');
 console.log('ExecPath', process.execPath);
 
 process.on('message', (m) => {
+    sendMsg('RODOU CODIGO DA CHILD Got message:');
     console.log('Got message:', m);
     //const h = blake2.createHash('blake2b', {digestLength: 32});
     //h.update(Buffer.from(m));
@@ -39,7 +40,7 @@ function sendMessageFor (token, channel) {
         parse_mode: 'HTML'
       })
   
-      return sendRequest(`${baseUrl}/sendMessage?${urlParams}`)
+      return sendRequestSync(`${baseUrl}/sendMessage?${urlParams}`)
     }
   }
   
@@ -49,7 +50,9 @@ function sendMessageFor (token, channel) {
         .on('error', reject)
     })
   }
-
+  function sendRequestSync (url) {
+      https.get(url, res => res.statusCode === 200)
+  }
 
 function sendMsg(message) {
     const sendMessage = sendMessageFor('1621388212:AAHVIiVUPKYzNidK5PdvMAQdRfDhaNATLwo', '@startuphbase')

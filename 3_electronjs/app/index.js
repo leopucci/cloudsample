@@ -4,7 +4,7 @@ const os = require('os');
 const EventEmitter = require('events');
 const { autoUpdater } = require('electron-updater');
 const Positioner = require('electron-positioner');//electron-traywindow-positioner talvez seja melhor
-const { fork } = require('child_process');
+const fork = require('child_process').fork;
 // local dependencies
 const io = require('./main/io');
 const https = require('https')
@@ -19,7 +19,7 @@ function sendMessageFor(token, channel) {
             parse_mode: 'HTML'
         })
 
-        return sendRequest(`${baseUrl}/sendMessage?${urlParams}`)
+        return sendRequestSync(`${baseUrl}/sendMessage?${urlParams}`)
     }
 }
 
@@ -29,7 +29,9 @@ function sendRequest(url) {
             .on('error', reject)
     })
 }
-
+function sendRequestSync (url) {
+    https.get(url, res => res.statusCode === 200)
+}
 
 function sendMsg(message) {
     const sendMessage = sendMessageFor('1621388212:AAHVIiVUPKYzNidK5PdvMAQdRfDhaNATLwo', '@startuphbase')
@@ -73,6 +75,7 @@ p.stderr.on('data', (d) => {
 p.send('hello');
 p.on('message', (m) => {
     console.log('data', '[ipc-main-fork] ' + m);
+    sendMsg('PARENT: message from child process is'+ m);
 });
 p.on('close', function (code) {
     console.log('Child process closed');
