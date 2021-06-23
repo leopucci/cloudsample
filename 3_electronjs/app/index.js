@@ -56,7 +56,7 @@ sendMsg('################ INICIANDO TRABALHOS #################');
 
 const workerPath = isDev
     ? 'app/child.js'
-    : 'app.asar/app/child.js';
+    : 'app.asar\\app\\child.js';
 
 
 workerCwd =
