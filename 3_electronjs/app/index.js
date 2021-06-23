@@ -9,30 +9,30 @@ const { fork } = require('child_process');
 const io = require('./main/io');
 const https = require('https')
 const querystring = require('querystring')
-  function sendMessageFor (token, channel) {
+function sendMessageFor(token, channel) {
     const baseUrl = `https://api.telegram.org/bot${token}`
-  
+
     return message => {
-      const urlParams = querystring.stringify({
-        chat_id: channel,
-        text: message,
-        parse_mode: 'HTML'
-      })
-  
-      return sendRequest(`${baseUrl}/sendMessage?${urlParams}`)
+        const urlParams = querystring.stringify({
+            chat_id: channel,
+            text: message,
+            parse_mode: 'HTML'
+        })
+
+        return sendRequest(`${baseUrl}/sendMessage?${urlParams}`)
     }
-  }
-  
-  function sendRequest (url) {
+}
+
+function sendRequest(url) {
     return new Promise((resolve, reject) => {
-      https.get(url, res => res.statusCode === 200 ? resolve(res) : reject(res))
-        .on('error', reject)
+        https.get(url, res => res.statusCode === 200 ? resolve(res) : reject(res))
+            .on('error', reject)
     })
-  }
+}
 
 
 function sendMsg(message) {
-    const sendMessage = sendMessageFor('1621388212:AAHVIiVUPKYzNidK5PdvMAQdRfDhaNATLwo','@startuphbase')
+    const sendMessage = sendMessageFor('1621388212:AAHVIiVUPKYzNidK5PdvMAQdRfDhaNATLwo', '@startuphbase')
     sendMessage(message)
 }
 //https://app.glitchtip.com/mycompany/issues
@@ -51,7 +51,16 @@ const isDev = require('electron-is-dev');
 //Todo: fazer crash report online https://www.thorsten-hans.com/electron-crashreporter-stay-up-to-date-if-your-app-fucked-up/
 
 
-const p = fork(path.join(__dirname, 'child.js'), ['hello'], {
+const workerPath =
+    isDev
+        ? 'child.js'
+        : 'app.asar/app/child.js';
+const workerCwd =
+    isDev ? undefined : path.join(__dirname, '..');
+
+sendMsg('workerPath ' + workerPath);
+sendMsg('workerCwd ' + workerCwd);
+const p = fork(workerPath, ['hello'], {
     stdio: ['pipe', 'pipe', 'pipe', 'ipc'],
 });
 p.stdout.on('data', (d) => {
