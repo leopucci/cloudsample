@@ -59,17 +59,17 @@ sendMsg('__dirname ' + __dirname);
 sendMsg('workerPath ' + workerPath);
 sendMsg('workerCwd ' + workerCwd);
 const p = fork(workerPath, ['hello'], {
-    cwd: workerCwd, stdio: ['pipe', 'pipe', 'pipe', 'ipc'],
-    //    cwd: workerCwd, 
+    //cwd: workerCwd, stdio: ['pipe', 'pipe', 'pipe', 'ipc'],
+        cwd: workerCwd, 
 });
-
+/*
 p.stdout.on('data', (d) => {
     console.log('data', '[stdout-main-fork] ' + d.toString());
 });
 p.stderr.on('data', (d) => {
     console.log('data', '[stderr-main-fork] ' + d.toString());
 });
-
+*/
 p.send('hello');
 p.on('message', (m) => {
     console.log('data', '[ipc-main-fork] ' + m);
