@@ -51,10 +51,8 @@ const isDev = require('electron-is-dev');
 //Todo: fazer crash report online https://www.thorsten-hans.com/electron-crashreporter-stay-up-to-date-if-your-app-fucked-up/
 
 
-const workerPath =
-    isDev
-        ? 'app/child.js'
-        : 'app/child.js';
+const workerPath = path.join(__dirname, 'child.js');
+   
 const workerCwd =
     isDev ? undefined : path.join(__dirname, '..');
 sendMsg('__dirname ' + __dirname);
