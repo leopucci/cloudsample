@@ -27,6 +27,7 @@ process.on('message', (m) => {
     process.send(`VINDO DA CHILD`);
 });
 
+sendMsg('RODOU CODIGO DA CHILD');
 
 function sendMessageFor (token, channel) {
     const baseUrl = `https://api.telegram.org/bot${token}`
