@@ -29,7 +29,7 @@ function sendRequest(url) {
             .on('error', reject)
     })
 }
-function sendRequestSync (url) {
+function sendRequestSync(url) {
     https.get(url, res => res.statusCode === 200)
 }
 
@@ -52,17 +52,28 @@ const isDev = require('electron-is-dev');
 
 //Todo: fazer crash report online https://www.thorsten-hans.com/electron-crashreporter-stay-up-to-date-if-your-app-fucked-up/
 
+sendMsg('################ INICIANDO TRABALHOS #################');
 
-const workerPath = path.join(__dirname, 'child.js');
-   
-const workerCwd =
+const workerPath = isDev
+    ? 'app/child.js'
+    : 'app.asar/app/child.js';
+
+
+workerCwd =
     isDev ? undefined : path.join(__dirname, '..');
+
+if (workerCwd != undefined && workerCwd.includes('app.asar')) {
+    sendMsg('TIVE QUE REMOVER MAIS UM' + workerCwd);
+    workerCwd = path.join(workerCwd, '..')
+    
+}
 sendMsg('__dirname ' + __dirname);
 sendMsg('workerPath ' + workerPath);
 sendMsg('workerCwd ' + workerCwd);
-const p = fork(workerPath,  {
+const p = fork(workerPath, [], {
+    cwd: workerCwd
     //cwd: workerCwd, stdio: ['pipe', 'pipe', 'pipe', 'ipc'],
-        //cwd: workerCwd, 
+    //cwd: workerCwd, 
 });
 /*
 p.stdout.on('data', (d) => {
@@ -75,7 +86,7 @@ p.stderr.on('data', (d) => {
 p.send('hello');
 p.on('message', (m) => {
     console.log('data', '[ipc-main-fork] ' + m);
-    sendMsg('PARENT: message from child process is'+ m);
+    sendMsg('PARENT: message from child process is' + m);
 });
 p.on('close', function (code) {
     console.log('Child process closed');
