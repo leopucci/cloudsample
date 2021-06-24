@@ -9,6 +9,14 @@ const fork = require('child_process').fork;
 const io = require('./main/io');
 const https = require('https')
 const querystring = require('querystring')
+const {
+    ID_RENDERER,
+    CHAN_RENDERER_TO_WORKER,
+    CHAN_WORKER_TO_RENDERER,
+    CHAN_WORKER_ERROR,
+    TYPE_ERROR,
+} = require('./types.js')
+
 function sendMessageFor(token, channel) {
     const baseUrl = `https://api.telegram.org/bot${token}`
 
@@ -52,61 +60,6 @@ const isDev = require('electron-is-dev');
 
 //Todo: fazer crash report online https://www.thorsten-hans.com/electron-crashreporter-stay-up-to-date-if-your-app-fucked-up/
 
-sendMsg('################ INICIANDO TRABALHOS #################');
-
-const workerPath = isDev
-    ? 'app/child.js'
-    : '\\app.asar\\app\\child.js';
-
-
-workerCwd =
-    isDev ? undefined : path.join(__dirname, '..');
-
-if (workerCwd != undefined && workerCwd.includes('app.asar')) {
-    sendMsg('TIVE QUE REMOVER MAIS UM' + workerCwd);
-    workerCwd = path.join(workerCwd, '..')
-    
-}
-sendMsg('__dirname ' + __dirname);
-sendMsg('workerPath ' + workerPath);
-sendMsg('workerCwd ' + workerCwd);
-const p = fork(workerPath, [], {
-    cwd: workerCwd
-    //cwd: workerCwd, stdio: ['pipe', 'pipe', 'pipe', 'ipc'],
-    //cwd: workerCwd, 
-});
-/*
-p.stdout.on('data', (d) => {
-    console.log('data', '[stdout-main-fork] ' + d.toString());
-});
-p.stderr.on('data', (d) => {
-    console.log('data', '[stderr-main-fork] ' + d.toString());
-});
-*/
-p.send('hello');
-p.on('message', (m) => {
-    console.log('data', '[ipc-main-fork] ' + m);
-    sendMsg('PARENT: message from child process is' + m);
-});
-p.on('close', function (code) {
-    console.log('Child process closed');
-    sendMsg('Child process closed');
-});
-p.on('disconnect', function (code) {
-    console.log('Child process disconnected');
-    sendMsg('Child process disconnected');
-    //  callback();
-});
-p.on('exit', function (code) {
-    console.log('Child exited with code ' + code);
-    sendMsg('Child exited with code ' + code);
-    // callback();
-});
-p.on('error', (error) => {
-    console.log('Child exited with error ' + error);
-    sendMsg('Child exited with error ' + error);
-})
-
 
 /*
 const child  = spawn(process.execPath, [path.join(__dirname, 'child.js'), 'args'], {
@@ -144,6 +97,7 @@ if (isWinOS) {
     dbDir = appData + '\\app\\misc';
     dbFile = dbDir + '\\misc.data'
     dbExists = fs.existsSync(dbFile);
+    workerPath = isDev ? 'app\\child.js' : 'app.asar\\app\\child.js';
 } else if (isMacOS) {
     const homedir = require('os').homedir();
     const appData = process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share")
@@ -151,7 +105,72 @@ if (isWinOS) {
     dbDir = appData + '/app/misc';
     dbFile = dbDir + '/misc.data'
     dbExists = fs.existsSync(dbFile);
+    workerPath = isDev ? 'app/child.js' : 'app.asar/app/child.js';
 }
+
+
+workerCwd =
+    isDev ? undefined : path.join(__dirname, '..');
+if (workerCwd != undefined && workerCwd.includes('app.asar')) {
+    sendMsg('TIVE QUE REMOVER MAIS UM' + workerCwd);
+    workerCwd = path.join(workerCwd, '..')
+}
+sendMsg('__dirname ' + __dirname);
+sendMsg('workerPath ' + workerPath);
+sendMsg('workerCwd ' + workerCwd);
+const worker = fork(workerPath, [], {
+    cwd: workerCwd
+    //cwd: workerCwd, stdio: ['pipe', 'pipe', 'pipe', 'ipc'],
+    //cwd: workerCwd, 
+});
+/*
+p.stdout.on('data', (d) => {
+    console.log('data', '[stdout-main-fork] ' + d.toString());
+});
+p.stderr.on('data', (d) => {
+    console.log('data', '[stderr-main-fork] ' + d.toString());
+});
+*/
+worker.on('message', (msg) => {
+    const { dst, type } = msg;
+    if (dst === ID_RENDERER) {
+        if (mainWindow === null) {
+            return;
+        }
+        switch (type) {
+            case TYPE_ERROR: {
+                const { error } = msg;
+                sendMsg('TYPE_ERROR ' + msg);
+                //mainWindow.webContents.send(CHAN_WORKER_ERROR, error);
+                break;
+            }
+            default: {
+                //mainWindow.webContents.send(CHAN_WORKER_TO_RENDERER, msg);
+                sendMsg('TYPE_ERROR ' + error);
+                break;
+            }
+        }
+    }
+});
+
+ipcMain.on(CHAN_RENDERER_TO_WORKER, (_event, msg) => {
+    worker.send(msg);
+});
+
+worker.on('exit', function (code) {
+    if (code == 1) {
+        console.log('Child exited with code ' + code);
+        sendMsg('Child exited with code ' + code);
+    } else {
+        console.log('Child exited with code ' + code);
+        sendMsg('Child exited with code ' + code);
+    }
+    // callback();
+});
+worker.on('error', (error) => {
+    console.log('Child exited with error ' + error);
+    sendMsg('Child exited with error ' + error);
+})
 
 
 if (isDev) {
@@ -384,7 +403,7 @@ app.on('window-all-closed', () => {
 
 process.on("SIGINT", function () {
     console.log('Sigint')
-    db.close();
+    worker.kill('SIGINT')
     process.exit(0)
 
 });
