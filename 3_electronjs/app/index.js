@@ -9,13 +9,10 @@ const fork = require('child_process').fork;
 const io = require('./main/io');
 const https = require('https')
 const querystring = require('querystring')
-const {
-    ID_RENDERER,
-    CHAN_RENDERER_TO_WORKER,
-    CHAN_WORKER_TO_RENDERER,
-    CHAN_WORKER_ERROR,
-    TYPE_ERROR,
-} = require('./types.js')
+var appReadyEvent = false
+var appLoginMode = false
+
+
 
 function sendMessageFor(token, channel) {
     const baseUrl = `https://api.telegram.org/bot${token}`
@@ -58,9 +55,6 @@ const isWinOS = process.platform === 'win32';
 const isMacOS = process.platform === 'darwin';
 const isDev = require('electron-is-dev');
 
-//Todo: fazer crash report online https://www.thorsten-hans.com/electron-crashreporter-stay-up-to-date-if-your-app-fucked-up/
-
-
 /*
 const child  = spawn(process.execPath, [path.join(__dirname, 'child.js'), 'args'], {
    // stdio: 'pipe'
@@ -93,16 +87,16 @@ child.stdout.pipe(process.stdout, { end:true });
 if (isWinOS) {
     const homedir = require('os').homedir();
     const appData = process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share")
-    syncDir = homedir + '\\PocketCloud\\';
-    dbDir = appData + '\\app\\misc';
+    syncDir = homedir + '\\Pocket.Cloud\\';
+    dbDir = appData + '\\Pocket.Cloud\\app\\misc';
     dbFile = dbDir + '\\misc.data'
     dbExists = fs.existsSync(dbFile);
     workerPath = isDev ? 'app\\child.js' : 'app.asar\\app\\child.js';
 } else if (isMacOS) {
     const homedir = require('os').homedir();
     const appData = process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share")
-    syncDir = homedir + '/PocketCloud/';
-    dbDir = appData + '/app/misc';
+    syncDir = homedir + '/Pocket.Cloud/';
+    dbDir = appData + '/Pocket.Cloud/app/misc';
     dbFile = dbDir + '/misc.data'
     dbExists = fs.existsSync(dbFile);
     workerPath = isDev ? 'app/child.js' : 'app.asar/app/child.js';
@@ -131,20 +125,34 @@ p.stderr.on('data', (d) => {
     console.log('data', '[stderr-main-fork] ' + d.toString());
 });
 */
-worker.on('message', (msg) => {
-    const { dst, type } = msg;
-    if (dst === ID_RENDERER) {
+worker.on('message', (message) => {
+    console.log("RECEBIDA MENSAGEM DA WORKER " ,message)
+    const { src, dst, type , msg } = message;
+    if (dst === 'ID_RENDERER') {
         if (mainWindow === null) {
             return;
         }
         switch (type) {
-            case TYPE_ERROR: {
+            case 'TYPE_ERROR': {
+                console.log("CAIU NO TYPE_ERROR")
                 const { error } = msg;
                 sendMsg('TYPE_ERROR ' + msg);
                 //mainWindow.webContents.send(CHAN_WORKER_ERROR, error);
                 break;
             }
+            case 'TYPE_STARTUP_SHOW_LOGIN_WINDOW': {
+                console.log("Recebi evento pra chamar tela de login da thread do banco. ")
+                mainWindow = startup_login_window();
+                //mainWindow.webContents.send(CHAN_WORKER_ERROR, error);
+                break;
+            }
+            case 'TYPE_STARTUP_SHOW_LOGGED_IN_WINDOW': {
+                console.log("Recebi evento pra chamar codigo logado da thread do banco. ")
+                //mainWindow.webContents.send(CHAN_WORKER_ERROR, error);
+                break;
+            }
             default: {
+                console.log("CAIU NO DEFAULT")
                 //mainWindow.webContents.send(CHAN_WORKER_TO_RENDERER, msg);
                 sendMsg('TYPE_ERROR ' + error);
                 break;
@@ -153,7 +161,7 @@ worker.on('message', (msg) => {
     }
 });
 
-ipcMain.on(CHAN_RENDERER_TO_WORKER, (_event, msg) => {
+ipcMain.on('CHAN_RENDERER_TO_WORKER', (_event, msg) => {
     worker.send(msg);
 });
 
@@ -242,13 +250,76 @@ if (gotTheLock) {
     return
 }
 
+function startup_login_window(){
+//https://bbbootstrap.com/snippets/login-form-footer-and-social-media-icons-55203607
+    while (appReadyEvent == false){
+        sleep(1);
+        console.log('aguardando o app estar ready pra montar janela. ')
+    }
+    appLoginMode = true;
 
+    const win = new BrowserWindow({
+        width: 1100,
+        height: 635,
+        webPreferences: {
+            nodeIntegration: true,
+        },
+        title: 'Pocket.Cloud',
+        show: true,
+        skipTaskbar: false,
+        //fullscreenable: false,
+        //maximizable: false,
+        //minimizable: false,
+        //transparent: true,
+        //frame: false,
+        // resizable: false,
+        // movable: false,
+        autoHideMenuBar: true,
+        center: true,
+        // thickFrame: true,
+        //backgroundColor: darkMode ? '#1f1f1f' : '#ffffff',
+    });
+    //win.setSkipTaskbar(true);
+
+    // Protocol handler for win32
+    if (process.platform == 'win32') {
+        // Keep only command line / deep linked arguments
+        deeplinkingUrl = process.argv.slice(1)
+    }
+    // load `index.html` file
+    win.loadFile(path.resolve(__dirname, 'render/html/login.html'));
+    win.webContents.setWindowOpenHandler(({ url }) => {
+        shell.openExternal(url);
+        return { action: 'deny' };
+      });
+
+    /*-----*/
+
+    tray = createTray();
+
+    win.on('minimize', function (event) {
+        //event.preventDefault();
+        //win.hide();
+
+    });
+
+    win.on('restore', function (event) {
+        win.show();
+        //tray.destroy();
+    });
+
+    return win; // return window
+
+
+
+}
 
 // open a window
 const openWindow = () => {
     const win = new BrowserWindow({
         width: 800,
         height: 500,
+        icon: __dirname + 'resources/icon.png',
         webPreferences: {
             nodeIntegration: true,
         },
@@ -383,10 +454,11 @@ setInterval(() => {
 
 // when app is ready, open a window
 app.on('ready', () => {
-    mainWindow = openWindow();
+    appReadyEvent = true;
+    //mainWindow = openWindow();
 
     // watch files
-    io.watchFiles(mainWindow);
+    //io.watchFiles(mainWindow);
 
 
 });
@@ -395,7 +467,6 @@ app.on('ready', () => {
 app.on('window-all-closed', () => {
     // On OS X it is common for applications and their menu bar
     // to stay active until the user quits explicitly with Cmd + Q
-    db.close();
     if (process.platform !== 'darwin') {
         app.quit();
     }
@@ -426,7 +497,7 @@ app.on('browser-window-focus', () => {
 app.on('browser-window-blur', () => {
     console.log('browser-window-blur');
     if (mainWindow) {
-        if (!isDialog) {
+        if (!isDialog && !appLoginMode) {
             mainWindow.hide();
         }
         isDialog = false;
@@ -488,4 +559,9 @@ ipcMain.on('app:on-file-copy', (event, file) => {
     });
 });
 
-
+function msleep(n) {
+    Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, n);
+  }
+  function sleep(n) {
+    msleep(n*1000);
+  }

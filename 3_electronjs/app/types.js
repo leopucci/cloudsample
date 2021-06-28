@@ -3,3 +3,5 @@ const CHAN_RENDERER_TO_WORKER = 'rendererToWorker';
 const CHAN_WORKER_ERROR = 'workerError';
 const CHAN_WORKER_TO_RENDERER = 'workerToRenderer';
 const TYPE_ERROR = 'error';
+const TYPE_STARTUP_SHOW_LOGIN_WINDOW = 'login_window';
+const TYPE_STARTUP_SHOW_LOGGED_IN_WINDOW = 'logged_in';

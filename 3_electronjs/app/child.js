@@ -12,7 +12,10 @@ const isWinOS = process.platform === 'win32';
 const isMacOS = process.platform === 'darwin';
 var currentTasksForHash = [];
 var currentTasksForDelete = [];
-var initialScanEnded = false;
+var chokidarInitialScanEnded = false;
+var databaseStartupFinished = false;
+var loggedIn = false;
+
 const machineIdSync = require('node-machine-id');
 const {
     ID_RENDERER,
@@ -20,6 +23,8 @@ const {
     CHAN_WORKER_TO_RENDERER,
     CHAN_WORKER_ERROR,
     TYPE_ERROR,
+    TYPE_STARTUP_SHOW_LOGIN_WINDOW,
+    TYPE_STARTUP_SHOW_LOGGED_IN_WINDOW,
 } = require('./types.js')
 
 
@@ -184,7 +189,7 @@ if (isWinOS) {
     const homedir = require('os').homedir();
     const appData = process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share")
     syncDir = homedir + '\\PocketCloud\\';
-    dbDir = appData + '\\app\\misc';
+    dbDir = appData + '\\Pocket.Cloud\\app\\misc';
     dbFile = dbDir + '\\misc.data'
     dbExists = fs.existsSync(dbFile);
     sqliteLogger.info('HOME DIR ' + homedir);
@@ -192,8 +197,8 @@ if (isWinOS) {
 } else if (isMacOS) {
     const homedir = require('os').homedir();
     const appData = process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share")
-    syncDir = homedir + '/PocketCloud/';
-    dbDir = appData + '/app/misc';
+    syncDir = homedir + '/Pocket.Cloud/';
+    dbDir = appData + '/Pocket.Cloud/app/misc';
     dbFile = dbDir + '/misc.data'
     dbExists = fs.existsSync(dbFile);
 }
@@ -217,6 +222,7 @@ if (!dbExists) {
     //Mandar uma mensagem pro servidor dizendo que é o primeiro download e baixar toda a listagem de arquivos que tem lá. 
     //A partir dai baixar todos. 
     db.exec('CREATE TABLE `instalation` ( `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,  `instalationId` TEXT, `machineId` TEXT )');
+    db.exec('CREATE TABLE `userLogin` ( `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,  `userId` TEXT, `accessToken` TEXT,`refreshToken` TEXT  )');
     const stmt = db.prepare(`INSERT INTO instalation(instalationId,machineId) VALUES(?,?)`);
     let machineId = machineIdSync.machineIdSync({ original: true })
     info = stmt.run(uuidv4(), machineId);
@@ -226,13 +232,34 @@ if (!dbExists) {
     //entao pro SW eu sempre vou considerar a pasta vazia? pq ele vai criar e rodar. tenho que por o sw pra rodar ao instalar, dae nao tem furo. 
 }
 
-
+var resultadoConsulta = undefined;
+try {
+    const stmt = db.prepare('SELECT accessToken FROM userLogin WHERE id  = 1');
+    resultadoConsulta = stmt.get();
+    if (resultadoConsulta == undefined) {
+        loggedIn = false;
+        process.send({
+            src: 'ID_WORKER',
+            dst: 'ID_RENDERER',
+            type: 'TYPE_STARTUP_SHOW_LOGIN_WINDOW',
+            msg: 'CHAMA A TELA DE LOGIN'
+        });
+    } else {
+        loggedIn = true;
+        process.send({
+            src: 'ID_WORKER',
+            dst: 'ID_RENDERER',
+            type: 'TYPE_STARTUP_SHOW_LOGGED_IN_WINDOW',
+            msg: 'CONTINUA O STARTUP JÁ LOGADO'
+        });
+    }
+} catch (error) {
+    sqliteLogger.error('Erro: ' + error);
+}
 
 if (!loggedIn) {
-
+    
 } else {
-
-
     const HasherPool = workerpool.pool(__dirname + '/hashpoolworker.js', { maxWorkers: 900000, workerType: 'thread', maxQueueSize: 200000 });
     const StartupDeletionPool = workerpool.pool(__dirname + '/startupdeleteworker.js', { maxWorkers: 900000, workerType: 'thread', maxQueueSize: 200000 });
 
@@ -297,7 +324,7 @@ if (!loggedIn) {
             }
 
             //Se ja tiver iniciado o monitoramento da pasta, entao age normalmente. 
-            if (initialScanEnded) {
+            if (chokidarInitialScanEnded) {
                 chokidarLogger.info('Ja terminou o scan inicial. initialScanEnded = TRUE');
                 //se tiver resultado, faz update e faz hash
                 if (resultadoConsulta) {
@@ -397,7 +424,7 @@ if (!loggedIn) {
     watcher.on('ready', () => {
         //Aqui eu tenho que re-escanear o diretorio todo, e bater com o banco.
         chokidarLogger.info('Initial scan complete. Ready for changes');
-        initialScanEnded = true;
+        chokidarInitialScanEnded = true;
         //Funcao que vai hashear com delay, os arquivos da pasta. 
         setTimeout(delayedHashAoIniciar, 5000);
     });
