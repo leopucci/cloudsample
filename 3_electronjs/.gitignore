@@ -107,9 +107,9 @@ dist
 *.BAK
 
 # output files
-out/mac
-out/linux-unpacked
-out/win-unpacked
-out/Pocket.Cloud Setup 1.0.0.exe.blockmap
-out/Pocket.Cloud-1.0.0.AppImage
-out/Pocket.Cloud-1.0.0.dmg
+out/*
+#out/linux-unpacked
+#out/win-unpacked
+#out/Pocket.Cloud Setup 1.0.0.exe.blockmap
+#out/Pocket.Cloud-1.0.0.AppImage
+#out/Pocket.Cloud-1.0.0.dmg

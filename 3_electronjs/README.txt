@@ -2,7 +2,7 @@ https://medium.com/jspoint/packaging-and-distributing-electron-applications-usin
 https://github.com/course-one/electron-lessons/tree/file-io-builder
 Comecei direto deste ponto sem react porque:
 Ja tem build configurado pras 3 plataformas
-Ja tem a comunica��o de io entre o chokdir/filesystem node com a UI usando IPC
+Ja tem a comunicação de io entre o chokdir/filesystem node com a UI usando IPC
 
 //Todo: fazer crash report online https://www.thorsten-hans.com/electron-crashreporter-stay-up-to-date-if-your-app-fucked-up/
 o crash report meio que eu ja fiz, usando https://app.glitchtip.com/mycompany/issues que eh o bagulho que ficou pago..
@@ -42,9 +42,25 @@ https://github.com/sleeyax/asarmor
 
 Servicos de localizacao.. pra traducao.. usando o github
 https://crowdin.com/project
-� feito por estes caras aqui https://alconost.com/en/localization/crowdin-alconost
+é feito por estes caras aqui https://alconost.com/en/localization/crowdin-alconost
 que tambem fazem videos e campanhas de marketing
 
-esta tambem e uma boa op��o
+esta tambem e uma boa opção
 https://lokalise.com/blog/category/tutorials/
 
+este ipc eh mais completo
+https://www.npmjs.com/package/electron-common-ipc
+
+https://github.com/atom/node-keytar
+
+https://medium.com/@bella.jonas1112/case-assignment-freemium-pricing-at-dropbox-c826f88ad758
+
+
+HOTP pra fazer token em javascript, 
+eu pensei em usar, mas isso vai contra JWT API pq dae como que eu vou disponibilizar API pra galera. 
+https://github.com/jiangts/JS-OTP
+
+
+montar um pacote javascript, no NPM que faça todo o meio de campo, (login) listar arquivos, fazer upload. deletar.. eh tipo um SAAS, ja deixa o serviço 
+exposto pra qualquer aplicação..
+nao precisa ser só em javascript, posso montar isto em outras linguagens, pra deixar pronto pro programador. 
