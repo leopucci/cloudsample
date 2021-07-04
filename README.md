@@ -85,3 +85,16 @@ https://www.npmjs.com/package/s3proxy
 
 
 
+
+Estou pondo estas ideias aqui que vieram na mente.. 
+Meu problema com o vnc no projeto de controle de maquinas era o acesso remoto. 
+Com o electron rodando node, eu posso muito bem comandar isto 
+com mqtt (manda a requisicao de conn). 
+e faz o whole punch todo. 
+se nao der certo dai usa relay. 
+https://github.com/SamDecrock/node-tcp-hole-punching
+https://gist.github.com/mildred/b803e48801f9cdd8a4a8
+
+
+este aqui eh um exemplo de produto comercial de conectividade. é um relay...
+https://ngrok.com/
