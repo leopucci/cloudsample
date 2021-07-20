@@ -6,12 +6,8 @@ const { roles } = require('../config/roles');
 
 const userSchema = mongoose.Schema(
   {
-    name: {
-      type: String,
-      required: true,
-      trim: true,
-    },
     firstName: {
+      alias: 'name',
       type: String,
       required: true,
       trim: true,
@@ -51,6 +47,10 @@ const userSchema = mongoose.Schema(
       },
       private: true, // used by the toJSON plugin
     },
+    isPasswordBlank: {
+      type: Boolean,
+      default: false,
+    },
     role: {
       type: String,
       enum: roles,
@@ -88,13 +88,16 @@ userSchema.statics.isEmailTaken = async function (email, excludeUserId) {
  */
 userSchema.methods.isPasswordMatch = async function (password) {
   const user = this;
-  return bcrypt.compare(password, user.password);
+  if (user.password != null) {
+    return bcrypt.compare(password, user.password);
+  }
 };
 
 userSchema.pre('save', async function (next) {
   const user = this;
   if (user.isModified('password')) {
     user.password = await bcrypt.hash(user.password, 8);
+    user.isPasswordBlank = false;
   }
   next();
 });
