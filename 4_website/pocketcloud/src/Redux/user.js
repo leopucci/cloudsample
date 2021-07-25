@@ -1,218 +1,215 @@
-const pkg = require('../../package.json')
-const axios = require('axios').create({
-    // .. where we make our configurations
-        baseURL: process.env.NODE_ENV === 'production' ? 'https://www.siteproducao.com/v1/' : pkg.proxy       
-    });
+const pkg = require("../../package.json");
+const axios = require("axios").create({
+  // .. where we make our configurations
+  baseURL:
+    process.env.NODE_ENV === "production"
+      ? "https://www.siteproducao.com/v1/"
+      : pkg.proxy,
+});
 
-
- 
 // Actions
-const SET_USER = 'redux/users/SET_USER'
-const LOG_OUT = 'redux/users/LOG_OUT'
-const SIGN_IN = 'redux/users/SIGN_IN'
-const SIGN_UP = 'redux/users/SIGN_UP'
-const SIGN_UP_COMPLETE = 'redux/users/SIGN_UP_COMPLETE'
-const SET_LOGIN_ERROR = 'redux/users/SET_LOGIN_ERROR'
-const SET_SIGNUP_ERROR = 'redux/users/SET_SIGNUP_ERROR'
+const SET_USER = "redux/users/SET_USER";
+const LOG_OUT = "redux/users/LOG_OUT";
+const SIGN_IN = "redux/users/SIGN_IN";
+const SIGN_UP = "redux/users/SIGN_UP";
+const SIGN_UP_COMPLETE = "redux/users/SIGN_UP_COMPLETE";
+const SET_LOGIN_ERROR = "redux/users/SET_LOGIN_ERROR";
+const SET_SIGNUP_ERROR = "redux/users/SET_SIGNUP_ERROR";
 
 // Reducer
 
 const initialState = {
-    profileName: null,
-    isLoggedIn: false,
-    isFetching: false,
-    jwt: null,
-    loginError: null,
-    signupError: null
-}
+  profileName: null,
+  isLoggedIn: false,
+  isFetching: false,
+  jwt: null,
+  loginError: null,
+  signupError: null,
+};
 
 const currentUser = (state = initialState, action) => {
-    switch (action.type) {
-        case SET_USER:
-            return {
-                ...state,
-                profileName: action.payload.email,
-                isLoggedIn: true,
-                isFetching: false,
-                jwt: action.payload.jwt,
-                loginError: null
-            }
-        case LOG_OUT:
-            return initialState
-        case SIGN_IN:
-            return {
-                ...state,
-                isFetching: true,
-                loginError: null
-            }
-        case SIGN_UP:
-            return {
-                ...state,
-                isFetching: true,
-                signupError: null
-            }
-        case SIGN_UP_COMPLETE:
-            return {
-                ...state,
-                isFetching: false,
-                signupError: null
-            }
-        case SET_LOGIN_ERROR:
-            return {
-                ...state,
-                isFetching: false,
-                loginError: action.payload.error
-            }
-        case SET_SIGNUP_ERROR:
-            return {
-                ...state,
-                isFetching: false,
-                signupError: action.payload.error
-            }
-        default:
-            return state
-    }
-}
+  switch (action.type) {
+    case SET_USER:
+      return {
+        ...state,
+        profileName: action.payload.email,
+        isLoggedIn: true,
+        isFetching: false,
+        jwt: action.payload.jwt,
+        loginError: null,
+      };
+    case LOG_OUT:
+      return initialState;
+    case SIGN_IN:
+      return {
+        ...state,
+        isFetching: true,
+        loginError: null,
+      };
+    case SIGN_UP:
+      return {
+        ...state,
+        isFetching: true,
+        signupError: null,
+      };
+    case SIGN_UP_COMPLETE:
+      return {
+        ...state,
+        isFetching: false,
+        signupError: null,
+      };
+    case SET_LOGIN_ERROR:
+      return {
+        ...state,
+        isFetching: false,
+        loginError: action.payload.error,
+      };
+    case SET_SIGNUP_ERROR:
+      return {
+        ...state,
+        isFetching: false,
+        signupError: action.payload.error,
+      };
+    default:
+      return state;
+  }
+};
 
-export default currentUser
-
+export default currentUser;
 
 // Action Creators
-const setUser = userObj => {
-    return {
-        type: SET_USER,
-        payload: userObj
-    }
-}
+const setUser = (userObj) => ({
+  type: SET_USER,
+  payload: userObj,
+});
 
-const setLoginError = error => {
-    return {
-        type: SET_LOGIN_ERROR,
-        payload: { error }
-    }
-}
+const setLoginError = (error) => ({
+  type: SET_LOGIN_ERROR,
+  payload: { error },
+});
 
-const setSignupError = error => {
-    return {
-        type: SET_SIGNUP_ERROR,
-        payload: { error }
-    }
-}
+const setSignupError = (error) => ({
+  type: SET_SIGNUP_ERROR,
+  payload: { error },
+});
 
-const signIn = (userObj) => dispatch => {
-    dispatch({
-        type: SIGN_IN
+const signIn = (userObj) => (dispatch) => {
+  dispatch({
+    type: SIGN_IN,
+  });
+
+  axios({
+    method: "post",
+    url: "/auth/login",
+    data: {
+      email: userObj.email,
+      password: userObj.password,
+    },
+  })
+    .then((response) => {
+      // handle success
+      dispatch(
+        setUser({
+          email: userObj.email,
+          jwt: response.data.jwt,
+        })
+      );
     })
-    
-    axios({
-        method: 'post',
-        url: '/auth/login',
-        data: {
-            email: userObj.email,
-            password: userObj.password
-        }
+    .catch((error) => {
+      // handle error
+      let errorMessage = "Network Error";
+      if (error.response) {
+        errorMessage = error.response.data.message;
+        errorMessage =
+          errorMessage === "WRONG_CREDENTIAL"
+            ? "Incorrect email or password"
+            : errorMessage;
+        // User does not exist. Sign up for an account
+      }
+      dispatch(setLoginError(errorMessage));
     })
-        .then(function (response) {
-            // handle success
-            dispatch(setUser({
-                email: userObj.email,
-                jwt: response.data.jwt
-            }))
+    .then(() => {
+      // always executed
+    });
+};
 
-        })
-        .catch(function (error) {
-            // handle error
-            let errorMessage = 'Network Error'
-            if (error.response) {
-                errorMessage = error.response.data.message
-                errorMessage = errorMessage === 'WRONG_CREDENTIAL' ? 'Incorrect email or password' : errorMessage
-                //User does not exist. Sign up for an account
-            }
-            dispatch(setLoginError(errorMessage))
-        })
-        .then(function () {
-            // always executed
-        })
-}
-
-const signUp = (userObj) => dispatch => {
-    dispatch({
-        type: SIGN_UP
+const signUp = (userObj) => (dispatch) => {
+  dispatch({
+    type: SIGN_UP,
+  });
+  axios({
+    method: "post",
+    url: "/auth/register",
+    data: {
+      email: userObj.email,
+      password: userObj.password,
+      firstName: userObj.firstName,
+      lastName: userObj.lastName,
+    },
+  })
+    .then((response) => {
+      // handle success
+      console.log("FOI");
+      if (response.data.id) {
+        console.log("TEM ID");
+        dispatch({
+          type: SIGN_UP_COMPLETE,
+        });
+        dispatch(signIn(userObj)); // Auto login on successful register
+      } else {
+        console.log("NAO TEM ID");
+      }
     })
-    axios({
-        method: 'post',
-        url: '/auth/register',
-        data: {
-            email: userObj.email,
-            password: userObj.password,
-            firstName: userObj.firstName,
-            lastName: userObj.lastName
-        }
+    .catch((error) => {
+      // handle error
+      let errorMessage = "Network Error";
+      if (error.response) {
+        errorMessage = error.response.data.message;
+        errorMessage =
+          errorMessage === "USERNAME_IS_NOT_AVAILABLE"
+            ? "Username/Email is not available"
+            : errorMessage;
+      }
+      dispatch(setSignupError(errorMessage));
     })
-        .then(function (response) {
-            // handle success
-            console.log('FOI')
-            if (response.data.id) {
-                console.log('TEM ID')
-                dispatch({
-                    type: SIGN_UP_COMPLETE
-                })
-                dispatch(signIn(userObj)) //Auto login on successful register
-            }else{
-                console.log('NAO TEM ID')
-            }
-        })
-        .catch(function (error) {
-            // handle error
-            let errorMessage = 'Network Error'
-            if (error.response) {
-                errorMessage = error.response.data.message
-                errorMessage = errorMessage === 'USERNAME_IS_NOT_AVAILABLE' ? 'Username/Email is not available' : errorMessage
-            }
-            dispatch(setSignupError(errorMessage))
-
-        })
-        .then(function () {
-            // always executed
-        })
-}
+    .then(() => {
+      // always executed
+    });
+};
 
 const getProfile = (access_token) => {
-    axios({
-        method: 'get',
-        url: '/api/user/me',
-        headers: {
-            'Authorization': 'Bearer ' + access_token,
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        }
+  axios({
+    method: "get",
+    url: "/api/user/me",
+    headers: {
+      Authorization: `Bearer ${access_token}`,
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
+  })
+    .then((response) => {
+      // handle success
+      console.log(response);
     })
-        .then(function (response) {
-            // handle success
-            console.log(response)
-        })
-        .catch(function (error) {
-            // handle error
-            console.log(error.response)
+    .catch((error) => {
+      // handle error
+      console.log(error.response);
+    })
+    .then(() => {
+      // always executed
+    });
+};
 
-        })
-        .then(function () {
-            // always executed
-        })
-}
-
-const logOut = () => {
-    return {
-        type: LOG_OUT
-    }
-}
+const logOut = () => ({
+  type: LOG_OUT,
+});
 
 export const actions = {
-    setUser,
-    logOut,
-    logIn: signIn,
-    signUp,
-    setLoginError,
-    setSignupError,
-    getProfile
-}
+  setUser,
+  logOut,
+  logIn: signIn,
+  signUp,
+  setLoginError,
+  setSignupError,
+  getProfile,
+};

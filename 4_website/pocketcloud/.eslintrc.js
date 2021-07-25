@@ -5,22 +5,19 @@ module.exports = {
     es2021: true,
   },
   extends: [
-    'plugin:react/recommended',
-    'airbnb',
+    "plugin:react/recommended",
+    "airbnb",
+    "plugin:prettier/recommended",
   ],
-  parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaFeatures: {
       jsx: true,
     },
     ecmaVersion: 12,
   },
-  plugins: [
-    'react',
-    '@typescript-eslint',
-    'formatjs',
-  ],
+  plugins: ["react", "@typescript-eslint", "formatjs"],
   rules: {
-    'formatjs/no-offset': 'error',
+    "formatjs/no-offset": "error",
+    "react/jsx-filename-extension": [1, { extensions: [".js", ".jsx"] }],
   },
 };
