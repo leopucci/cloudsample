@@ -41,9 +41,9 @@ app.use(compression());
 app.use(cors());
 app.options('*', cors());
 
-//Pra renderizar a pagina do login no electron. 
+// Pra renderizar a pagina do login no electron.
 app.set('view engine', 'ejs');
-app.set('views', __dirname + '/views');
+app.set('views', `${__dirname}/views`);
 
 // jwt authentication
 app.use(passport.initialize());

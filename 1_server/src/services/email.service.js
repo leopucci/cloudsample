@@ -1,8 +1,12 @@
 const nodemailer = require('nodemailer');
+const Email = require('email-templates');
+const path = require('path');
+const { I18n } = require('i18n');
 const config = require('../config/config');
 const logger = require('../config/logger');
 
 const transport = nodemailer.createTransport(config.email.smtp);
+
 /* istanbul ignore next */
 if (config.env !== 'test') {
   transport
@@ -18,9 +22,48 @@ if (config.env !== 'test') {
  * @param {string} text
  * @returns {Promise}
  */
-const sendEmail = async (to, subject, text) => {
-  const msg = { from: config.email.from, to, subject, text };
-  await transport.sendMail(msg);
+const sendEmail = async (to, template, locals) => {
+  const i18n = new I18n({
+    // https://speakt.com/top-10-languages-used-internet/
+    // aqui um exemplo +- de como integrar https://docusaurus.io/docs/2.0.0-beta.0/i18n/crowdin
+    // lokalise parece ser mais completo que crowdin https://github.com/lokalise/i18n-ally
+    // https://stackoverflow.com/a/28357857/3156756 lista de locales no javastript
+    // https://en.wikipedia.org/wiki/Languages_used_on_the_Internet#Internet_users_by_language
+    locales: ['en', 'ja', 'es', 'de', 'ru', 'fr', 'it', 'zh', 'pt', 'pt_BR', 'pl', 'ar', 'fa', 'id', 'nl', 'tr'],
+    directory: path.join(__dirname, 'locales'),
+  });
+
+  const email = new Email({
+    message: {
+      from: config.email.from,
+    },
+    // uncomment below to send emails in development/test env:
+    // send: true
+    transport: {
+      transport,
+    },
+    i18n,
+    subjectPrefix: config.env === 'production' ? false : `[${config.env.toUpperCase()}] `,
+    views: {
+      options: {
+        extension: 'ejs',
+      },
+    },
+  });
+
+  await email
+    .send({
+      template: path.join(__dirname, '../', 'views', 'emails', template),
+      message: {
+        to,
+      },
+      locals,
+    })
+    .then(console.log)
+    .catch(console.error);
+
+  // const msg = { from: config.email.from, to, subject, text };
+  // await transport.sendMail(msg);
 };
 
 /**
@@ -55,9 +98,26 @@ If you did not create an account, then ignore this email.`;
   await sendEmail(to, subject, text);
 };
 
+/**
+ * Send welcome email
+ * @param {string} to
+ * @param {string} token
+ * @returns {Promise}
+ */
+const sendWelcomeConfirmationEmail = async (to, token, firstName, locale) => {
+  const locals = {
+    locale,
+    name: firstName,
+    token,
+  };
+
+  await sendEmail(to, 'signupwelcome', locals);
+};
+
 module.exports = {
   transport,
   sendEmail,
   sendResetPasswordEmail,
   sendVerificationEmail,
+  sendWelcomeConfirmationEmail,
 };

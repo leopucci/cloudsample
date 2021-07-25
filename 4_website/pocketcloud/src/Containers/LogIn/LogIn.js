@@ -61,7 +61,7 @@ export default function LogIn() {
     const dispatch = useDispatch()
 
     const [values, setValues] = React.useState({
-        username: '',
+        email: '',
         password: ''
     })
 
@@ -94,10 +94,10 @@ export default function LogIn() {
                         margin="normal"
                         required
                         fullWidth
-                        id="username"
-                        label="Email Address/ Username"
-                        name="username"
-                        autoComplete="username"
+                        id="email"
+                        label="Email Address"
+                        name="email"
+                        autoComplete="email"
                         helperText={loginError}
                         autoFocus
                         onChange={(e) => handleOnChange(e.target.value, e.target.name)}

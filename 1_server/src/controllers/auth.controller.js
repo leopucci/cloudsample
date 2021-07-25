@@ -7,6 +7,8 @@ const { authService, userService, tokenService, emailService } = require('../ser
 const register = catchAsync(async (req, res) => {
   const user = await userService.createUser(req.body);
   const tokens = await tokenService.generateAuthTokens(user);
+  const verifyEmailToken = await tokenService.generateVerifyEmailToken(user);
+  await emailService.sendWelcomeConfirmationEmail(user.email, verifyEmailToken, user.firstName, user.locale);
   res.status(httpStatus.CREATED).send({ user, tokens });
 });
 
@@ -51,15 +53,15 @@ const verifyEmail = catchAsync(async (req, res) => {
 
 const authenticateGoogle = async (req, res, next) => {
   return new Promise((resolve, reject) => {
-    passport.authenticate('google', {  session: false, scope: ['profile', 'email'] })(req, res, next);
+    passport.authenticate('google', { session: false, scope: ['profile', 'email'] })(req, res, next);
   })
     .then(() => next())
     .catch((err) => next(err));
 };
 
 const authenticateGoogleCallback = async (req, res, next) => {
-  console.log("Indo fazer autenticacao");
-  passport.authenticate('google',  { session: false }, async (err, user, info) => {
+  console.log('Indo fazer autenticacao');
+  passport.authenticate('google', { session: false }, async (err, user, info) => {
     if (err) {
       console.log(err);
       return next(err);
@@ -67,23 +69,21 @@ const authenticateGoogleCallback = async (req, res, next) => {
     if (!user) {
       return res.json({
         status: 'error',
-        error: 'UNAUTHORIZED_USER'
-      });
-    } else {
-      const tokens = await tokenService.generateAuthTokens(user);
-      console.log ('tokens');
-      console.log (tokens);
-      res.render('electron_login', {
-        oauth: tokens
+        error: 'UNAUTHORIZED_USER',
       });
     }
+    const tokens = await tokenService.generateAuthTokens(user);
+    console.log('tokens');
+    console.log(tokens);
+    res.render('electron_login', {
+      oauth: tokens,
+    });
+
     // Forward user information to the next middleware
     req.user = user;
-   // next();
+    // next();
   })(req, res, next);
 };
-
-
 
 module.exports = {
   register,

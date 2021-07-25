@@ -58,6 +58,7 @@ const googleVerify = async (accessToken, refreshToken, profile, done) => {
       newUser.google.id = profile.id;
       newUser.google.email = profile.emails[0].value;
       newUser.isEmailVerified = profile.emails[0].verified;
+      newUser.isPasswordBlank = true;
       newUser.save(function (err) {
         if (err) throw err;
 

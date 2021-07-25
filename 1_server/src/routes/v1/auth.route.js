@@ -17,10 +17,11 @@ router.post('/send-verification-email', auth(), authController.sendVerificationE
 router.post('/verify-email', validate(authValidation.verifyEmail), authController.verifyEmail);
 
 router.get('/google', authController.authenticateGoogle);
-router.get('/google/callback',  authController.authenticateGoogleCallback);
+router.get('/google/callback', authController.authenticateGoogleCallback);
 
 router.get('/apple', passport.authenticate('apple'));
-router.get('/apple/callback',
+router.get(
+  '/apple/callback',
   passport.authenticate('apple', function (err, user, info) {
     if (err) {
       if (err == 'AuthorizationError') {

@@ -1,5 +1,11 @@
-const axios = require('axios')
+const pkg = require('../../package.json')
+const axios = require('axios').create({
+    // .. where we make our configurations
+        baseURL: process.env.NODE_ENV === 'production' ? 'https://www.siteproducao.com/v1/' : pkg.proxy       
+    });
 
+
+ 
 // Actions
 const SET_USER = 'redux/users/SET_USER'
 const LOG_OUT = 'redux/users/LOG_OUT'
@@ -25,7 +31,7 @@ const currentUser = (state = initialState, action) => {
         case SET_USER:
             return {
                 ...state,
-                profileName: action.payload.username,
+                profileName: action.payload.email,
                 isLoggedIn: true,
                 isFetching: false,
                 jwt: action.payload.jwt,
@@ -97,18 +103,19 @@ const signIn = (userObj) => dispatch => {
     dispatch({
         type: SIGN_IN
     })
+    
     axios({
         method: 'post',
-        url: 'http://localhost:3000/api/user/login ',
+        url: '/auth/login',
         data: {
-            username: userObj.username,
+            email: userObj.email,
             password: userObj.password
         }
     })
         .then(function (response) {
             // handle success
             dispatch(setUser({
-                username: userObj.username,
+                email: userObj.email,
                 jwt: response.data.jwt
             }))
 
@@ -118,7 +125,7 @@ const signIn = (userObj) => dispatch => {
             let errorMessage = 'Network Error'
             if (error.response) {
                 errorMessage = error.response.data.message
-                errorMessage = errorMessage === 'WRONG_CREDENTIAL' ? 'Incorrect username or password' : errorMessage
+                errorMessage = errorMessage === 'WRONG_CREDENTIAL' ? 'Incorrect email or password' : errorMessage
                 //User does not exist. Sign up for an account
             }
             dispatch(setLoginError(errorMessage))
@@ -134,19 +141,25 @@ const signUp = (userObj) => dispatch => {
     })
     axios({
         method: 'post',
-        url: 'http://localhost:3000/api/user/register ',
+        url: '/auth/register',
         data: {
-            username: userObj.username,
-            password: userObj.password
+            email: userObj.email,
+            password: userObj.password,
+            firstName: userObj.firstName,
+            lastName: userObj.lastName
         }
     })
         .then(function (response) {
             // handle success
-            if (response.data.userId) {
+            console.log('FOI')
+            if (response.data.id) {
+                console.log('TEM ID')
                 dispatch({
                     type: SIGN_UP_COMPLETE
                 })
                 dispatch(signIn(userObj)) //Auto login on successful register
+            }else{
+                console.log('NAO TEM ID')
             }
         })
         .catch(function (error) {
@@ -167,7 +180,7 @@ const signUp = (userObj) => dispatch => {
 const getProfile = (access_token) => {
     axios({
         method: 'get',
-        url: 'http://localhost:3000/api/user/me ',
+        url: '/api/user/me',
         headers: {
             'Authorization': 'Bearer ' + access_token,
             'Accept': 'application/json',
@@ -197,7 +210,7 @@ const logOut = () => {
 export const actions = {
     setUser,
     logOut,
-    signIn,
+    logIn: signIn,
     signUp,
     setLoginError,
     setSignupError,

@@ -41,7 +41,7 @@ https://github.com/bytenode/bytenode  => read this https://www.reddit.com/r/elec
 https://github.com/sleeyax/asarmor
 
 Servicos de localizacao.. pra traducao.. usando o github
-https://crowdin.com/project
+https://crowdin.com/project   https://docusaurus.io/docs/2.0.0-beta.0/i18n/crowdin
 é feito por estes caras aqui https://alconost.com/en/localization/crowdin-alconost
 que tambem fazem videos e campanhas de marketing
 

@@ -13,6 +13,13 @@ const { tokenTypes } = require('../config/tokens');
  */
 const loginUserWithEmailAndPassword = async (email, password) => {
   const user = await userService.getUserByEmail(email);
+  if (user != null && Object.prototype.hasOwnProperty.call(user, 'isPasswordBlank') && user.isPasswordBlank) {
+    throw new ApiError(
+      httpStatus.UNAUTHORIZED,
+      'You have loggedin using Google or Apple Login, use them instead or click forgot password'
+    );
+  }
+
   if (!user || !(await user.isPasswordMatch(password))) {
     throw new ApiError(httpStatus.UNAUTHORIZED, 'Incorrect email or password');
   }

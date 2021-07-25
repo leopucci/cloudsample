@@ -8,6 +8,7 @@ import { Provider } from 'react-redux'
 import rootReducer from './Redux'
 import App from './Containers/App';
 import reportWebVitals from './reportWebVitals';
+import {IntlProvider} from "react-intl";
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose
 
@@ -25,7 +26,9 @@ ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>
       <Router>
+      <IntlProvider locale='en'>
         <App />
+    </IntlProvider>,
       </Router>
     </Provider>
   </React.StrictMode>,

@@ -23,7 +23,7 @@ function Copyright() {
         <Typography variant="body2" color="textSecondary" align="center">
             {'Copyright © '}
             <Link color="inherit" href="https://material-ui.com/">
-                Your Website
+                Website
       </Link>{' '}
             {new Date().getFullYear()}
             {'.'}
@@ -60,8 +60,10 @@ export default function SignUp() {
 
 
     const [values, setValues] = React.useState({
-        username: '',
-        password: ''
+        email: '',
+        password: '',
+        firstName: '',
+        lastName: ''
     })
 
 
@@ -97,6 +99,7 @@ export default function SignUp() {
                                 id="firstName"
                                 label="First Name"
                                 autoFocus
+                                onChange={(e) => handleOnChange(e.target.value, e.target.name)}
                             />
                         </Grid>
                         <Grid item xs={12} sm={6}>
@@ -108,6 +111,7 @@ export default function SignUp() {
                                 label="Last Name"
                                 name="lastName"
                                 autoComplete="lname"
+                                onChange={(e) => handleOnChange(e.target.value, e.target.name)}
                             />
                         </Grid>
                         <Grid item xs={12}>
@@ -117,10 +121,10 @@ export default function SignUp() {
                                 margin="normal"
                                 required
                                 fullWidth
-                                id="username"
-                                label="Email Address/ Username"
-                                name="username"
-                                autoComplete="username"
+                                id="email"
+                                label="Email Address"
+                                name="email"
+                                autoComplete="email"
                                 autoFocus
                                 helperText={signupError}
                                 onChange={(e) => handleOnChange(e.target.value, e.target.name)}
@@ -136,6 +140,19 @@ export default function SignUp() {
                                 type="password"
                                 id="password"
                                 autoComplete="current-password"
+                                onChange={(e) => handleOnChange(e.target.value, e.target.name)}
+                            />
+                        </Grid>
+                        <Grid item xs={12}>
+                            <TextField
+                                variant="outlined"
+                                required
+                                fullWidth
+                                name="confirmPassword"
+                                label="Confirm Password"
+                                type="password"
+                                id="confirmPassword"
+                                autoComplete="confirmPassword"
                                 onChange={(e) => handleOnChange(e.target.value, e.target.name)}
                             />
                         </Grid>
@@ -157,7 +174,7 @@ export default function SignUp() {
                     </Button>
                     <Grid container justify="flex-end">
                         <Grid item>
-                            <Link component={RouterLink} to="/signin" variant="body2" href="#" className={classes.link}>
+                            <Link component={RouterLink} to="/login" variant="body2" href="#" className={classes.link}>
                                 Already have an account? Sign in
                             </Link>
                         </Grid>

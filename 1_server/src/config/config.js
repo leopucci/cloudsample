@@ -23,6 +23,7 @@ const envVarsSchema = Joi.object()
     SMTP_USERNAME: Joi.string().description('username for email server'),
     SMTP_PASSWORD: Joi.string().description('password for email server'),
     EMAIL_FROM: Joi.string().description('the from field in the emails sent by the app'),
+    EMAIL_WEBSITE_BASE_URL: Joi.string().description('the base website url for the links on the e-mail to be clicked'),
   })
   .unknown();
 
@@ -60,5 +61,6 @@ module.exports = {
       },
     },
     from: envVars.EMAIL_FROM,
+    baseUrl: envVars.EMAIL_WEBSITE_BASE_URL,
   },
 };
