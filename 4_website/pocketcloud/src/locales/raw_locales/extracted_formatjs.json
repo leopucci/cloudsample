@@ -1,0 +1,26 @@
+{
+  "loginScreen.EmailAddressField": {
+    "defaultMessage": "Email Address",
+    "description": "Email Address TextField Text"
+  },
+  "loginScreen.ForgotPasswordButton": {
+    "defaultMessage": "Forgot password?",
+    "description": "Forgot password Button Text"
+  },
+  "loginScreen.PasswordField": {
+    "defaultMessage": "Password",
+    "description": "Password TextField Text"
+  },
+  "loginScreen.SignInButton": {
+    "defaultMessage": "Sign In",
+    "description": "Sign In Button Text"
+  },
+  "loginScreen.SignInH1Text": {
+    "defaultMessage": "Sign In",
+    "description": "Sign In H1 Text"
+  },
+  "loginScreen.SignUpButton": {
+    "defaultMessage": "Don't have an account? Sign Up",
+    "description": "SignUp Button Text"
+  }
+}

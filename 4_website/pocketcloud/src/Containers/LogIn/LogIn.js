@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Redirect, Link as RouterLink } from "react-router-dom";
-
+import { FormattedMessage } from "react-intl";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -83,7 +83,11 @@ export default function LogIn() {
           <LockOutlinedIcon />
         </Avatar>
         <Typography component="h1" variant="h5">
-          Sign in
+          <FormattedMessage
+            id="loginScreen.SignInH1Text"
+            defaultMessage="Sign In"
+            description="Sign In H1 Text"
+          />
         </Typography>
         <form className={classes.form} noValidate>
           <TextField
@@ -93,7 +97,13 @@ export default function LogIn() {
             required
             fullWidth
             id="email"
-            label="Email Address"
+            label={
+              <FormattedMessage
+                id="loginScreen.EmailAddressField"
+                defaultMessage="Email Address"
+                description="Email Address TextField Text"
+              />
+            }
             name="email"
             autoComplete="email"
             helperText={loginError}
@@ -107,7 +117,13 @@ export default function LogIn() {
             required
             fullWidth
             name="password"
-            label="Password"
+            label={
+              <FormattedMessage
+                id="loginScreen.PasswordField"
+                defaultMessage="Password"
+                description="Password TextField Text"
+              />
+            }
             type="password"
             id="password"
             autoComplete="current-password"
@@ -124,12 +140,20 @@ export default function LogIn() {
             className={classes.submit}
             onClick={() => dispatch(actions.logIn(values))}
           >
-            Sign In
+            <FormattedMessage
+              id="loginScreen.SignInButton"
+              defaultMessage="Sign In"
+              description="Sign In Button Text"
+            />
           </Button>
           <Grid container>
             <Grid item xs>
               <Link href="/#" variant="body2">
-                Forgot password?
+                <FormattedMessage
+                  id="loginScreen.ForgotPasswordButton"
+                  defaultMessage="Forgot password?"
+                  description="Forgot password Button Text"
+                />
               </Link>
             </Grid>
             <Grid item>
@@ -140,7 +164,11 @@ export default function LogIn() {
                 href="/#"
                 className={classes.link}
               >
-                Don't have an account? Sign Up
+                <FormattedMessage
+                  id="loginScreen.SignUpButton"
+                  defaultMessage="Don't have an account? Sign Up"
+                  description="SignUp Button Text"
+                />
               </Link>
             </Grid>
           </Grid>

@@ -28,7 +28,12 @@
     "lint": "eslint ./",
     "lint:fix": "eslint ./ --fix",
     "prettier": "prettier --check **/*.js",
-    "prettier:fix": "prettier --write **/*.js"
+    "prettier:fix": "prettier --write **/*.js",
+    "localization_extract_formatjs_default": "NAO USAR, esta aqui so de referencia usar o script 1_localization_extrair_ids_babelfishoucrowdin.sh formatjs extract 'src/**/*.{ts,js,tsx,jsx}' --out-file src/locales/raw_locales/extracted_formatjs.json --id-interpolation-pattern '[sha512:contenthash:base64:6]' && jq -s '.[0] * .[1]' src/locales/raw_locales/en.json src/locales/raw_locales/extracted_formatjs.json > src/locales/raw_locales/merged.json && cp src/locales/raw_locales/merged.json src/locales/raw_locales/en.json",
+    "localization_extract_crowdin": "NAO USAR, esta aqui so de referencia usar o script 1_localization_extrair_ids_babelfishoucrowdin.sh formatjs extract 'src/**/*.{ts,js,tsx,jsx}' --out-file temporary_locales/extracted_crowdin.json --format crowdin",
+    "localization_extract_lokalise": "NAO USAR, esta aqui so de referencia usar o script 1_localization_extrair_ids_babelfishoucrowdin.sh formatjs extract 'src/**/*.{ts,js,tsx,jsx}' --out-file temporary_locales/extracted_lokalise.json --format lokalise",
+    "localization_extract_phrase_lingohub_simplelocalize": "NAO USAR, esta aqui so de referencia usar o script 1_localization_extrair_ids_babelfishoucrowdin.sh formatjs extract 'src/**/*.{ts,js,tsx,jsx}' --out-file temporary_locales/extracted_simple.json --format simple",
+    "localization_compile": "NAO USAR, esta aqui so de referencia usar o script 2_localization_compilar_linguas formatjs compile src/locales/raw_locales/en.json --ast --out-file src/locales/compiled_locales/en.json"
   },
   "eslintConfig": {
     "extends": [
@@ -50,6 +55,7 @@
   },
   "proxy": "http://localhost:2000/v1/",
   "devDependencies": {
+    "@formatjs/cli": "^4.2.29",
     "@typescript-eslint/eslint-plugin": "^4.28.4",
     "@typescript-eslint/parser": "^4.28.4",
     "eslint": "^7.31.0",
@@ -61,6 +67,7 @@
     "eslint-plugin-prettier": "^3.4.0",
     "eslint-plugin-react": "^7.24.0",
     "eslint-plugin-react-hooks": "^4.2.0",
+    "formatjs": "^0.1.1",
     "prettier": "^2.3.2"
   }
 }

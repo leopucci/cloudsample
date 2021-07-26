@@ -1,0 +1,20 @@
+{
+  "loginScreen.EmailAddressField": {
+    "defaultMessage": ""
+  },
+  "loginScreen.ForgotPasswordButton": {
+    "defaultMessage": ""
+  },
+  "loginScreen.PasswordField": {
+    "defaultMessage": ""
+  },
+  "loginScreen.SignInButton": {
+    "defaultMessage": ""
+  },
+  "loginScreen.SignInH1Text": {
+    "defaultMessage": "Einloggen"
+  },
+  "loginScreen.SignUpButton": {
+    "defaultMessage": ""
+  }
+}

@@ -19,6 +19,18 @@ module.exports = {
   rules: {
     "formatjs/no-offset": "error",
     "react/jsx-filename-extension": [1, { extensions: [".js", ".jsx"] }],
-    "ignoreImports": true,
+    camelcase: [
+      "error",
+      {
+        ignoreImports: true,
+      },
+      // aqui tem muito exemplos de config https://github.com/standard/eslint-config-standard-with-typescript/issues/303
+    ],
+    "formatjs/enforce-id": [
+      "error",
+      {
+        idInterpolationPattern: "",
+      },
+    ],
   },
 };
