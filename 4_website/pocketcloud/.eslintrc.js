@@ -19,5 +19,6 @@ module.exports = {
   rules: {
     "formatjs/no-offset": "error",
     "react/jsx-filename-extension": [1, { extensions: [".js", ".jsx"] }],
+    "ignoreImports": true,
   },
 };
