@@ -85,7 +85,7 @@ export default function Header({ isLoggedIn }) {
             to="/"
             variant="button"
             color="textPrimary"
-            href="#"
+            href="/#"
             className={classes.link}
           >
             Public
@@ -95,7 +95,7 @@ export default function Header({ isLoggedIn }) {
             to="/Home"
             variant="button"
             color="textPrimary"
-            href="#"
+            href="/#"
             className={classes.link}
           >
             Home

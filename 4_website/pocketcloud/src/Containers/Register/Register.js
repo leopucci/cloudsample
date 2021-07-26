@@ -177,7 +177,7 @@ export default function SignUp() {
                 component={RouterLink}
                 to="/login"
                 variant="body2"
-                href="#"
+                href="/#"
                 className={classes.link}
               >
                 Already have an account? Sign in

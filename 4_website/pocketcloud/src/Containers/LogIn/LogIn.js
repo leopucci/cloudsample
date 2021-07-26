@@ -128,7 +128,7 @@ export default function LogIn() {
           </Button>
           <Grid container>
             <Grid item xs>
-              <Link href="#" variant="body2">
+              <Link href="/#" variant="body2">
                 Forgot password?
               </Link>
             </Grid>
@@ -137,7 +137,7 @@ export default function LogIn() {
                 component={RouterLink}
                 to="/signup"
                 variant="body2"
-                href="#"
+                href="/#"
                 className={classes.link}
               >
                 Don't have an account? Sign Up
