@@ -1,4 +1,5 @@
 const pkg = require("../../package.json");
+// eslint-disable-next-line import/order
 const axios = require("axios").create({
   // .. where we make our configurations
   baseURL:
@@ -110,8 +111,8 @@ const signIn = (userObj) => (dispatch) => {
       // handle success
       dispatch(
         setUser({
-          email: userObj.email,
-          jwt: response.data.jwt,
+          email: response.data.user.email,
+          jwt: response.data.tokens,
         })
       );
     })

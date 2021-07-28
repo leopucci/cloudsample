@@ -14,11 +14,14 @@ export default function App() {
     (state) => state.user.isLoggedIn && state.user.jwt !== null
   );
 
+  // eslint-disable-next-line react/prop-types
   const PrivateRoute = ({ component: Component, ...rest }) => (
     <Route
+      // eslint-disable-next-line react/jsx-props-no-spreading
       {...rest}
       render={(props) =>
         isLoggedIn === true ? (
+          // eslint-disable-next-line react/jsx-props-no-spreading
           <Component {...props} />
         ) : (
           <Redirect to="/login" />

@@ -1,4 +1,5 @@
 const allRoles = {
+  freePlan: [],
   user: [],
   admin: ['getUsers', 'manageUsers'],
 };

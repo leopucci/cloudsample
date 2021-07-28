@@ -6,7 +6,10 @@ import { BrowserRouter as Router } from "react-router-dom";
 import { createStore, applyMiddleware, compose } from "redux";
 import { Provider } from "react-redux";
 import { IntlProvider } from "react-intl";
-
+import {
+  createStateSyncMiddleware,
+  initMessageListener,
+} from "redux-state-sync";
 import rootReducer from "./Redux";
 import App from "./Containers/App";
 import reportWebVitals from "./reportWebVitals";
@@ -24,19 +27,28 @@ const messages = {
 };
 
 // https://www.npmjs.com/package/react-intl-redux
-// Pra colocar no redux a parte de lingua, junto com as demais infos. 
+// Pra colocar no redux a parte de lingua, junto com as demais infos.
 
 const language = navigator.language.split(/[-_]/)[0]; // language without region code
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
+const reduxStateSyncConfig = {
+  // TOGGLE_TODO will not be triggered in other tabs
+  blacklist: ["TOGGLE_TODO_ISTO_EH_SO_UM_EXEMPLO"],
+};
+
 const store = createStore(
   rootReducer,
   composeEnhancers(
-    applyMiddleware(thunkMiddleware),
+    applyMiddleware(
+      createStateSyncMiddleware(reduxStateSyncConfig),
+      thunkMiddleware
+    ),
     persistState(/* paths, config */)
   )
 );
+initMessageListener(store);
 
 ReactDOM.render(
   <React.StrictMode>
