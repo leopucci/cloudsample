@@ -8,6 +8,8 @@ const axios = require("axios").create({
       : pkg.proxy,
 });
 
+// Aqui ele nomeou as ações. o bom disto é que ele pode fazer um import * as actions e depois usar actions. e ter todas disponiveis
+// e caso ele precise mudar em algum lugar, ele muda tudo no mesmo lugar. 
 // Actions
 const SET_USER = "redux/users/SET_USER";
 const LOG_OUT = "redux/users/LOG_OUT";
@@ -28,6 +30,13 @@ const initialState = {
   signupError: null,
 };
 
+// functional programing
+// currying eh um conceito de ter 1 funcao que retorna funcao, ao inves de ter 2 parametros, tenho 1 so aninhado. 
+
+// isto aqui é uma funçao.. por causa do '() =>{}' que ele usou
+// currentUser eh o export default entao eh so o nome de uma reducer que
+// vai ser usada pelo redux. 
+// esta sendo exportada uma função, a reducer é uma função. 
 const currentUser = (state = initialState, action) => {
   switch (action.type) {
     case SET_USER:
@@ -79,6 +88,9 @@ const currentUser = (state = initialState, action) => {
 export default currentUser;
 
 // Action Creators
+// Aqui ele esta devolvendo um objeto veja o () antes do {}
+// Isso serve pra facilitar na hora de declarar.
+// agora ele usa  dispatch(setLoginError(errorMessage)); e ja esta indo a estrutura pronta e ele só precisa declarar num lugar
 const setUser = (userObj) => ({
   type: SET_USER,
   payload: userObj,
