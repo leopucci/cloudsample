@@ -9,15 +9,15 @@ const axios = require("axios").create({
 });
 
 // Aqui ele nomeou as ações. o bom disto é que ele pode fazer um import * as actions e depois usar actions. e ter todas disponiveis
-// e caso ele precise mudar em algum lugar, ele muda tudo no mesmo lugar. 
+// e caso ele precise mudar em algum lugar, ele muda tudo no mesmo lugar.
 // Actions
-const SET_USER = "redux/users/SET_USER";
-const LOG_OUT = "redux/users/LOG_OUT";
-const SIGN_IN = "redux/users/SIGN_IN";
-const SIGN_UP = "redux/users/SIGN_UP";
-const SIGN_UP_COMPLETE = "redux/users/SIGN_UP_COMPLETE";
-const SET_LOGIN_ERROR = "redux/users/SET_LOGIN_ERROR";
-const SET_SIGNUP_ERROR = "redux/users/SET_SIGNUP_ERROR";
+export const SET_USER = "redux/users/SET_USER";
+export const LOG_OUT = "redux/users/LOG_OUT";
+export const SIGN_IN = "redux/users/SIGN_IN";
+export const SIGN_UP = "redux/users/SIGN_UP";
+export const SIGN_UP_COMPLETE = "redux/users/SIGN_UP_COMPLETE";
+export const SET_LOGIN_ERROR = "redux/users/SET_LOGIN_ERROR";
+export const SET_SIGNUP_ERROR = "redux/users/SET_SIGNUP_ERROR";
 
 // Reducer
 
@@ -31,12 +31,12 @@ const initialState = {
 };
 
 // functional programing
-// currying eh um conceito de ter 1 funcao que retorna funcao, ao inves de ter 2 parametros, tenho 1 so aninhado. 
+// currying eh um conceito de ter 1 funcao que retorna funcao, ao inves de ter 2 parametros, tenho 1 so aninhado.
 
 // isto aqui é uma funçao.. por causa do '() =>{}' que ele usou
 // currentUser eh o export default entao eh so o nome de uma reducer que
-// vai ser usada pelo redux. 
-// esta sendo exportada uma função, a reducer é uma função. 
+// vai ser usada pelo redux.
+// esta sendo exportada uma função, a reducer é uma função.
 const currentUser = (state = initialState, action) => {
   switch (action.type) {
     case SET_USER:
