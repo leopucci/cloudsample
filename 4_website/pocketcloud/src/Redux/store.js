@@ -15,7 +15,15 @@ const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
 const reduxStateSyncConfig = {
   // TOGGLE_TODO will not be triggered in other tabs
-  blacklist: [PERSIST, PURGE, REHYDRATE],
+  predicate: (action) => {
+    const blacklist = [PERSIST, PURGE, REHYDRATE];
+    if (typeof action !== "function") {
+      if (Array.isArray(blacklist)) {
+        return blacklist.indexOf(action.type) < 0;
+      }
+    }
+    return false;
+  },
 };
 
 const persistConfig = {
