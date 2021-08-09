@@ -1,13 +1,4 @@
-const pkg = require("../../package.json");
-// eslint-disable-next-line import/order
-const axios = require("axios").create({
-  // .. where we make our configurations
-  baseURL:
-    process.env.NODE_ENV === "production"
-      ? "https://www.siteproducao.com/v1/"
-      : pkg.proxy,
-});
-
+import api from "./api";
 // Aqui ele nomeou as ações. o bom disto é que ele pode fazer um import * as actions e depois usar actions. e ter todas disponiveis
 // e caso ele precise mudar em algum lugar, ele muda tudo no mesmo lugar.
 // Actions
@@ -15,6 +6,7 @@ export const SET_USER = "redux/users/SET_USER";
 export const LOG_OUT = "redux/users/LOG_OUT";
 export const SIGN_IN = "redux/users/SIGN_IN";
 export const SIGN_UP = "redux/users/SIGN_UP";
+export const REFRESHED_TOKEN = "redux/users/REFRESHED_TOKEN";
 export const SIGN_UP_COMPLETE = "redux/users/SIGN_UP_COMPLETE";
 export const SET_LOGIN_ERROR = "redux/users/SET_LOGIN_ERROR";
 export const SET_SIGNUP_ERROR = "redux/users/SET_SIGNUP_ERROR";
@@ -39,6 +31,11 @@ const initialState = {
 // esta sendo exportada uma função, a reducer é uma função.
 const currentUser = (state = initialState, action) => {
   switch (action.type) {
+    case REFRESHED_TOKEN:
+      return {
+        ...state,
+        jwt: action.payload.jwt,
+      };
     case SET_USER:
       return {
         ...state,
@@ -96,6 +93,10 @@ const setUser = (userObj) => ({
   payload: userObj,
 });
 
+const refreshedToken = (userObj) => ({
+  type: REFRESHED_TOKEN,
+  payload: userObj,
+});
 const setLoginError = (error) => ({
   type: SET_LOGIN_ERROR,
   payload: { error },
@@ -111,7 +112,7 @@ const signIn = (userObj) => (dispatch) => {
     type: SIGN_IN,
   });
 
-  axios({
+  return api({
     method: "post",
     url: "/auth/login",
     data: {
@@ -130,6 +131,7 @@ const signIn = (userObj) => (dispatch) => {
     })
     .catch((error) => {
       // handle error
+      console.log(error);
       let errorMessage = "Network Error";
       if (error.response) {
         errorMessage = error.response.data.message;
@@ -150,7 +152,7 @@ const signUp = (userObj) => (dispatch) => {
   dispatch({
     type: SIGN_UP,
   });
-  axios({
+  api({
     method: "post",
     url: "/auth/register",
     data: {
@@ -191,7 +193,7 @@ const signUp = (userObj) => (dispatch) => {
 };
 
 const getProfile = (access_token) => {
-  axios({
+  api({
     method: "get",
     url: "/api/user/me",
     headers: {
@@ -225,4 +227,5 @@ export const actions = {
   setLoginError,
   setSignupError,
   getProfile,
+  refreshedToken,
 };

@@ -8,7 +8,7 @@ import { initMessageListener } from "redux-state-sync";
 import { store, persistor } from "./Redux/store";
 import App from "./Containers/App";
 import reportWebVitals from "./reportWebVitals";
-
+import setupAxiosApiInterceptors from "./Redux/setupInterceptors";
 // eslint-disable-next-line camelcase
 import messages_de from "./locales/compiled_locales/de.json";
 // eslint-disable-next-line camelcase
@@ -26,6 +26,7 @@ const messages = {
 
 const language = navigator.language.split(/[-_]/)[0]; // language without region code
 initMessageListener(store);
+setupAxiosApiInterceptors(store);
 ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>
