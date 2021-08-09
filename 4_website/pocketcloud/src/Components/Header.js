@@ -8,7 +8,7 @@ import Typography from "@material-ui/core/Typography";
 import Link from "@material-ui/core/Link";
 import Button from "@material-ui/core/Button";
 import { makeStyles } from "@material-ui/core/styles";
-
+import "axios-progress-bar/dist/nprogress.css";
 import { actions } from "../Redux/user";
 
 const useStyles = makeStyles((theme) => ({
