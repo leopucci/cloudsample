@@ -1,3 +1,52 @@
+
+
+https://github.com/robtaussig/react-use-websocket
+
+Aqui parece ter um exemplo de websocket com redux interessantes
+https://www.pluralsight.com/guides/using-web-sockets-in-your-reactredux-app
+https://github.com/ManZzup/plguides/blob/master/11-using-websockets-in-your-react-redux-app/chat-app/src/WebSocket.js
+
+
+
+Modulos pra permissao de usuario. 
+quem manda e a api, la esta a permissao. 
+no react é só um reflexo do que vem no jwt 
+https://github.com/stalniy/casl
+https://github.com/mjrussell/redux-auth-wrapper#redux-auth-wrapper
+
+
+https://github.com/patelmayankce/react-redux-permission#readme
+
+
+
+
+isto aqui eh bom pra fazer formularios, melhor uqe o o do redux
+https://github.com/formium/formik
+
+
+interessante pra ações de dispatch pra ir pra outras telas
+https://github.com/supasate/connected-react-router
+
+
+aqui tem um exemplo interessante de porque tem detalhes de implementação interessantes. o connected-react-router peguei daqui
+o redux deste cara está bem implementado.. mais pra frente a ideia seria copiar o modelo e estruturar o meu desta forma
+https://github.com/flaviuse/mern-authentication
+
+
+otimo sistema de notifications (tirei do falviuse/mern tbm) 
+olhar RNC https://github.com/djizco/mern-boilerplate/blob/master/client/store/thunks/auth.js
+https://www.npmjs.com/package/react-notifications-component
+
+
+
+
+
+
+
+
+
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
