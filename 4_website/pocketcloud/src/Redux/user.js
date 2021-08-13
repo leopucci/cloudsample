@@ -158,6 +158,7 @@ const signUp = (userObj) => (dispatch) => {
     data: {
       email: userObj.email,
       password: userObj.password,
+      confirmPassword: userObj.confirmPassword,
       firstName: userObj.firstName,
       lastName: userObj.lastName,
     },
@@ -215,9 +216,34 @@ const getProfile = (access_token) => {
     });
 };
 
-const logOut = () => ({
-  type: LOG_OUT,
-});
+const logOut = (userObj) => (dispatch) => {
+  api({
+    method: "post",
+    url: "/auth/logout",
+    data: {
+      refreshToken: userObj.access_token,
+    },
+  })
+    .then((response) => {
+      // handle success
+      console.log(response);
+      dispatch({
+        type: LOG_OUT,
+      });
+    })
+    .catch((error) => {
+      // handle error
+      let errorMessage = "Network Error";
+      if (error.response) {
+        errorMessage = error.response.data.message;
+        errorMessage =
+          errorMessage === "USERNAME_IS_NOT_AVAILABLE"
+            ? "Username/Email is not available"
+            : errorMessage;
+      }
+      dispatch(setSignupError(errorMessage));
+    });
+};
 
 export const actions = {
   setUser,

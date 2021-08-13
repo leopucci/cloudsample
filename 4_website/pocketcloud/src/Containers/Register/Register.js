@@ -62,6 +62,7 @@ export default function SignUp() {
   const [values, setValues] = React.useState({
     email: "",
     password: "",
+    confirmPassword: "",
     firstName: "",
     lastName: "",
   });
