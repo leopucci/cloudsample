@@ -5,6 +5,11 @@ const register = {
   body: Joi.object().keys({
     email: Joi.string().required().email(),
     password: Joi.string().required().custom(password),
+    confirmPassword: Joi.any()
+      .equal(Joi.ref('password'))
+      .required()
+      .label('Confirm password')
+      .messages({ 'any.only': '{{#label}} does not match' }),
     firstName: Joi.string().required(),
     lastName: Joi.string().required(),
   }),
