@@ -216,33 +216,45 @@ const getProfile = (access_token) => {
     });
 };
 
-const logOut = (userObj) => (dispatch) => {
-  api({
-    method: "post",
-    url: "/auth/logout",
-    data: {
-      refreshToken: userObj.access_token,
-    },
-  })
-    .then((response) => {
-      // handle success
-      console.log(response);
-      dispatch({
-        type: LOG_OUT,
-      });
+const logOut = (userObj) => (dispatch, getState) => {
+  const state = getState();
+  let token;
+  if (state.user.jwt != null) {
+    token = state.user.jwt.refresh.token;
+    api({
+      method: "post",
+      url: "/auth/logout",
+      data: {
+        refreshToken: token,
+      },
     })
-    .catch((error) => {
-      // handle error
-      let errorMessage = "Network Error";
-      if (error.response) {
-        errorMessage = error.response.data.message;
-        errorMessage =
-          errorMessage === "USERNAME_IS_NOT_AVAILABLE"
-            ? "Username/Email is not available"
-            : errorMessage;
-      }
-      dispatch(setSignupError(errorMessage));
+      .then((response) => {
+        // handle success
+        console.log(response);
+        dispatch({
+          type: LOG_OUT,
+        });
+      })
+      .catch((error) => {
+        //AQUI PRECISA GERAR ERRO TBM, SE NAO CONSEGUIU CONECTAR
+        //UMA MENSAGEM NA TELA/NOTIFICAÇÃO
+        // handle error
+        let errorMessage = "Network Error";
+        if (error.response) {
+          errorMessage = error.response.data.message;
+          errorMessage =
+            errorMessage === "USERNAME_IS_NOT_AVAILABLE"
+              ? "Username/Email is not available"
+              : errorMessage;
+        }
+        dispatch(setSignupError(errorMessage));
+      });
+  } else {
+    //AQUI TEM UM ERRO EMBUTIDO QUE PRECISA SER LOGADO. ELE VAI DESLOGAR NO CLIENTE SEM DESLOGAR NA API
+    dispatch({
+      type: LOG_OUT,
     });
+  }
 };
 
 export const actions = {
