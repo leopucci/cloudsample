@@ -15,6 +15,8 @@ import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
+import GoogleLogin from "react-google-login";
+import { GoogleLoginButton } from "react-social-login-buttons";
 
 import { actions } from "../../Redux/user";
 
@@ -146,6 +148,28 @@ export default function LogIn() {
               description="Sign In Button Text"
             />
           </Button>
+
+          <GoogleLogin
+            clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}
+            onSuccess={(response) => {
+              dispatch(actions.googleLogIn(response));
+            }}
+            onFailure={(response) => {
+              if (response.error) {
+                switch (response.error) {
+                  case "popup_closed_by_user":
+                    console.log("popup_closed_by_user");
+                    break;
+                  default:
+                    console.log(response.error);
+                    dispatch(actions.setGoogleLogInError(response.error));
+                }
+              } else {
+                console.log(response);
+              }
+            }}
+            cookiePolicy="single_host_origin"
+          />
           <Grid container>
             <Grid item xs>
               <Link href="/#" variant="body2">

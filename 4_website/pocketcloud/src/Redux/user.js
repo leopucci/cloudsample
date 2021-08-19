@@ -102,6 +102,11 @@ const setLoginError = (error) => ({
   payload: { error },
 });
 
+const setGoogleLogInError = (error) => ({
+  type: SET_LOGIN_ERROR,
+  payload: { error },
+});
+
 const setSignupError = (error) => ({
   type: SET_SIGNUP_ERROR,
   payload: { error },
@@ -118,6 +123,47 @@ const signIn = (userObj) => (dispatch) => {
     data: {
       email: userObj.email,
       password: userObj.password,
+    },
+  })
+    .then((response) => {
+      // handle success
+      dispatch(
+        setUser({
+          email: response.data.user.email,
+          jwt: response.data.tokens,
+        })
+      );
+    })
+    .catch((error) => {
+      // handle error
+      console.log(error);
+      let errorMessage = "Network Error";
+      if (error.response) {
+        errorMessage = error.response.data.message;
+        errorMessage =
+          errorMessage === "WRONG_CREDENTIAL"
+            ? "Incorrect email or password"
+            : errorMessage;
+        // User does not exist. Sign up for an account
+      }
+      dispatch(setLoginError(errorMessage));
+    })
+    .then(() => {
+      // always executed
+    });
+};
+
+const googleSignIn = (userObj) => (dispatch) => {
+  dispatch({
+    type: SIGN_IN,
+  });
+
+  console.log(userObj);
+  return api({
+    method: "post",
+    url: "/auth/login/google",
+    data: {
+      token: userObj.tokenId,
     },
   })
     .then((response) => {
@@ -261,8 +307,10 @@ export const actions = {
   setUser,
   logOut,
   logIn: signIn,
+  googleLogIn: googleSignIn,
   signUp,
   setLoginError,
+  setGoogleLogInError,
   setSignupError,
   getProfile,
   refreshedToken,

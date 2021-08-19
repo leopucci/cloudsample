@@ -31,11 +31,17 @@ https://github.com/supasate/connected-react-router
 aqui tem um exemplo interessante de porque tem detalhes de implementação interessantes. o connected-react-router peguei daqui
 o redux deste cara está bem implementado.. mais pra frente a ideia seria copiar o modelo e estruturar o meu desta forma
 https://github.com/flaviuse/mern-authentication
+eh um dos 2  q tem organizado https://github.com/djizco/mern-boilerplate
+corrrer o olho neste tbm pra ver se tem coisa boa https://github.com/nemanjam/mern-boilerplate
 
-
-otimo sistema de notifications (tirei do falviuse/mern tbm) 
+otimo sistema de notifications (tirei do https://github.com/djizco/mern-boilerplate) 
 olhar RNC https://github.com/djizco/mern-boilerplate/blob/master/client/store/thunks/auth.js
 https://www.npmjs.com/package/react-notifications-component
+
+
+
+aqui tem o filestash, que aparentemente vai ser o modelo que eu vou usar pra interface 
+https://github.com/mickael-kerjean/filestash/tree/master/client
 
 
 
