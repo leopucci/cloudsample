@@ -1273,25 +1273,6 @@
     "chalk" "^4.1.1"
     "tslib" "^2.1.0"
 
-"@fortawesome/fontawesome-common-types@^0.2.36":
-  "integrity" "sha512-a/7BiSgobHAgBWeN7N0w+lAhInrGxksn13uK7231n2m8EDPE3BMCl9NZLTGrj9ZXfCmC6LM0QLqXidIizVQ6yg=="
-  "resolved" "https://registry.npmjs.org/@fortawesome/fontawesome-common-types/-/fontawesome-common-types-0.2.36.tgz"
-  "version" "0.2.36"
-
-"@fortawesome/fontawesome-svg-core@^1.2.32":
-  "integrity" "sha512-YUcsLQKYb6DmaJjIHdDWpBIGCcyE/W+p/LMGvjQem55Mm2XWVAP5kWTMKWLv9lwpCVjpLxPyOMOyUocP1GxrtA=="
-  "resolved" "https://registry.npmjs.org/@fortawesome/fontawesome-svg-core/-/fontawesome-svg-core-1.2.36.tgz"
-  "version" "1.2.36"
-  dependencies:
-    "@fortawesome/fontawesome-common-types" "^0.2.36"
-
-"@fortawesome/react-fontawesome@^0.1.15":
-  "integrity" "sha512-/HFHdcoLESxxMkqZAcZ6RXDJ69pVApwdwRos/B2kiMWxDSAX2dFK8Er2/+rG+RsrzWB/dsAyjefLmemgmfE18g=="
-  "resolved" "https://registry.npmjs.org/@fortawesome/react-fontawesome/-/react-fontawesome-0.1.15.tgz"
-  "version" "0.1.15"
-  dependencies:
-    "prop-types" "^15.7.2"
-
 "@hapi/address@2.x.x":
   "integrity" "sha512-QD1PhQk+s31P1ixsX0H0Suoupp3VMXzIVMSwobR3F3MSUO2YCV0B7xqLcUw/Bh8yuvd3LhpyqLQWTNcRmp6IdQ=="
   "resolved" "https://registry.npmjs.org/@hapi/address/-/address-2.1.4.tgz"
@@ -5843,6 +5824,11 @@
     "merge2" "^1.3.0"
     "slash" "^3.0.0"
 
+"google-one-tap-login@^1.0.1":
+  "integrity" "sha512-/vrR/5Qq+KQnao0pIf6vZGrC2WMSS/DK3moDWE3d7DColwloeyVXg/S1Tc5cP/0CoUDagsx9RS+VudCIFcZf4Q=="
+  "resolved" "https://registry.npmjs.org/google-one-tap-login/-/google-one-tap-login-1.0.1.tgz"
+  "version" "1.0.1"
+
 "graceful-fs@^4.1.11", "graceful-fs@^4.1.15", "graceful-fs@^4.1.2", "graceful-fs@^4.1.6", "graceful-fs@^4.2.0", "graceful-fs@^4.2.4":
   "integrity" "sha512-nTnJ528pbqxYanhpDYsi4Rd8MAeaBA67+RZ10CM1m3bTAVFEDcd5AuA4a6W5YkGZ1iNXHzZz8T6TBKLeBuNriQ=="
   "resolved" "https://registry.npmjs.org/graceful-fs/-/graceful-fs-4.2.6.tgz"
@@ -9887,6 +9873,11 @@
     "@types/react" "*"
     "prop-types" "^15.6.0"
 
+"react-google-one-tap-login@^0.0.9":
+  "integrity" "sha512-j9BHSmtVRJmgfuTtNDvNUUFA69R7OR4Ho58Ais5KauwInmUyQxrXp8NvGW4P1ehQ50Rfz0Bi6xYIM0KaD8Ml5g=="
+  "resolved" "https://registry.npmjs.org/react-google-one-tap-login/-/react-google-one-tap-login-0.0.9.tgz"
+  "version" "0.0.9"
+
 "react-intl@^5.20.5":
   "integrity" "sha512-2CfAt+W/abFcxkQXSvkjsXZlnxCithskrpEIMUkR5TQzEFr6BgUddW8zoa/xXUEi07SP534WA8tjtPH5jcqDPA=="
   "resolved" "https://registry.npmjs.org/react-intl/-/react-intl-5.20.5.tgz"
@@ -10039,10 +10030,10 @@
   optionalDependencies:
     "fsevents" "^2.1.3"
 
-"react-social-login-buttons@^3.5.0":
-  "integrity" "sha512-4oDkEpY3M8h3+MkqYq6xpfzvumnVE4DDars0xNCLJNZ7MikT+YN/IaZRFXCM0vV250iPrHpk+b6juw1HXOmWsw=="
-  "resolved" "https://registry.npmjs.org/react-social-login-buttons/-/react-social-login-buttons-3.5.0.tgz"
-  "version" "3.5.0"
+"react-social-login-buttons@^3.5.1":
+  "integrity" "sha512-3TjHYARN9cOfEEl6uQeeB1oMV/dJ2lyxqK98Y+HuvP0E9Q0HJoFvNps6h6EYKE6Yw6LMllUeR5264tSqalM/ww=="
+  "resolved" "https://registry.npmjs.org/react-social-login-buttons/-/react-social-login-buttons-3.5.1.tgz"
+  "version" "3.5.1"
 
 "react-transition-group@^4.4.0":
   "integrity" "sha512-/RNYfRAMlZwDSr6z4zNKV6xu53/e2BuaBbGhbyYIXTrmgu/bGHzmqOs7mJSJBHy9Ud+ApHx3QjrkKSp1pxvlFg=="
@@ -10054,7 +10045,7 @@
     "loose-envify" "^1.4.0"
     "prop-types" "^15.6.2"
 
-"react@*", "react@^0.14.0 || ^15.0.0 || ^16.0.0 || ^17.0.0", "react@^15.0.0 || ^16.0.0 || ^17.x", "react@^16 || ^17", "react@^16.3.0 || 17", "react@^16.8.0 || ^17.0.0", "react@^16.8.3 || ^17", "react@^17.0.2", "react@>= 16", "react@>=15", "react@>=16.6.0", "react@>=16.x", "react@17.0.2":
+"react@*", "react@^0.14.0 || ^15.0.0 || ^16.0.0 || ^17.0.0", "react@^15.0.0 || ^16.0.0 || ^17.x", "react@^16 || ^17", "react@^16.3.0 || 17", "react@^16.8.0 || ^17.0.0", "react@^16.8.3 || ^17", "react@^17.0.2", "react@>= 16", "react@>= 16.8.0", "react@>=15", "react@>=16.6.0", "react@17.0.2":
   "integrity" "sha512-gnhPt75i/dq/z3/6q/0asP78D0u592D5L1pd7M8P+dck6Fu/jJeL6iVVK23fptSUZj8Vjf++7wXA8UNclGQcbA=="
   "resolved" "https://registry.npmjs.org/react/-/react-17.0.2.tgz"
   "version" "17.0.2"

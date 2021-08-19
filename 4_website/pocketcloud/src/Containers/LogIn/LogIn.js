@@ -16,7 +16,10 @@ import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import GoogleLogin from "react-google-login";
-import { GoogleLoginButton } from "react-social-login-buttons";
+import {
+  GoogleLoginButton,
+  AppleLoginButton,
+} from "react-social-login-buttons";
 
 import { actions } from "../../Redux/user";
 
@@ -86,9 +89,9 @@ export default function LogIn() {
         </Avatar>
         <Typography component="h1" variant="h5">
           <FormattedMessage
-            id="loginScreen.SignInH1Text"
-            defaultMessage="Sign In"
-            description="Sign In H1 Text"
+            id="loginScreen.LogInH1Text"
+            defaultMessage="Log in"
+            description="Log In H1 Text"
           />
         </Typography>
         <form className={classes.form} noValidate>
@@ -143,13 +146,26 @@ export default function LogIn() {
             onClick={() => dispatch(actions.logIn(values))}
           >
             <FormattedMessage
-              id="loginScreen.SignInButton"
-              defaultMessage="Sign In"
-              description="Sign In Button Text"
+              id="loginScreen.LogInButton"
+              defaultMessage="Log In"
+              description="Log In Button Text"
             />
           </Button>
-
           <GoogleLogin
+            style={{
+              textAlign: "center",
+              alignItems: "center",
+              borderRadius: 50,
+              justifyContent: "center",
+              width: "900",
+            }}
+            className={classes.submit}
+            render={(renderProps) => (
+              <GoogleLoginButton
+                onClick={renderProps.onClick}
+                disabled={renderProps.disabled}
+              />
+            )}
             clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}
             onSuccess={(response) => {
               dispatch(actions.googleLogIn(response));
@@ -170,6 +186,7 @@ export default function LogIn() {
             }}
             cookiePolicy="single_host_origin"
           />
+          <AppleLoginButton />
           <Grid container>
             <Grid item xs>
               <Link href="/#" variant="body2">
