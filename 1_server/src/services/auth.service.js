@@ -1,9 +1,68 @@
 const httpStatus = require('http-status');
+const { OAuth2Client } = require('google-auth-library');
 const tokenService = require('./token.service');
 const userService = require('./user.service');
 const Token = require('../models/token.model');
 const ApiError = require('../utils/ApiError');
 const { tokenTypes } = require('../config/tokens');
+const { User } = require('../models');
+/**
+ * Login with google signIn user
+ * @param {string} token
+ * @returns {Promise<User>}
+ */
+const googleLoginOrCreateAccount = async (token) => {
+  const client = new OAuth2Client(process.env.CLIENT_ID);
+  let payload;
+
+  try {
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: process.env.GOOGLE_LOGIN_CLIENT_ID,
+    });
+    payload = ticket.getPayload();
+  } catch (error) {
+    throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid credentials');
+  }
+  let user = await userService.getUserByEmail(payload.email);
+  if (!user) {
+    const newUser = new User();
+    // eslint-disable-next-line camelcase
+    newUser.firstName = payload.given_name;
+    // eslint-disable-next-line camelcase
+    newUser.lastName = payload.family_name;
+    newUser.email = payload.email;
+    newUser.google.id = payload.sub;
+    newUser.google.token = token;
+    newUser.profilePicture = payload.picture;
+    // eslint-disable-next-line camelcase
+    newUser.isEmailVerified = payload.email_verified;
+    newUser.isPasswordBlank = true;
+    user = await userService.createUser(newUser);
+    return user;
+  }
+  user = await userService.updateUserById(user.id, {
+    firstName: payload.given_name,
+    lastName: payload.family_name,
+    profilePicture: payload.picture,
+    google: {
+      id: payload.sub,
+      token,
+    },
+    // Se for true, nao mexe, mas se nao for dae tenta mexer
+    // eslint-disable-next-line camelcase
+    isEmailVerified: user.isEmailVerified === true ? true : payload.email_verified,
+  });
+  return user;
+};
+
+/*
+const user = await db.user.upsert({ 
+    where: { email: email },
+    update: { name, picture },
+    create: { name, email, picture }
+})
+*/
 
 /**
  * Login with username and password
@@ -13,10 +72,10 @@ const { tokenTypes } = require('../config/tokens');
  */
 const loginUserWithEmailAndPassword = async (email, password) => {
   const user = await userService.getUserByEmail(email);
-  if (user != null && Object.prototype.hasOwnProperty.call(user, 'isPasswordBlank') && user.isPasswordBlank) {
+  if (user != null && 'isPasswordBlank' in user && user.isPasswordBlank === true) {
     throw new ApiError(
       httpStatus.UNAUTHORIZED,
-      'You have loggedin using Google or Apple Login, use them instead or click forgot password'
+      'You have logged in using Google or Apple Login, use them instead or click forgot password to generate a password'
     );
   }
 
@@ -98,6 +157,7 @@ const verifyEmail = async (verifyEmailToken) => {
 };
 
 module.exports = {
+  googleLoginOrCreateAccount,
   loginUserWithEmailAndPassword,
   logout,
   refreshAuth,

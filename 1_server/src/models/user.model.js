@@ -7,7 +7,6 @@ const { roles } = require('../config/roles');
 const userSchema = mongoose.Schema(
   {
     firstName: {
-      alias: 'name',
       type: String,
       required: true,
       trim: true,
@@ -29,11 +28,14 @@ const userSchema = mongoose.Schema(
         }
       },
     },
+    profilePicture: {
+      type: String,
+      required: false,
+      trim: true,
+    },
     google: {
       id: String,
       token: String,
-      email: String,
-      name: String,
     },
     password: {
       type: String,

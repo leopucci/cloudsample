@@ -9,6 +9,7 @@ const router = express.Router();
 
 router.post('/register', validate(authValidation.register), authController.register);
 router.post('/login', validate(authValidation.login), authController.login);
+router.post('/login/google', validate(authValidation.googleLogin), authController.googleLoginOrCreateAccount);
 router.post('/logout', validate(authValidation.logout), authController.logout);
 router.post('/refresh-tokens', validate(authValidation.refreshTokens), authController.refreshTokens);
 router.post('/forgot-password', validate(authValidation.forgotPassword), authController.forgotPassword);
@@ -20,6 +21,7 @@ router.get('/google', authController.authenticateGoogle);
 router.get('/google/callback', authController.authenticateGoogleCallback);
 
 router.get('/apple', passport.authenticate('apple'));
+/*
 router.get(
   '/apple/callback',
   passport.authenticate('apple', function (err, user, info) {
@@ -40,6 +42,7 @@ router.get(
     }
   })
 );
+*/
 
 module.exports = router;
 

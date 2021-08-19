@@ -1,5 +1,6 @@
 const passport = require('passport');
 const httpStatus = require('http-status');
+
 const path = require('path');
 const catchAsync = require('../utils/catchAsync');
 const { authService, userService, tokenService, emailService } = require('../services');
@@ -15,6 +16,13 @@ const register = catchAsync(async (req, res) => {
 const login = catchAsync(async (req, res) => {
   const { email, password } = req.body;
   const user = await authService.loginUserWithEmailAndPassword(email, password);
+  const tokens = await tokenService.generateAuthTokens(user);
+  res.send({ user, tokens });
+});
+
+const googleLoginOrCreateAccount = catchAsync(async (req, res) => {
+  const { token } = req.body;
+  const user = await authService.googleLoginOrCreateAccount(token);
   const tokens = await tokenService.generateAuthTokens(user);
   res.send({ user, tokens });
 });
@@ -88,6 +96,7 @@ const authenticateGoogleCallback = async (req, res, next) => {
 module.exports = {
   register,
   login,
+  googleLoginOrCreateAccount,
   logout,
   refreshTokens,
   forgotPassword,
