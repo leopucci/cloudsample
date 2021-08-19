@@ -139,6 +139,7 @@ export default function LogIn() {
             label="Remember me"
           />
           <Button
+            size="large"
             fullWidth
             variant="contained"
             color="primary"
