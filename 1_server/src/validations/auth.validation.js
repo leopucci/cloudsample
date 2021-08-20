@@ -22,6 +22,13 @@ const login = {
   }),
 };
 
+const appleLogin = {
+  body: Joi.object().keys({
+    authorization: Joi.string().required(),
+    appleUser: Joi.string().required(),
+  }),
+};
+
 const googleLogin = {
   body: Joi.object().keys({
     token: Joi.string().required(),
@@ -61,13 +68,21 @@ const verifyEmail = {
   }),
 };
 
+const appleSignInWebHook = {
+  body: Joi.object().keys({
+    payload: Joi.string().required(),
+  }),
+};
+
 module.exports = {
   register,
   login,
+  appleLogin,
   googleLogin,
   logout,
   refreshTokens,
   forgotPassword,
   resetPassword,
   verifyEmail,
+  appleSignInWebHook,
 };

@@ -36,6 +36,13 @@ const userSchema = mongoose.Schema(
     google: {
       id: String,
       token: String,
+      lastGoogleLogin: Date,
+    },
+    apple: {
+      id: String,
+      isEmailProxy: Boolean,
+      token: String,
+      lastAppleLogin: Date,
     },
     password: {
       type: String,
@@ -52,6 +59,9 @@ const userSchema = mongoose.Schema(
     isPasswordBlank: {
       type: Boolean,
       default: false,
+    },
+    lastPasswordLogin: {
+      type: Date,
     },
     role: {
       type: String,

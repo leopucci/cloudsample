@@ -9,6 +9,8 @@ const router = express.Router();
 
 router.post('/register', validate(authValidation.register), authController.register);
 router.post('/login', validate(authValidation.login), authController.login);
+router.post('/login/apple', validate(authValidation.appleLogin), authController.appleLoginOrCreateAccount);
+router.post('/login/applesigninwebhook', validate(authValidation.appleSignInWebHook), authController.appleSignInWebHook);
 router.post('/login/google', validate(authValidation.googleLogin), authController.googleLoginOrCreateAccount);
 router.post('/logout', validate(authValidation.logout), authController.logout);
 router.post('/refresh-tokens', validate(authValidation.refreshTokens), authController.refreshTokens);
@@ -16,10 +18,13 @@ router.post('/forgot-password', validate(authValidation.forgotPassword), authCon
 router.post('/reset-password', validate(authValidation.resetPassword), authController.resetPassword);
 router.post('/send-verification-email', auth(), authController.sendVerificationEmail);
 router.post('/verify-email', validate(authValidation.verifyEmail), authController.verifyEmail);
-
+// Estas autenticacoes sao com o passportjs.
+// Eu tinha feito isto pensando no electron, mas decidi largar tudo no react
+// entao estou refazendo no path /login/google e /login/apple
+// estas rotas permitem autenticacao toda no backend, sem o react no front.. o back gera os html de tela
+// mudou um pouco o formato do banco, preciso atualizar se for usar isto aqui pra alguma coisa
 router.get('/google', authController.authenticateGoogle);
 router.get('/google/callback', authController.authenticateGoogleCallback);
-
 router.get('/apple', passport.authenticate('apple'));
 /*
 router.get(

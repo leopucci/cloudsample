@@ -1,7 +1,6 @@
 const passport = require('passport');
 const httpStatus = require('http-status');
 
-const path = require('path');
 const catchAsync = require('../utils/catchAsync');
 const { authService, userService, tokenService, emailService } = require('../services');
 
@@ -19,6 +18,19 @@ const login = catchAsync(async (req, res) => {
   const tokens = await tokenService.generateAuthTokens(user);
   res.send({ user, tokens });
 });
+
+const appleLoginOrCreateAccount = catchAsync(async (req, res) => {
+  const { authorization, appleUser } = req.body;
+  const user = await authService.appleLoginOrCreateAccount(authorization, appleUser);
+  const tokens = await tokenService.generateAuthTokens(user);
+  res.send({ user, tokens });
+});
+
+const appleSignInWebHook = async (req, res) => {
+  const { payload } = req.body;
+  await authService.appleSignInWebHook(payload);
+  res.status(httpStatus.OK).send();
+};
 
 const googleLoginOrCreateAccount = catchAsync(async (req, res) => {
   const { token } = req.body;
@@ -96,6 +108,8 @@ const authenticateGoogleCallback = async (req, res, next) => {
 module.exports = {
   register,
   login,
+  appleLoginOrCreateAccount,
+  appleSignInWebHook,
   googleLoginOrCreateAccount,
   logout,
   refreshTokens,
