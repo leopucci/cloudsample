@@ -20,7 +20,8 @@ import {
   GoogleLoginButton,
   AppleLoginButton,
 } from "react-social-login-buttons";
-
+import AppleSignin from "react-apple-signin-auth";
+import AppleLogin from "react-apple-login";
 import { actions } from "../../Redux/user";
 
 function Copyright() {
@@ -163,6 +164,7 @@ export default function LogIn() {
             className={classes.submit}
             render={(renderProps) => (
               <GoogleLoginButton
+                align="center"
                 onClick={renderProps.onClick}
                 disabled={renderProps.disabled}
               />
@@ -187,7 +189,75 @@ export default function LogIn() {
             }}
             cookiePolicy="single_host_origin"
           />
-          <AppleLoginButton />
+          <AppleSignin
+            /** Auth options passed to AppleID.auth.init() */
+            authOptions={{
+              /** Client ID - eg: 'com.example.com' */
+              clientId: process.env.REACT_APP_APPLE_CLIENT_ID,
+              /** Requested scopes, seperated by spaces - eg: 'email name' */
+              scope: "email name",
+              /** Apple's redirectURI - must be one of the URIs you added to the serviceID - the undocumented trick in apple docs is that you should call auth from a page that is listed as a redirectURI, localhost fails */
+              redirectURI: "https://example.com",
+              /** State string that is returned with the apple response */
+              state: "state",
+              /** Nonce */
+              nonce: "nonce",
+              /** Uses popup auth instead of redirection */
+              usePopup: true,
+            }} // REQUIRED
+            /** General props */
+            uiType="light"
+            /** className */
+            className="apple-auth-btn"
+            /** Removes default style tag */
+            noDefaultStyle={false}
+            /** Allows to change the button's children, eg: for changing the button text */
+            // buttonExtraChildren="Continue with Apple"
+            /** Extra controlling props */
+            /** Called upon signin success in case authOptions.usePopup = true -- which means auth is handled client side */
+            onSuccess={(response) => {
+              dispatch(actions.googleLogIn(response));
+            }} // default = undefined
+            /** Called upon signin error */
+            onError={(response) => {
+              // PRECISA TESTAR ESTA RESPOSTA E AJUSTAR ISTO, SO COPIEI E COLEI
+              if (response.error) {
+                switch (response.error) {
+                  case "popup_closed_by_user":
+                    console.log("popup_closed_by_user");
+                    break;
+                  default:
+                    console.log(response.error);
+                    dispatch(actions.setGoogleLogInError(response.error));
+                }
+              } else {
+                console.log(response);
+              }
+            }} // default = undefined
+            /** Skips loading the apple script if true */
+            skipScript={false} // default = undefined
+            /** Apple image props */
+            // iconProp={{ style: { marginTop: "10px" } }} // default = undefined
+            /** render function - called with all props - can be used to fully customize the UI by rendering your own component  */
+            render={(renderProps) => (
+              <AppleLoginButton onClick={renderProps.onClick} align="center" />
+            )}
+
+            //     render={(renderProps) => (
+            //         <button onClick={renderProps.onClick}>My Custom Button</button>
+            //       )}
+          />
+
+          <AppleLogin
+            clientId="com.react.apple.login"
+            redirectURI="https://redirectUrl.com"
+            responseType="code"
+            responseMode="query"
+            usePopup
+            render={(renderProps) => (
+              <AppleLoginButton onClick={renderProps.onClick} align="center" />
+            )}
+          />
           <Grid container>
             <Grid item xs>
               <Link href="/#" variant="body2">
