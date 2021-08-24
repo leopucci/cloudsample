@@ -1,3 +1,4 @@
+import { GoogleReCaptchaProvider } from "react-google-recaptcha-v3";
 import React from "react";
 import ReactDOM from "react-dom";
 import { PersistGate } from "redux-persist/integration/react";
@@ -21,9 +22,6 @@ const messages = {
   en: messages_en,
 };
 
-// https://www.npmjs.com/package/react-intl-redux
-// Pra colocar no redux a parte de lingua, junto com as demais infos.
-
 const language = navigator.language.split(/[-_]/)[0]; // language without region code
 initMessageListener(store);
 setupAxiosApiInterceptors(store);
@@ -31,16 +29,29 @@ ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
-        <Router>
-          <IntlProvider
-            messages={messages[language]}
-            locale={language}
-            defaultLocale="en"
-          >
-            <App />
-          </IntlProvider>
-          ,
-        </Router>
+        <GoogleReCaptchaProvider
+          reCaptchaKey={process.env.REACT_APP_RECAPTCHA_SITE_ID}
+          language={language}
+          useRecaptchaNet={false}
+          useEnterprise={false}
+          scriptProps={{
+            async: false, // optional, default to false,
+            defer: false, // optional, default to false
+            appendTo: "head", // optional, default to "head", can be "head" or "body",
+            nonce: undefined, // optional, default undefined
+          }}
+        >
+          <Router>
+            <IntlProvider
+              messages={messages[language]}
+              locale={language}
+              defaultLocale="en"
+            >
+              <App />
+            </IntlProvider>
+            ,
+          </Router>
+        </GoogleReCaptchaProvider>
       </PersistGate>
     </Provider>
   </React.StrictMode>,
