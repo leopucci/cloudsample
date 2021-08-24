@@ -1,4 +1,5 @@
 import axios from "axios";
+import { loadProgressBar } from "axios-progress-bar";
 
 const pkg = require("../../package.json");
 
@@ -11,5 +12,6 @@ const instance = axios.create({
     "Content-Type": "application/json",
   },
 });
+loadProgressBar(null, instance);
 
 export default instance;

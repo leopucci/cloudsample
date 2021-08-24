@@ -7,6 +7,13 @@ https://www.pluralsight.com/guides/using-web-sockets-in-your-reactredux-app
 https://github.com/ManZzup/plguides/blob/master/11-using-websockets-in-your-react-redux-app/chat-app/src/WebSocket.js
 
 
+INTERACAO DO USUARIO USANDO REDUX PARECE INTERESSANTE
+https://www.freecodecamp.org/news/how-to-track-user-interactions-in-your-react-app-b82f0bc4c7ff/
+
+https://github.com/faouzioudouh/react-tracker
+
+DEBOUNCE DE ACOES
+https://github.com/ryanseddon/redux-debounced
 
 Modulos pra permissao de usuario. 
 quem manda e a api, la esta a permissao. 
@@ -18,6 +25,8 @@ https://github.com/mjrussell/redux-auth-wrapper#redux-auth-wrapper
 https://github.com/patelmayankce/react-redux-permission#readme
 
 
+encriptar o storage
+https://www.npmjs.com/package/encrypt-storage#redux-persist
 
 
 isto aqui eh bom pra fazer formularios, melhor uqe o o do redux
