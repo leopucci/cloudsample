@@ -4,13 +4,13 @@ import { Redirect, Link as RouterLink } from "react-router-dom";
 import { FormattedMessage } from "react-intl";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
+import Box from "@material-ui/core/Box";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import TextField from "@material-ui/core/TextField";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Checkbox from "@material-ui/core/Checkbox";
 import Link from "@material-ui/core/Link";
 import Grid from "@material-ui/core/Grid";
-import Box from "@material-ui/core/Box";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
@@ -21,20 +21,11 @@ import {
   AppleLoginButton,
 } from "react-social-login-buttons";
 import AppleSignin from "react-apple-signin-auth";
-import AppleLogin from "react-apple-login";
+// import AppleLogin from "react-apple-login";
+import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 import { actions } from "../../Redux/user";
-
-function Copyright() {
-  return (
-    <Typography variant="body2" color="textSecondary" align="center">
-      {"Copyright © "}
-      <Link color="inherit" href="https://material-ui.com/">
-        Your Website
-      </Link>{" "}
-      {new Date().getFullYear()}.
-    </Typography>
-  );
-}
+import RecaptchaTermsOfService from "../../Components/RecaptchaTermsOfService";
+import Footer from "../../Components/Footer";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -57,6 +48,15 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function LogIn() {
+  /* useLayoutEffect(() => {
+    const captcha = document.getElementsByClassName("grecaptcha-badge")[0];
+    if (captcha) {
+      captcha.style.visibility = "hidden";
+    }
+  }, []);
+
+  */
+  const { executeRecaptcha } = useGoogleReCaptcha();
   const isLoggedIn = useSelector(
     (state) => state.user.isLoggedIn && state.user.jwt !== null
   );
@@ -69,10 +69,37 @@ export default function LogIn() {
   const [values, setValues] = React.useState({
     email: "",
     password: "",
+    recaptcha: "",
   });
 
   const handleOnChange = (value, name) => {
     setValues({ ...values, [name]: value });
+  };
+
+  const onClickLogin = async () => {
+    dispatch(actions.clearLoginError());
+    if (values.email === "" || values.password === "") {
+      dispatch(
+        actions.setGoogleLogInError("Please add Email and Password to continue")
+      );
+    } else {
+      if (!executeRecaptcha) {
+        dispatch(actions.notify("Execute recaptcha not yet available", 1));
+        return;
+      }
+      const recaptcha = await executeRecaptcha("SimpleLogin");
+      if (recaptcha != null) {
+        dispatch(actions.logIn(values, recaptcha));
+      } else {
+        dispatch(actions.notify("Recaptcha esta vindo em branco no login", 1));
+      }
+    }
+  };
+
+  const onSuccessGoogleLogin = async (response) => {
+    dispatch(actions.clearLoginError());
+    const recaptcha = await executeRecaptcha("LoginViaGoogle");
+    dispatch(actions.googleLogIn(response, recaptcha));
   };
 
   useEffect(() => {
@@ -80,7 +107,6 @@ export default function LogIn() {
   }, [dispatch]);
 
   if (isLoggedIn) return <Redirect to="/Home" />;
-
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
@@ -135,6 +161,28 @@ export default function LogIn() {
             autoComplete="current-password"
             onChange={(e) => handleOnChange(e.target.value, e.target.name)}
           />
+          {/*
+          <Reaptcha
+            ref={recaptchaRef}
+            sitekey={process.env.REACT_APP_RECAPTCHA_SITE_ID}
+            onVerify={(e) => console.log(e)}
+            size="invisible"
+          />
+          
+          <ReCAPTCHA
+            align="center"
+            ref={recaptchaRef}
+            size="invisible"
+            sitekey={process.env.REACT_APP_RECAPTCHA_SITE_ID}
+            onChange={recaptchaOnChange}
+            onErrored={(error) => {
+              dispatch(actions.setGoogleLogInError(error));
+              console.log(error);
+            }}
+            asyncScriptOnLoad={() => console.log("asyncScriptOnLoad")}
+            onExpired={() => console.log("EXPIROU")}
+          />
+*/}
           <FormControlLabel
             control={<Checkbox value="remember" color="primary" />}
             label="Remember me"
@@ -145,7 +193,7 @@ export default function LogIn() {
             variant="contained"
             color="primary"
             className={classes.submit}
-            onClick={() => dispatch(actions.logIn(values))}
+            onClick={onClickLogin}
           >
             <FormattedMessage
               id="loginScreen.LogInButton"
@@ -170,9 +218,7 @@ export default function LogIn() {
               />
             )}
             clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}
-            onSuccess={(response) => {
-              dispatch(actions.googleLogIn(response));
-            }}
+            onSuccess={onSuccessGoogleLogin}
             onFailure={(response) => {
               if (response.error) {
                 switch (response.error) {
@@ -182,9 +228,21 @@ export default function LogIn() {
                   default:
                     console.log(response.error);
                     dispatch(actions.setGoogleLogInError(response.error));
+                    dispatch(
+                      actions.notify(
+                        `Erro no login do google: ${response.error}`,
+                        1
+                      )
+                    );
                 }
               } else {
                 console.log(response);
+                dispatch(
+                  actions.notify(
+                    `Erro no login do google response: ${response}`,
+                    1
+                  )
+                );
               }
             }}
             cookiePolicy="single_host_origin"
@@ -229,9 +287,21 @@ export default function LogIn() {
                   default:
                     console.log(response.error);
                     dispatch(actions.setGoogleLogInError(response.error));
+                    dispatch(
+                      actions.notify(
+                        `Erro no login da apple: ${response.error}`,
+                        1
+                      )
+                    );
                 }
               } else {
                 console.log(response);
+                dispatch(
+                  actions.notify(
+                    `Erro no login da apple response: ${response}`,
+                    1
+                  )
+                );
               }
             }} // default = undefined
             /** Skips loading the apple script if true */
@@ -248,6 +318,7 @@ export default function LogIn() {
             //       )}
           />
 
+          {/*
           <AppleLogin
             clientId="com.react.apple.login"
             redirectURI="https://redirectUrl.com"
@@ -257,7 +328,7 @@ export default function LogIn() {
             render={(renderProps) => (
               <AppleLoginButton onClick={renderProps.onClick} align="center" />
             )}
-          />
+          /> */}
           <Grid container>
             <Grid item xs>
               <Link href="/#" variant="body2">
@@ -285,10 +356,12 @@ export default function LogIn() {
             </Grid>
           </Grid>
         </form>
+        <br />
       </div>
-      <Box mt={8}>
-        <Copyright />
+      <Box mt={3}>
+        <RecaptchaTermsOfService />
       </Box>
+      <Footer />
     </Container>
   );
 }

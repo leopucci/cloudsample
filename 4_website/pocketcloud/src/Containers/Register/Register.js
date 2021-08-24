@@ -15,20 +15,11 @@ import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
+import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 
 import { actions } from "../../Redux/user";
-
-function Copyright() {
-  return (
-    <Typography variant="body2" color="textSecondary" align="center">
-      {"Copyright © "}
-      <Link color="inherit" href="https://material-ui.com/">
-        Website
-      </Link>{" "}
-      {new Date().getFullYear()}.
-    </Typography>
-  );
-}
+import RecaptchaTermsOfService from "../../Components/RecaptchaTermsOfService";
+import Footer from "../../Components/Footer";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -51,6 +42,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function SignUp() {
+  const { executeRecaptcha } = useGoogleReCaptcha();
   const isLoggedIn = useSelector(
     (state) => state.user.isLoggedIn && state.user.jwt !== null
   );
@@ -74,6 +66,34 @@ export default function SignUp() {
   useEffect(() => {
     dispatch(actions.logOut()); // reset state and clear any errors
   }, [dispatch]);
+
+  const onClickRegister = async () => {
+    dispatch(actions.clearLoginError());
+    if (
+      values.email === "" ||
+      values.password === "" ||
+      values.confirmPassword === "" ||
+      values.firstName === "" ||
+      values.lastName === ""
+    ) {
+      dispatch(
+        actions.setSignupError("Please add Email and Password to continue")
+      );
+    } else {
+      if (!executeRecaptcha) {
+        dispatch(actions.notify("Execute recaptcha not yet available", 1));
+        return;
+      }
+      const recaptcha = await executeRecaptcha("Register");
+      if (recaptcha != null) {
+        dispatch(actions.signUp(values, recaptcha));
+      } else {
+        dispatch(
+          actions.notify("Recaptcha esta vindo em branco no register", 1)
+        );
+      }
+    }
+  };
 
   if (isLoggedIn) return <Redirect to="/Home" />;
 
@@ -168,7 +188,7 @@ export default function SignUp() {
             variant="contained"
             color="primary"
             className={classes.submit}
-            onClick={() => dispatch(actions.signUp(values))}
+            onClick={onClickRegister}
           >
             Sign Up
           </Button>
@@ -187,9 +207,10 @@ export default function SignUp() {
           </Grid>
         </form>
       </div>
-      <Box mt={5}>
-        <Copyright />
+      <Box mt={3}>
+        <RecaptchaTermsOfService />
       </Box>
+      <Footer />
     </Container>
   );
 }

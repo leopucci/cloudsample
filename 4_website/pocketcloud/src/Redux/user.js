@@ -1,3 +1,4 @@
+import wakeEvent from "wake-event";
 import api from "./api";
 // Aqui ele nomeou as ações. o bom disto é que ele pode fazer um import * as actions e depois usar actions. e ter todas disponiveis
 // e caso ele precise mudar em algum lugar, ele muda tudo no mesmo lugar.
@@ -9,6 +10,7 @@ export const SIGN_UP = "redux/users/SIGN_UP";
 export const REFRESHED_TOKEN = "redux/users/REFRESHED_TOKEN";
 export const SIGN_UP_COMPLETE = "redux/users/SIGN_UP_COMPLETE";
 export const SET_LOGIN_ERROR = "redux/users/SET_LOGIN_ERROR";
+export const CLEAR_LOGIN_ERROR = "redux/users/CLEAR_LOGIN_ERROR";
 export const SET_SIGNUP_ERROR = "redux/users/SET_SIGNUP_ERROR";
 
 // Reducer
@@ -71,6 +73,12 @@ const currentUser = (state = initialState, action) => {
         isFetching: false,
         loginError: action.payload.error,
       };
+    case CLEAR_LOGIN_ERROR:
+      return {
+        ...state,
+        isFetching: false,
+        loginError: null,
+      };
     case SET_SIGNUP_ERROR:
       return {
         ...state,
@@ -101,6 +109,10 @@ const setLoginError = (error) => ({
   type: SET_LOGIN_ERROR,
   payload: { error },
 });
+const clearLoginError = (error) => ({
+  type: CLEAR_LOGIN_ERROR,
+  payload: { error },
+});
 
 const setGoogleLogInError = (error) => ({
   type: SET_LOGIN_ERROR,
@@ -112,17 +124,17 @@ const setSignupError = (error) => ({
   payload: { error },
 });
 
-const signIn = (userObj) => (dispatch) => {
+const signIn = (userObj, recaptcha) => (dispatch) => {
   dispatch({
     type: SIGN_IN,
   });
-
   return api({
     method: "post",
     url: "/auth/login",
     data: {
       email: userObj.email,
       password: userObj.password,
+      recaptcha,
     },
   })
     .then((response) => {
@@ -153,7 +165,7 @@ const signIn = (userObj) => (dispatch) => {
     });
 };
 
-const googleSignIn = (userObj) => (dispatch) => {
+const googleSignIn = (userObj, recaptcha) => (dispatch) => {
   dispatch({
     type: SIGN_IN,
   });
@@ -164,6 +176,7 @@ const googleSignIn = (userObj) => (dispatch) => {
     url: "/auth/login/google",
     data: {
       token: userObj.tokenId,
+      recaptcha,
     },
   })
     .then((response) => {
@@ -194,7 +207,7 @@ const googleSignIn = (userObj) => (dispatch) => {
     });
 };
 
-const signUp = (userObj) => (dispatch) => {
+const signUp = (userObj, recaptcha) => (dispatch) => {
   dispatch({
     type: SIGN_UP,
   });
@@ -207,19 +220,27 @@ const signUp = (userObj) => (dispatch) => {
       confirmPassword: userObj.confirmPassword,
       firstName: userObj.firstName,
       lastName: userObj.lastName,
+      recaptcha,
     },
   })
     .then((response) => {
       // handle success
       console.log("FOI");
-      if (response.data.id) {
+      if (response.data.user.id) {
         console.log("TEM ID");
         dispatch({
           type: SIGN_UP_COMPLETE,
         });
-        dispatch(signIn(userObj)); // Auto login on successful register
+        dispatch(
+          setUser({
+            email: response.data.user.email,
+            jwt: response.data.tokens,
+          })
+        );
+        // Auto login on successful register
       } else {
         console.log("NAO TEM ID");
+        console.log(response.data);
       }
     })
     .catch((error) => {
@@ -233,29 +254,6 @@ const signUp = (userObj) => (dispatch) => {
             : errorMessage;
       }
       dispatch(setSignupError(errorMessage));
-    })
-    .then(() => {
-      // always executed
-    });
-};
-
-const getProfile = (access_token) => {
-  api({
-    method: "get",
-    url: "/api/user/me",
-    headers: {
-      Authorization: `Bearer ${access_token}`,
-      Accept: "application/json",
-      "Content-Type": "application/json",
-    },
-  })
-    .then((response) => {
-      // handle success
-      console.log(response);
-    })
-    .catch((error) => {
-      // handle error
-      console.log(error.response);
     })
     .then(() => {
       // always executed
@@ -282,8 +280,8 @@ const logOut = (userObj) => (dispatch, getState) => {
         });
       })
       .catch((error) => {
-        //AQUI PRECISA GERAR ERRO TBM, SE NAO CONSEGUIU CONECTAR
-        //UMA MENSAGEM NA TELA/NOTIFICAÇÃO
+        // AQUI PRECISA GERAR ERRO TBM, SE NAO CONSEGUIU CONECTAR
+        // UMA MENSAGEM NA TELA/NOTIFICAÇÃO
         // handle error
         let errorMessage = "Network Error";
         if (error.response) {
@@ -296,13 +294,48 @@ const logOut = (userObj) => (dispatch, getState) => {
         dispatch(setSignupError(errorMessage));
       });
   } else {
-    //AQUI TEM UM ERRO EMBUTIDO QUE PRECISA SER LOGADO. ELE VAI DESLOGAR NO CLIENTE SEM DESLOGAR NA API
+    // AQUI TEM UM ERRO EMBUTIDO QUE PRECISA SER LOGADO. ELE VAI DESLOGAR NO CLIENTE SEM DESLOGAR NA API
     dispatch({
       type: LOG_OUT,
     });
   }
 };
 
+const notify =
+  (message, channel = 1) =>
+  (dispatch) => {
+    dispatch({
+      type: SIGN_IN,
+    });
+    return api({
+      method: "post",
+      url: "/auth/login/errors",
+      data: {
+        message,
+      },
+    })
+      .catch((error) => {
+        // handle error
+        console.log(error);
+        let errorMessage = "Network Error";
+        if (error.response) {
+          errorMessage = error.response.data.message;
+          errorMessage =
+            errorMessage === "WRONG_CREDENTIAL"
+              ? "Incorrect email or password"
+              : errorMessage;
+          // User does not exist. Sign up for an account
+        }
+        dispatch(setLoginError(errorMessage));
+      })
+      .then(() => {
+        // always executed
+      });
+  };
+
+wakeEvent(function () {
+  notify("computer woke up!");
+});
 export const actions = {
   setUser,
   logOut,
@@ -310,8 +343,9 @@ export const actions = {
   googleLogIn: googleSignIn,
   signUp,
   setLoginError,
+  clearLoginError,
   setGoogleLogInError,
   setSignupError,
-  getProfile,
+  notify,
   refreshedToken,
 };
