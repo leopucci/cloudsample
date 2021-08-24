@@ -20,6 +20,10 @@ const useStyles = makeStyles((theme) => ({
     li: {
       listStyle: "none",
     },
+    // Isto tira o recaptcha badge, so que eu fiz no app.js
+    ".grecaptcha-badge": {
+      visibility: "hidden",
+    },
   },
   appBar: {
     borderBottom: `1px solid ${theme.palette.divider}`,

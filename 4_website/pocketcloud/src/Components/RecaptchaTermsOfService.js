@@ -1,8 +1,6 @@
 import React from "react";
 import Typography from "@material-ui/core/Typography";
-import Link from "@material-ui/core/Link";
 import { makeStyles } from "@material-ui/core/styles";
-// import { FaHeart, FaYoutube, FaInstagram } from "react-icons/fa";
 
 const useStyles = makeStyles({
   bg: {
@@ -13,20 +11,19 @@ const useStyles = makeStyles({
   },
 });
 
-export default function Footer() {
+export default function RecaptchaTermsOfService() {
+  // eslint-disable-next-line no-unused-vars
   const classes = useStyles();
   return (
     <Typography
       variant="body2"
       color="textSecondary"
       align="center"
-      className={classes.bg}
+      style={{ whiteSpace: "pre-line", fontSize: 10 }}
     >
-      {"Copyright © "}
-      <Link color="inherit" href="https://material-ui.com/">
-        Your Website
-      </Link>{" "}
-      {new Date().getFullYear()}.
+      This site is protected by reCAPTCHA{"\n"} and the Google&nbsp;
+      <a href="https://policies.google.com/privacy">Privacy Policy</a> and&nbsp;
+      <a href="https://policies.google.com/terms">Terms of Service</a> apply.
     </Typography>
   );
 }
