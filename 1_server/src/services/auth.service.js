@@ -1,18 +1,67 @@
 const httpStatus = require('http-status');
 const { OAuth2Client } = require('google-auth-library');
 const appleSignin = require('apple-signin-auth');
+const reCAPTCHA = require('recaptcha2');
+const myAxiosInstance = require('../utils/axioshttp');
+
 const tokenService = require('./token.service');
 const userService = require('./user.service');
 const Token = require('../models/token.model');
 const ApiError = require('../utils/ApiError');
+const { enviaNotificacaoApi } = require('../utils/notify');
 const { tokenTypes } = require('../config/tokens');
 const { User } = require('../models');
 
 /**
  * Login with apple signIn user
- * @param {string} token
+ * @param {string} recaptcha
  * @returns {Promise<User>}
  */
+// siteKey: process.env.RECAPTCHA_SITE_KEY,
+// secretKey: process.env.RECAPTCHA_SECRET_KEY,
+const verifyRecaptcha = async (token, clientIpAddress) => {
+  let result;
+  try {
+    result = await myAxiosInstance({
+      method: 'post',
+      url: 'https://www.google.com/recaptcha/api/siteverify',
+      params: {
+        secret: process.env.RECAPTCHA_SECRET_KEY,
+        response: token,
+        remoteIp: clientIpAddress,
+      },
+    });
+  } catch (err) {
+    enviaNotificacaoApi(`Erro no recaptcha axiostry/catch http falhou:  ${err.toString()}`);
+    return false;
+  }
+  const data = result.data || {};
+  if (!data.success) {
+    if (data['error-codes'].length > 1) {
+      enviaNotificacaoApi(`Erro no recaptcha maior que 1:  ${JSON.stringify(data['error-codes'])}`);
+      // eh pra me avisar que isso eu previso aprender.
+    }
+    switch (data['error-codes'].pop()) {
+      case 'timeout-or-duplicate':
+        // return true;
+        break;
+      default:
+        enviaNotificacaoApi(
+          `Erro no recaptcha default:  ${JSON.stringify(data['error-codes'])} remoteIp: ${clientIpAddress}`
+        );
+    }
+    return false;
+  }
+  // Deixar em 0.3 por um tempo e só aumentar pra 0.5 quando madurar.
+  // o certo é retornar um erro especifico e abrir um recaptcha pra ser preenchido.
+  // https://stackoverflow.com/a/35641680/3156756
+  // https://andremonteiro.pt/react-redux-modal/
+  if (data.score < 0.3) {
+    enviaNotificacaoApi(`Erro no recaptcha SCORE BAIXO:  ${JSON.stringify(data)} remoteIp: ${clientIpAddress}`);
+    return false;
+  }
+  return true;
+};
 
 /*
 {
@@ -34,6 +83,11 @@ const { User } = require('../models');
 
 // ISTO AQUI AJUDA https://dev.to/heyitsarpit/how-to-add-signin-with-apple-on-your-website-43m9
 
+/**
+ * Login with apple signIn user
+ * @param {string} token
+ * @returns {Promise<User>}
+ */
 const appleLoginOrCreateAccount = async (authorization, appleUser) => {
   let appleVerifiedData;
   try {
@@ -105,6 +159,7 @@ LoginTicket {
     jti: '816356df711adf2aafc66afcc548c9ca2a6cdb07'
   }
 } */
+
 /**
  * Login with google signIn user
  * @param {string} token
@@ -155,13 +210,18 @@ const googleLoginOrCreateAccount = async (token) => {
   return user;
 };
 
-/*
-const user = await db.user.upsert({ 
-    where: { email: email },
-    update: { name, picture },
-    create: { name, email, picture }
-})
-*/
+/**
+ * Login with username and password
+ * @param {string} email
+ * @returns {Boolean}
+ */
+const userHasPassword = async (email) => {
+  const user = await userService.getUserByEmail(email);
+  if (user != null && 'isPasswordBlank' in user && user.isPasswordBlank === true) {
+    return false;
+  }
+  return true;
+};
 
 /**
  * Login with username and password
@@ -296,8 +356,10 @@ const appleSignInWebHookHandler = async (payload) => {
 };
 
 module.exports = {
+  verifyRecaptcha,
   appleLoginOrCreateAccount,
   googleLoginOrCreateAccount,
+  userHasPassword,
   loginUserWithEmailAndPassword,
   logout,
   refreshAuth,

@@ -12,6 +12,14 @@ const register = {
       .messages({ 'any.only': '{{#label}} does not match' }),
     firstName: Joi.string().required(),
     lastName: Joi.string().required(),
+    recaptcha: Joi.string().required(),
+  }),
+};
+
+const loginErrors = {
+  body: Joi.object().keys({
+    message: Joi.string().required(),
+    channel: Joi.number().integer(),
   }),
 };
 
@@ -19,6 +27,7 @@ const login = {
   body: Joi.object().keys({
     email: Joi.string().required(),
     password: Joi.string().required(),
+    recaptcha: Joi.string().required(),
   }),
 };
 
@@ -26,12 +35,14 @@ const appleLogin = {
   body: Joi.object().keys({
     authorization: Joi.string().required(),
     appleUser: Joi.string().required(),
+    recaptcha: Joi.string().required(),
   }),
 };
 
 const googleLogin = {
   body: Joi.object().keys({
     token: Joi.string().required(),
+    recaptcha: Joi.string().required(),
   }),
 };
 
@@ -76,6 +87,7 @@ const appleSignInWebHook = {
 
 module.exports = {
   register,
+  loginErrors,
   login,
   appleLogin,
   googleLogin,

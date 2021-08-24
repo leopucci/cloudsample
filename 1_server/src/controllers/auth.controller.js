@@ -1,8 +1,8 @@
 const passport = require('passport');
 const httpStatus = require('http-status');
-
 const catchAsync = require('../utils/catchAsync');
 const { authService, userService, tokenService, emailService } = require('../services');
+const { enviaNotificacaoSite } = require('../utils/notify');
 
 const register = catchAsync(async (req, res) => {
   const user = await userService.createUser(req.body);
@@ -13,14 +13,34 @@ const register = catchAsync(async (req, res) => {
 });
 
 const login = catchAsync(async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, recaptcha } = req.body;
+
+  const recaptchaOK = await authService.verifyRecaptcha(recaptcha, req.connection.remoteAddress);
+  if (!recaptchaOK) {
+    res.status(httpStatus.NOT_ACCEPTABLE).send('{"message": "Recaptcha Error"}');
+    return;
+  }
+  const userHasPassword = await authService.userHasPassword(email);
+  if (!userHasPassword) {
+    res
+      .status(httpStatus.NOT_ACCEPTABLE)
+      .send(
+        '{"message": "You have logged in using Google or Apple Login, use them instead or click forgot password to generate a password"}'
+      );
+    return;
+  }
   const user = await authService.loginUserWithEmailAndPassword(email, password);
   const tokens = await tokenService.generateAuthTokens(user);
   res.send({ user, tokens });
 });
 
 const appleLoginOrCreateAccount = catchAsync(async (req, res) => {
-  const { authorization, appleUser } = req.body;
+  const { authorization, appleUser, recaptcha } = req.body;
+  const recaptchaOK = await authService.verifyRecaptcha(recaptcha, req.connection.remoteAddress);
+  if (!recaptchaOK) {
+    res.status(httpStatus.NOT_ACCEPTABLE).send('{"message": "Recaptcha Error"}');
+    return;
+  }
   const user = await authService.appleLoginOrCreateAccount(authorization, appleUser);
   const tokens = await tokenService.generateAuthTokens(user);
   res.send({ user, tokens });
@@ -33,7 +53,12 @@ const appleSignInWebHook = async (req, res) => {
 };
 
 const googleLoginOrCreateAccount = catchAsync(async (req, res) => {
-  const { token } = req.body;
+  const { token, recaptcha } = req.body;
+  const recaptchaOK = await authService.verifyRecaptcha(recaptcha, req.connection.remoteAddress);
+  if (!recaptchaOK) {
+    res.status(httpStatus.NOT_ACCEPTABLE).send('{"message": "Recaptcha Error"}');
+    return;
+  }
   const user = await authService.googleLoginOrCreateAccount(token);
   const tokens = await tokenService.generateAuthTokens(user);
   res.send({ user, tokens });
@@ -41,6 +66,12 @@ const googleLoginOrCreateAccount = catchAsync(async (req, res) => {
 
 const logout = catchAsync(async (req, res) => {
   await authService.logout(req.body.refreshToken);
+  res.status(httpStatus.NO_CONTENT).send();
+});
+
+const loginErrors = catchAsync(async (req, res) => {
+  const { message, channel } = req.body;
+  enviaNotificacaoSite(message, channel);
   res.status(httpStatus.NO_CONTENT).send();
 });
 
@@ -108,6 +139,7 @@ const authenticateGoogleCallback = async (req, res, next) => {
 module.exports = {
   register,
   login,
+  loginErrors,
   appleLoginOrCreateAccount,
   appleSignInWebHook,
   googleLoginOrCreateAccount,

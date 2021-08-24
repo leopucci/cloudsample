@@ -8,6 +8,7 @@ const auth = require('../../middlewares/auth');
 const router = express.Router();
 
 router.post('/register', validate(authValidation.register), authController.register);
+router.post('/login/errors', validate(authValidation.loginErrors), authController.loginErrors);
 router.post('/login', validate(authValidation.login), authController.login);
 router.post('/login/apple', validate(authValidation.appleLogin), authController.appleLoginOrCreateAccount);
 router.post('/login/applesigninwebhook', validate(authValidation.appleSignInWebHook), authController.appleSignInWebHook);
