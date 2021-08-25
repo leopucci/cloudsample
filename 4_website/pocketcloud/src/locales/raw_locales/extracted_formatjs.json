@@ -12,15 +12,15 @@
     "description": "Password TextField Text"
   },
   "loginScreen.SignInButton": {
-    "defaultMessage": "Sign In",
-    "description": "Sign In Button Text"
+    "defaultMessage": "Log In",
+    "description": "Log In Button Text"
   },
   "loginScreen.SignInH1Text": {
-    "defaultMessage": "Sign In",
-    "description": "Sign In H1 Text"
+    "defaultMessage": "Log In",
+    "description": "Log In H1 Text"
   },
-  "loginScreen.SignUpButton": {
-    "defaultMessage": "Don't have an account? Sign Up",
-    "description": "SignUp Button Text"
+  "loginScreen.RegisterButton": {
+    "defaultMessage": "Don't have an account? Register",
+    "description": "Register Button Text"
   }
 }

@@ -14,7 +14,7 @@
   "loginScreen.SignInH1Text": {
     "defaultMessage": "Einloggen"
   },
-  "loginScreen.SignUpButton": {
+  "loginScreen.RegisterButton": {
     "defaultMessage": ""
   }
 }

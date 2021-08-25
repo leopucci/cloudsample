@@ -73,7 +73,7 @@
                     <concept_node>
                         <name>SignInButton</name>
                         <definition_loaded>false</definition_loaded>
-                        <description>Sign In Button Text</description>
+                        <description>Log In Button Text</description>
                         <comment/>
                         <default_text/>
                         <translations>
@@ -90,7 +90,7 @@
                     <concept_node>
                         <name>SignInH1Text</name>
                         <definition_loaded>false</definition_loaded>
-                        <description>Sign In H1 Text</description>
+                        <description>Log In H1 Text</description>
                         <comment/>
                         <default_text/>
                         <translations>
@@ -105,9 +105,9 @@
                         </translations>
                     </concept_node>
                     <concept_node>
-                        <name>SignUpButton</name>
+                        <name>RegisterButton</name>
                         <definition_loaded>false</definition_loaded>
-                        <description>SignUp Button Text</description>
+                        <description>Register Button Text</description>
                         <comment/>
                         <default_text/>
                         <translations>

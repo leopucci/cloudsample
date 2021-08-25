@@ -11,7 +11,7 @@ export const REFRESHED_TOKEN = "redux/users/REFRESHED_TOKEN";
 export const SIGN_UP_COMPLETE = "redux/users/SIGN_UP_COMPLETE";
 export const SET_LOGIN_ERROR = "redux/users/SET_LOGIN_ERROR";
 export const CLEAR_LOGIN_ERROR = "redux/users/CLEAR_LOGIN_ERROR";
-export const SET_SIGNUP_ERROR = "redux/users/SET_SIGNUP_ERROR";
+export const SET_REGISTER_ERROR = "redux/users/SET_REGISTER_ERROR";
 
 // Reducer
 
@@ -21,7 +21,7 @@ const initialState = {
   isFetching: false,
   jwt: null,
   loginError: null,
-  signupError: null,
+  registerError: null,
 };
 
 // functional programing
@@ -59,13 +59,13 @@ const currentUser = (state = initialState, action) => {
       return {
         ...state,
         isFetching: true,
-        signupError: null,
+        registerError: null,
       };
     case SIGN_UP_COMPLETE:
       return {
         ...state,
         isFetching: false,
-        signupError: null,
+        registerError: null,
       };
     case SET_LOGIN_ERROR:
       return {
@@ -79,11 +79,11 @@ const currentUser = (state = initialState, action) => {
         isFetching: false,
         loginError: null,
       };
-    case SET_SIGNUP_ERROR:
+    case SET_REGISTER_ERROR:
       return {
         ...state,
         isFetching: false,
-        signupError: action.payload.error,
+        registerError: action.payload.error,
       };
     default:
       return state;
@@ -120,7 +120,7 @@ const setGoogleLogInError = (error) => ({
 });
 
 const setSignupError = (error) => ({
-  type: SET_SIGNUP_ERROR,
+  type: SET_REGISTER_ERROR,
   payload: { error },
 });
 
@@ -156,7 +156,7 @@ const signIn = (userObj, recaptcha) => (dispatch) => {
           errorMessage === "WRONG_CREDENTIAL"
             ? "Incorrect email or password"
             : errorMessage;
-        // User does not exist. Sign up for an account
+        // User does not exist. Register for an account
       }
       dispatch(setLoginError(errorMessage));
     })
@@ -198,7 +198,7 @@ const googleSignIn = (userObj, recaptcha) => (dispatch) => {
           errorMessage === "WRONG_CREDENTIAL"
             ? "Incorrect email or password"
             : errorMessage;
-        // User does not exist. Sign up for an account
+        // User does not exist. Register for an account
       }
       dispatch(setLoginError(errorMessage));
     })
@@ -324,7 +324,7 @@ const notify =
             errorMessage === "WRONG_CREDENTIAL"
               ? "Incorrect email or password"
               : errorMessage;
-          // User does not exist. Sign up for an account
+          // User does not exist. Register for an account
         }
         dispatch(setLoginError(errorMessage));
       })

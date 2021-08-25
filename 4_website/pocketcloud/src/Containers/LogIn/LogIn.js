@@ -272,11 +272,11 @@ export default function LogIn() {
             /** Allows to change the button's children, eg: for changing the button text */
             // buttonExtraChildren="Continue with Apple"
             /** Extra controlling props */
-            /** Called upon signin success in case authOptions.usePopup = true -- which means auth is handled client side */
+            /** Called upon login success in case authOptions.usePopup = true -- which means auth is handled client side */
             onSuccess={(response) => {
               dispatch(actions.googleLogIn(response));
             }} // default = undefined
-            /** Called upon signin error */
+            /** Called upon login error */
             onError={(response) => {
               // PRECISA TESTAR ESTA RESPOSTA E AJUSTAR ISTO, SO COPIEI E COLEI
               if (response.error) {
@@ -342,15 +342,15 @@ export default function LogIn() {
             <Grid item>
               <Link
                 component={RouterLink}
-                to="/signup"
+                to="/register"
                 variant="body2"
                 href="/#"
                 className={classes.link}
               >
                 <FormattedMessage
-                  id="loginScreen.SignUpButton"
-                  defaultMessage="Don't have an account? Sign Up"
-                  description="SignUp Button Text"
+                  id="loginScreen.RegisterButton"
+                  defaultMessage="Don't have an account? Register"
+                  description="Register Button Text"
                 />
               </Link>
             </Grid>
@@ -358,7 +358,7 @@ export default function LogIn() {
         </form>
         <br />
       </div>
-      <Box mt={3}>
+      <Box mt={8}>
         <RecaptchaTermsOfService />
       </Box>
       <Footer />

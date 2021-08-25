@@ -16,6 +16,12 @@ import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
+import {
+  GoogleLoginButton,
+  AppleLoginButton,
+} from "react-social-login-buttons";
+import AppleSignin from "react-apple-signin-auth";
+import GoogleLogin from "react-google-login";
 
 import { actions } from "../../Redux/user";
 import RecaptchaTermsOfService from "../../Components/RecaptchaTermsOfService";
@@ -41,13 +47,13 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function SignUp() {
+export default function Register() {
   const { executeRecaptcha } = useGoogleReCaptcha();
   const isLoggedIn = useSelector(
     (state) => state.user.isLoggedIn && state.user.jwt !== null
   );
-  const signupError = useSelector((state) => state.user.signupError);
-  const isSignupError = !!signupError;
+  const registerError = useSelector((state) => state.user.registerError);
+  const isSignupError = !!registerError;
   const classes = useStyles();
   const dispatch = useDispatch();
 
@@ -95,6 +101,12 @@ export default function SignUp() {
     }
   };
 
+  const onSuccessGoogleLogin = async (response) => {
+    dispatch(actions.clearLoginError());
+    const recaptcha = await executeRecaptcha("LoginViaGoogle");
+    dispatch(actions.googleLogIn(response, recaptcha));
+  };
+
   if (isLoggedIn) return <Redirect to="/Home" />;
 
   return (
@@ -105,7 +117,7 @@ export default function SignUp() {
           <LockOutlinedIcon />
         </Avatar>
         <Typography component="h1" variant="h5">
-          Sign up
+          Register
         </Typography>
         <form className={classes.form} noValidate>
           <Grid container spacing={2}>
@@ -146,7 +158,7 @@ export default function SignUp() {
                 name="email"
                 autoComplete="email"
                 autoFocus
-                helperText={signupError}
+                helperText={registerError}
                 onChange={(e) => handleOnChange(e.target.value, e.target.name)}
               />
             </Grid>
@@ -190,8 +202,125 @@ export default function SignUp() {
             className={classes.submit}
             onClick={onClickRegister}
           >
-            Sign Up
+            Register
           </Button>
+          <GoogleLogin
+            style={{
+              textAlign: "center",
+              alignItems: "center",
+              borderRadius: 50,
+              justifyContent: "center",
+              width: "900",
+            }}
+            className={classes.submit}
+            render={(renderProps) => (
+              <GoogleLoginButton
+                text="Register with Google"
+                align="center"
+                onClick={renderProps.onClick}
+                disabled={renderProps.disabled}
+              />
+            )}
+            clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}
+            onSuccess={onSuccessGoogleLogin}
+            onFailure={(response) => {
+              if (response.error) {
+                switch (response.error) {
+                  case "popup_closed_by_user":
+                    console.log("popup_closed_by_user");
+                    break;
+                  default:
+                    console.log(response.error);
+                    dispatch(actions.setGoogleLogInError(response.error));
+                    dispatch(
+                      actions.notify(
+                        `Erro no login do google: ${response.error}`,
+                        1
+                      )
+                    );
+                }
+              } else {
+                console.log(response);
+                dispatch(
+                  actions.notify(
+                    `Erro no login do google response: ${response}`,
+                    1
+                  )
+                );
+              }
+            }}
+            cookiePolicy="single_host_origin"
+          />
+          <AppleSignin
+            /** Auth options passed to AppleID.auth.init() */
+            authOptions={{
+              /** Client ID - eg: 'com.example.com' */
+              clientId: process.env.REACT_APP_APPLE_CLIENT_ID,
+              /** Requested scopes, seperated by spaces - eg: 'email name' */
+              scope: "email name",
+              /** Apple's redirectURI - must be one of the URIs you added to the serviceID - the undocumented trick in apple docs is that you should call auth from a page that is listed as a redirectURI, localhost fails */
+              redirectURI: "https://example.com",
+              /** State string that is returned with the apple response */
+              state: "state",
+              /** Nonce */
+              nonce: "nonce",
+              /** Uses popup auth instead of redirection */
+              usePopup: true,
+            }} // REQUIRED
+            /** General props */
+            uiType="light"
+            /** className */
+            className="apple-auth-btn"
+            /** Removes default style tag */
+            noDefaultStyle={false}
+            /** Allows to change the button's children, eg: for changing the button text */
+            // buttonExtraChildren="Continue with Apple"
+            /** Extra controlling props */
+            /** Called upon login success in case authOptions.usePopup = true -- which means auth is handled client side */
+            onSuccess={(response) => {
+              dispatch(actions.googleLogIn(response));
+            }} // default = undefined
+            /** Called upon login error */
+            onError={(response) => {
+              // PRECISA TESTAR ESTA RESPOSTA E AJUSTAR ISTO, SO COPIEI E COLEI
+              if (response.error) {
+                switch (response.error) {
+                  case "popup_closed_by_user":
+                    console.log("popup_closed_by_user");
+                    break;
+                  default:
+                    console.log(response.error);
+                    dispatch(actions.setGoogleLogInError(response.error));
+                    dispatch(
+                      actions.notify(
+                        `Erro no login da apple: ${response.error}`,
+                        1
+                      )
+                    );
+                }
+              } else {
+                console.log(response);
+                dispatch(
+                  actions.notify(
+                    `Erro no login da apple response: ${response}`,
+                    1
+                  )
+                );
+              }
+            }} // default = undefined
+            /** Skips loading the apple script if true */
+            skipScript={false} // default = undefined
+            /** Apple image props */
+            // iconProp={{ style: { marginTop: "10px" } }} // default = undefined
+            /** render function - called with all props - can be used to fully customize the UI by rendering your own component  */
+            render={(renderProps) => (
+              <AppleLoginButton onClick={renderProps.onClick} text="Register with Apple" align="center" />
+            )}
+
+            //     render={(renderProps) => (
+            //         <button onClick={renderProps.onClick}>My Custom Button</button>
+            //       )}
+          />
           <Grid container justify="flex-end">
             <Grid item>
               <Link
