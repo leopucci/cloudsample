@@ -29,7 +29,7 @@ encriptar o storage
 https://www.npmjs.com/package/encrypt-storage#redux-persist
 
 
-isto aqui eh bom pra fazer formularios, melhor uqe o o do redux
+isto aqui eh bom pra fazer formularios, melhor uqe o o do redux - nao usar o reduxform ele eh bem complicado.. 
 https://github.com/formium/formik
 
 
