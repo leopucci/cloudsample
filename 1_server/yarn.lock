@@ -769,6 +769,11 @@
   "resolved" "https://registry.npmjs.org/@tootallnate/once/-/once-1.1.2.tgz"
   "version" "1.1.2"
 
+"@types/append-query@^2.0.0":
+  "integrity" "sha512-L/RxncHj5Wh8B0A5yGTYQbCu+YVbrbtuPaemp/yrQCy1du/qYqEnQBgZoipeSYhTSJoTqRJGLqmnbUOn5iu0cQ=="
+  "resolved" "https://registry.npmjs.org/@types/append-query/-/append-query-2.0.1.tgz"
+  "version" "2.0.1"
+
 "@types/babel__core@^7.0.0", "@types/babel__core@^7.1.7":
   "integrity" "sha512-zGZJzzBUVDo/eV6KgbE0f0ZI7dInEYvo12Rb70uNQDshC3SkRMb67ja0GgRHZgAX3Za6rhaWlvbDO8rrGyAb1g=="
   "resolved" "https://registry.npmjs.org/@types/babel__core/-/babel__core-7.1.14.tgz"
@@ -1131,6 +1136,13 @@
   dependencies:
     "normalize-path" "^3.0.0"
     "picomatch" "^2.0.4"
+
+"append-query@^2.1.0":
+  "integrity" "sha512-adm0E8o1o7ay+HbkWvGIpNNeciLB/rxJ0heThHuzSSVq5zcdQ5/ZubFnUoY0imFmk6gZVghSpwoubLVtwi9EHQ=="
+  "resolved" "https://registry.npmjs.org/append-query/-/append-query-2.1.1.tgz"
+  "version" "2.1.1"
+  dependencies:
+    "extend" "^3.0.2"
 
 "apple-signin-auth@^1.5.1":
   "integrity" "sha512-1AIJhvoo5+Kb70ST5JuhLuHAstm59dIVaC/8dcKYVHiOT4QclajS5xvv5vJRB3IPc4doe1MC9kty951TsVPIrw=="
@@ -5361,6 +5373,23 @@
     "pascal-case" "^3.1.1"
     "snake-case" "^3.0.3"
     "url-join" "^4.0.1"
+
+"messaging-api-messenger@^1.0.5":
+  "integrity" "sha512-T17O+T6YAPkF8zDydsleMBtZ5HmCBDUZNHmF1nUUM82+WLaeqCTTHvJN3XR6hFjOA7XCTEXoxu4z+0A3QZv9yg=="
+  "resolved" "https://registry.npmjs.org/messaging-api-messenger/-/messaging-api-messenger-1.0.5.tgz"
+  "version" "1.0.5"
+  dependencies:
+    "@types/append-query" "^2.0.0"
+    "@types/lodash" "^4.14.156"
+    "@types/warning" "^3.0.0"
+    "append-query" "^2.1.0"
+    "axios" "^0.21.1"
+    "axios-error" "^1.0.4"
+    "form-data" "^3.0.0"
+    "lodash" "^4.17.15"
+    "messaging-api-common" "^1.0.4"
+    "ts-invariant" "^0.4.4"
+    "warning" "^4.0.3"
 
 "messaging-api-telegram@^1.0.4":
   "integrity" "sha512-tDEKlwPMrpbBSIbEuYI1sJhAbn858HypB5QOLdatL0u/sBGrtp5yte52xgOfb7ySnzRqI2eH6C588VFyimHwBA=="

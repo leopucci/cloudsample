@@ -55,12 +55,14 @@ const logout = {
 const refreshTokens = {
   body: Joi.object().keys({
     refreshToken: Joi.string().required(),
+    recaptcha: Joi.string().required(),
   }),
 };
 
 const forgotPassword = {
   body: Joi.object().keys({
     email: Joi.string().email().required(),
+    recaptcha: Joi.string().required(),
   }),
 };
 

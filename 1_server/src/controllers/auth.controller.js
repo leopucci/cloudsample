@@ -46,6 +46,11 @@ const appleLoginOrCreateAccount = catchAsync(async (req, res) => {
   res.send({ user, tokens });
 });
 
+// estou anotanto aqui mas nao sei se anotei em outro lugar
+// alem do webhook, todo dia rodar um job testando a validade do token, se tiver invalido
+// eu tenho que deslogar o cliente que fez login com a apple/google..
+// pra isto eu tenho que gerar tokens com identificação.. pra eu saber se o cara logou com senha ou com fb/google
+// dae eu vou deslogar só o token daquele cara especifico, com aquele tipo de login especifico.
 const appleSignInWebHook = async (req, res) => {
   const { payload } = req.body;
   await authService.appleSignInWebHook(payload);
@@ -76,12 +81,24 @@ const loginErrors = catchAsync(async (req, res) => {
 });
 
 const refreshTokens = catchAsync(async (req, res) => {
-  const tokens = await authService.refreshAuth(req.body.refreshToken);
+  const { refreshToken, recaptcha } = req.body;
+  const recaptchaOK = await authService.verifyRecaptcha(recaptcha, req.connection.remoteAddress);
+  if (!recaptchaOK) {
+    res.status(httpStatus.NOT_ACCEPTABLE).send('{"message": "Recaptcha Error"}');
+    return;
+  }
+  const tokens = await authService.refreshAuth(refreshToken);
   res.send({ ...tokens });
 });
 
 const forgotPassword = catchAsync(async (req, res) => {
-  const resetPasswordToken = await tokenService.generateResetPasswordToken(req.body.email);
+  const { email, recaptcha } = req.body;
+  const recaptchaOK = await authService.verifyRecaptcha(recaptcha, req.connection.remoteAddress);
+  if (!recaptchaOK) {
+    res.status(httpStatus.NOT_ACCEPTABLE).send('{"message": "Recaptcha Error"}');
+    return;
+  }
+  const resetPasswordToken = await tokenService.generateResetPasswordToken(email);
   await emailService.sendResetPasswordEmail(req.body.email, resetPasswordToken);
   res.status(httpStatus.NO_CONTENT).send();
 });
