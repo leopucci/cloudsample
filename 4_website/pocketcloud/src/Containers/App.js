@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import { Route, Switch, Redirect } from "react-router-dom";
 
 import LogIn from "./LogIn/LogIn";
+import ForgotPassword from "./ForgotPassword/ForgotPassword";
 import Register from "./Register/Register";
 import Home from "./Home/Home";
 import Public from "./PublicPage/Public";
@@ -37,6 +38,7 @@ export default function App() {
         <Route path="/" component={Public} exact />
         <Route path="/login" component={LogIn} />
         <Route path="/register" component={Register} />
+        <Route path="/forgotpassword" component={ForgotPassword} />
         <PrivateRoute path="/Home" component={Home} />
         <Route component={NotFound} />
       </Switch>

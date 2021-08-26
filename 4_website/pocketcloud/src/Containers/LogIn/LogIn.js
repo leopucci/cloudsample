@@ -48,14 +48,6 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function LogIn() {
-  /* useLayoutEffect(() => {
-    const captcha = document.getElementsByClassName("grecaptcha-badge")[0];
-    if (captcha) {
-      captcha.style.visibility = "hidden";
-    }
-  }, []);
-
-  */
   const { executeRecaptcha } = useGoogleReCaptcha();
   const isLoggedIn = useSelector(
     (state) => state.user.isLoggedIn && state.user.jwt !== null
@@ -331,7 +323,7 @@ export default function LogIn() {
           /> */}
           <Grid container>
             <Grid item xs>
-              <Link href="/#" variant="body2">
+              <Link href="/forgotpassword" variant="body2">
                 <FormattedMessage
                   id="loginScreen.ForgotPasswordButton"
                   defaultMessage="Forgot password?"

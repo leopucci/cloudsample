@@ -260,6 +260,46 @@ const signUp = (userObj, recaptcha) => (dispatch) => {
     });
 };
 
+const forgotPassword = (userObj, recaptcha) => (dispatch) => {
+  dispatch({
+    type: SIGN_IN,
+  });
+  return api({
+    method: "post",
+    url: "/auth/forgot-password",
+    data: {
+      email: userObj.email,
+      recaptcha,
+    },
+  })
+    .then((response) => {
+      // handle success
+      dispatch(
+        setUser({
+          email: response.data.user.email,
+          jwt: response.data.tokens,
+        })
+      );
+    })
+    .catch((error) => {
+      // handle error
+      console.log(error);
+      let errorMessage = "Network Error";
+      if (error.response) {
+        errorMessage = error.response.data.message;
+        errorMessage =
+          errorMessage === "WRONG_CREDENTIAL"
+            ? "Incorrect email or password"
+            : errorMessage;
+        // User does not exist. Register for an account
+      }
+      dispatch(setLoginError(errorMessage));
+    })
+    .then(() => {
+      // always executed
+    });
+};
+
 const logOut = (userObj) => (dispatch, getState) => {
   const state = getState();
   let token;
@@ -312,6 +352,7 @@ const notify =
       url: "/auth/login/errors",
       data: {
         message,
+        channel,
       },
     })
       .catch((error) => {
@@ -346,6 +387,7 @@ export const actions = {
   clearLoginError,
   setGoogleLogInError,
   setSignupError,
+  forgotPassword,
   notify,
   refreshedToken,
 };
