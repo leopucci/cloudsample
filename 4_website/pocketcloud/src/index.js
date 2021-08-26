@@ -2,11 +2,11 @@ import { GoogleReCaptchaProvider } from "react-google-recaptcha-v3";
 import React from "react";
 import ReactDOM from "react-dom";
 import { PersistGate } from "redux-persist/integration/react";
-import { BrowserRouter as Router } from "react-router-dom";
 import { Provider } from "react-redux";
 import { IntlProvider } from "react-intl";
 import { initMessageListener } from "redux-state-sync";
-import { store, persistor } from "./Redux/store";
+import { ConnectedRouter } from "connected-react-router";
+import { store, persistor, history } from "./Redux/store";
 import App from "./Containers/App";
 import reportWebVitals from "./reportWebVitals";
 import setupAxiosApiInterceptors from "./Redux/setupInterceptors";
@@ -41,7 +41,7 @@ ReactDOM.render(
             nonce: undefined, // optional, default undefined
           }}
         >
-          <Router>
+          <ConnectedRouter history={history}>
             <IntlProvider
               messages={messages[language]}
               locale={language}
@@ -50,7 +50,7 @@ ReactDOM.render(
               <App />
             </IntlProvider>
             ,
-          </Router>
+          </ConnectedRouter>
         </GoogleReCaptchaProvider>
       </PersistGate>
     </Provider>

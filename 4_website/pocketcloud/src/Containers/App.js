@@ -4,6 +4,7 @@ import { Route, Switch, Redirect } from "react-router-dom";
 
 import LogIn from "./LogIn/LogIn";
 import ForgotPassword from "./ForgotPassword/ForgotPassword";
+import VerifyEmail from "./VerifyEmail/VerifyEmail";
 import Register from "./Register/Register";
 import Home from "./Home/Home";
 import Public from "./PublicPage/Public";
@@ -39,6 +40,7 @@ export default function App() {
         <Route path="/login" component={LogIn} />
         <Route path="/register" component={Register} />
         <Route path="/forgotpassword" component={ForgotPassword} />
+        <Route path="/verifyemail" component={VerifyEmail} />
         <PrivateRoute path="/Home" component={Home} />
         <Route component={NotFound} />
       </Switch>

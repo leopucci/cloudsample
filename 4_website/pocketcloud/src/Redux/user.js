@@ -1,4 +1,5 @@
 import wakeEvent from "wake-event";
+import { push } from "connected-react-router";
 import api from "./api";
 // Aqui ele nomeou as ações. o bom disto é que ele pode fazer um import * as actions e depois usar actions. e ter todas disponiveis
 // e caso ele precise mudar em algum lugar, ele muda tudo no mesmo lugar.
@@ -264,6 +265,7 @@ const forgotPassword = (userObj, recaptcha) => (dispatch) => {
   dispatch({
     type: SIGN_IN,
   });
+  const { email } = userObj;
   return api({
     method: "post",
     url: "/auth/forgot-password",
@@ -274,12 +276,7 @@ const forgotPassword = (userObj, recaptcha) => (dispatch) => {
   })
     .then((response) => {
       // handle success
-      dispatch(
-        setUser({
-          email: response.data.user.email,
-          jwt: response.data.tokens,
-        })
-      );
+      dispatch(push(`/verifyemail`));
     })
     .catch((error) => {
       // handle error
