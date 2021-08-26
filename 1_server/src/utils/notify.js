@@ -9,7 +9,8 @@ const { TelegramClient } = require('messaging-api-telegram');
 const enviaNotificacaoApi = (mensagem, canal = '@pocketapi', enviaTelegram = true) => {
   if (enviaTelegram) {
     const client = new TelegramClient({
-      accessToken: '1621388212:AAHVIiVUPKYzNidK5PdvMAQdRfDhaNATLwo',
+      // PUBSHARE BOT accessToken: '1621388212:AAHVIiVUPKYzNidK5PdvMAQdRfDhaNATLwo',
+      accessToken: '1942279280:AAEoxbNJvbJlG7ksHmI86pord-aMYxyFF60', // PocketBot
     });
 
     client.sendMessage(canal, mensagem).then(() => {
@@ -25,6 +26,11 @@ const enviaNotificacaoApi = (mensagem, canal = '@pocketapi', enviaTelegram = tru
  * @returns {true}
  */
 const enviaNotificacaoSite = (mensagem, canal = '@pocketsite', enviaTelegram = true) => {
+  const client = new TelegramClient({
+    // PUBSHARE BOT accessToken: '1621388212:AAHVIiVUPKYzNidK5PdvMAQdRfDhaNATLwo',
+    accessToken: '1942279280:AAEoxbNJvbJlG7ksHmI86pord-aMYxyFF60', // PocketBot
+  });
+
   if (enviaTelegram) {
     let canalEscolhido;
     // Deixei isto aqui pra segmentar mensagens la do cliente.
@@ -36,9 +42,6 @@ const enviaNotificacaoSite = (mensagem, canal = '@pocketsite', enviaTelegram = t
       default:
         canalEscolhido = '@pocketsite';
     }
-    const client = new TelegramClient({
-      accessToken: '1621388212:AAHVIiVUPKYzNidK5PdvMAQdRfDhaNATLwo',
-    });
 
     client.sendMessage(canalEscolhido, mensagem).then(() => {
       console.log('enviaNotificacaoSite Telegram message sent');
