@@ -9,6 +9,7 @@ import Link from "@material-ui/core/Link";
 import Button from "@material-ui/core/Button";
 import { makeStyles } from "@material-ui/core/styles";
 import "axios-progress-bar/dist/nprogress.css";
+// import logow from "./logo4-removebg-preview.png";
 import { actions } from "../Redux/user";
 
 const useStyles = makeStyles((theme) => ({
@@ -23,6 +24,11 @@ const useStyles = makeStyles((theme) => ({
     // Isto tira o recaptcha badge, so que eu fiz no app.js
     ".grecaptcha-badge": {
       visibility: "hidden",
+    },
+    body: {
+      margin: 0,
+      // minHeight: "100%",
+      // height: "100%",
     },
   },
   appBar: {
@@ -75,13 +81,25 @@ export default function Header({ isLoggedIn }) {
       className={classes.appBar}
     >
       <Toolbar className={classes.toolbar}>
+        {/* <div
+          style={{
+            width: "200px",
+            height: "48px",
+
+            overflow: "hidden",
+            objectFit: "cover",
+          }}
+        >
+           <img src={logow} alt="logo" className="img-fluid" /> 
+        </div>
+        */}
         <Typography
           variant="h6"
           color="inherit"
           noWrap
           className={classes.toolbarTitle}
         >
-          Company name
+          Pocket Cloud
         </Typography>
         <nav>
           <Link
@@ -104,6 +122,15 @@ export default function Header({ isLoggedIn }) {
           >
             Home
           </Link>
+          <Button
+            component={RouterLink}
+            to="/register"
+            color="primary"
+            variant="outlined"
+            className={classes.link}
+          >
+            Register
+          </Button>
         </nav>
         {loginStatus()}
       </Toolbar>
