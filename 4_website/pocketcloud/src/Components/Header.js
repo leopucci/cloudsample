@@ -126,7 +126,7 @@ export default function Header({ isLoggedIn }) {
             component={RouterLink}
             to="/register"
             color="primary"
-            variant="outlined"
+            variant="contained"
             className={classes.link}
           >
             Register
