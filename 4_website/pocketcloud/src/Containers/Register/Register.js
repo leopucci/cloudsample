@@ -29,7 +29,7 @@ import Footer from "../../Components/Footer";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
-    marginTop: theme.spacing(8),
+    marginTop: theme.spacing(1),
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
@@ -314,7 +314,11 @@ export default function Register() {
             // iconProp={{ style: { marginTop: "10px" } }} // default = undefined
             /** render function - called with all props - can be used to fully customize the UI by rendering your own component  */
             render={(renderProps) => (
-              <AppleLoginButton onClick={renderProps.onClick} text="Register with Apple" align="center" />
+              <AppleLoginButton
+                onClick={renderProps.onClick}
+                text="Register with Apple"
+                align="center"
+              />
             )}
 
             //     render={(renderProps) => (
