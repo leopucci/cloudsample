@@ -7,13 +7,15 @@ const webhookMiddleware = require('x-hub-signature').middleware;
 const bodyParser = require('body-parser');
 
 const router = express.Router();
-
-const githubWebhookvalidation = {
-  body: Joi.object().keys({
-    payload: Joi.string().required(),
-  }),
+const SECRET_CONFIGURADO_NO_GITHUB = 'SECRET_CONFIGURADO_NO_GITHUBAA';
+const githubWebhookvalidation = () => {
+  webhookMiddleware({
+    algorithm: 'sha1',
+    secret: SECRET_CONFIGURADO_NO_GITHUB,
+    require: true,
+  });
 };
-const SECRET_CONFIGURADO_NO_GITHUB = 'SECRET_CONFAIGURADO_NO_GITHUB';
+
 const githubWebhook = async (req, res) => {
   // console.log(req.body);
   console.log(req.body);
@@ -22,14 +24,6 @@ const githubWebhook = async (req, res) => {
   res.status(httpStatus.OK).send();
 };
 
-router.post(
-  '/githubwebhook',
-  webhookMiddleware({
-    algorithm: 'sha1',
-    secret: SECRET_CONFIGURADO_NO_GITHUB,
-    require: true,
-  }),
-  githubWebhook
-);
+router.post('/githubwebhook', githubWebhookvalidation, githubWebhook);
 
 module.exports = router;
