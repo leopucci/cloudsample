@@ -11,7 +11,7 @@ const githubWebhookvalidation = {
     payload: Joi.string().required(),
   }),
 };
-const SECRET_CONFIGURADO_NO_GITHUB = 'SECRET';
+const SECRET_CONFIGURADO_NO_GITHUB = 'SECRET_CONFIGURADO_NO_GITHUB';
 const githubWebhook = async (req, res) => {
   // console.log(req.body);
   const signature = `sha1=${crypto.createHmac('sha1', SECRET_CONFIGURADO_NO_GITHUB).digest('hex')}`;
