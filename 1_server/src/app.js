@@ -6,6 +6,7 @@ const compression = require('compression');
 const cors = require('cors');
 const passport = require('passport');
 const httpStatus = require('http-status');
+const webhookMiddleware = require('x-hub-signature').middleware;
 const config = require('./config/config');
 const morgan = require('./config/morgan');
 const { jwtStrategy, googleStrategy, appleStrategy } = require('./config/passport');
@@ -26,7 +27,9 @@ if (config.env !== 'test') {
 app.use(helmet());
 
 // parse json request body
-app.use(express.json());
+// este verify: webhookMiddleware.extractRawBody  foi adicionado para que
+// ele preserve o raw, pro github hooks validar a assinatura la no arquivo ghwh.route.js
+app.use(express.json({ verify: webhookMiddleware.extractRawBody }));
 
 // parse urlencoded request body
 app.use(express.urlencoded({ extended: true }));
