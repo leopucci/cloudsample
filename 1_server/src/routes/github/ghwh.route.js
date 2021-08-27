@@ -15,7 +15,7 @@ const SECRET_CONFIGURADO_NO_GITHUB = 'SECRET';
 const githubWebhook = async (req, res) => {
   // console.log(req.body);
   const signature = `sha1=${crypto.createHmac('sha1', SECRET_CONFIGURADO_NO_GITHUB).digest('hex')}`;
-
+  console.log(signature);
   const isAllowed = req.headers['x-hub-signature'] === signature;
   console.log(isAllowed);
   // const { payload } = req.body;
