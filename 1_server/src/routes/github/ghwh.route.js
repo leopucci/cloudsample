@@ -12,8 +12,20 @@ const SECRET_CONFIGURADO_NO_GITHUB = 'SECRET_CONFIGURADO_NO_GITHUB';
 const githubWebhook = async (req, res) => {
   // console.log(req.body);
   console.log(req.body);
-  // const { payload } = req.body;
-  // await authService.appleSignInWebHook(payload);
+
+  const isMaster = req.body?.ref === 'refs/heads/master';
+  console.log(isMaster);
+
+  const directory = GITHUB_REPOSITORIES_TO_DIR[body?.repository?.full_name];
+
+  if (isAllowed && isMaster && directory) {
+    try {
+      exec(`cd ${directory} && bash deploy.sh`);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   res.status(httpStatus.OK).send();
 };
 
