@@ -3,6 +3,8 @@ const Joi = require('joi');
 const httpStatus = require('http-status');
 const crypto = require('crypto');
 const validate = require('../../middlewares/validate');
+const webhookMiddleware = require('x-hub-signature').middleware;
+const bodyParser = require('body-parser');
 
 const router = express.Router();
 
@@ -14,16 +16,20 @@ const githubWebhookvalidation = {
 const SECRET_CONFIGURADO_NO_GITHUB = 'SECRET_CONFIGURADO_NO_GITHUB';
 const githubWebhook = async (req, res) => {
   // console.log(req.body);
-  const signature = `sha1=${crypto.createHmac('sha1', SECRET_CONFIGURADO_NO_GITHUB).digest('hex')}`;
-  console.log(signature);
-  console.log(req.headers['x-hub-signature']);
-  const isAllowed = req.headers['x-hub-signature'] === signature;
-  console.log(isAllowed);
+  console.log(req.body);
   // const { payload } = req.body;
   // await authService.appleSignInWebHook(payload);
   res.status(httpStatus.OK).send();
 };
 
-router.post('/githubwebhook', githubWebhook);
+router.post(
+  '/githubwebhook',
+  webhookMiddleware({
+    algorithm: 'sha1',
+    secret: SECRET_CONFIGURADO_NO_GITHUB,
+    require: true,
+  }),
+  githubWebhook
+);
 
 module.exports = router;
