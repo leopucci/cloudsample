@@ -32,11 +32,23 @@ const enviaNotificacaoApi = (mensagem, canal = '1', enviaTelegram = true) => {
       .catch((error) => {
         const clientFb = new MessengerClient({
           accessToken:
-            'EAAFC09mX2OQBAHLGdy9QOwww9AEEzCkgRZBXZACTD1M6rU1E6hFiqtIDmQnMqJqlTjoW32qTT0enY2DtSopIZChQazthIZAeTYyoiTmAR1YLzWmwLCIAekPcZBPsWkkaSTzbEZCg7OZBvp7hsB8zbbinruhZCg6ddRrIJZAUsfMwnNFuqTcR6MxTtub0k8sMsWzQQNJD8S2kiEwZDZD',
+            'EAAJJRoq0aY4BAJKbWv7h4e2COW8MReQZB3JDiY6iDdM9OVrLUoQPUSJju4hRXEHAQVGNKy6rLPNy9oIh3ozwKcdpj9X6B65fkfaQ8flEIWYF9xGKIHRMQbQvNiIzJAqlkgA9uZCO4dbu4EXhIWxDo0yGGrp5GlMHDhf8IirOoaHXH5pvcckWjs1H0E1rTgODEJ6XchXQZDZD',
         });
 
+        let formatedError;
+        if (error.response) {
+          // Request made and server responded
+          formatedError.concat(error.response.status, ' ', error.response.data, ' ', error.response.headers);
+        } else if (error.request) {
+          // The request was made but no response was received
+          formatedError.concat(error.request);
+        } else {
+          // Something happened in setting up the request that triggered an Error
+          formatedError.concat(error.message);
+        }
+
         clientFb
-          .sendText('leonardojcpucci', `Hello World : ${JSON.stringify(error)}`)
+          .sendText('100000350602373', `Hello World : ${formatedError}`)
           .then(() => {
             console.log('sent');
           })
@@ -67,25 +79,45 @@ const enviaNotificacaoSite = (mensagem, canal = '1', enviaTelegram = true) => {
       case '1':
         canalEscolhido = '@pocketsite';
         break;
+      case '2':
+        canalEscolhido = '3';
+        break;
       default:
         canalEscolhido = '@pocketsite';
     }
-    const clientFb = new MessengerClient({
-      accessToken:
-        'EAAFC09mX2OQBAHLGdy9QOwww9AEEzCkgRZBXZACTD1M6rU1E6hFiqtIDmQnMqJqlTjoW32qTT0enY2DtSopIZChQazthIZAeTYyoiTmAR1YLzWmwLCIAekPcZBPsWkkaSTzbEZCg7OZBvp7hsB8zbbinruhZCg6ddRrIJZAUsfMwnNFuqTcR6MxTtub0k8sMsWzQQNJD8S2kiEwZDZD',
-    });
 
-    clientFb
-      .sendText('100000350602373', `Hello World :`)
+    client
+      .sendMessage(canalEscolhido, mensagem)
       .then(() => {
-        console.log('sent');
+        console.log('enviaNotificacaoSite Telegram message sent');
       })
       .catch((error) => {
-        console.log(`FBMESSENGER error: ${error}`);
+        console.log('enviaNotificacaoSite Telegram message falhou');
+        const clientFb = new MessengerClient({
+          accessToken:
+            'EAAJJRoq0aY4BAJKbWv7h4e2COW8MReQZB3JDiY6iDdM9OVrLUoQPUSJju4hRXEHAQVGNKy6rLPNy9oIh3ozwKcdpj9X6B65fkfaQ8flEIWYF9xGKIHRMQbQvNiIzJAqlkgA9uZCO4dbu4EXhIWxDo0yGGrp5GlMHDhf8IirOoaHXH5pvcckWjs1H0E1rTgODEJ6XchXQZDZD',
+        });
+        const formatedError = [];
+        if (error.response) {
+          // Request made and server responded
+          formatedError.concat(error.response.status, ' ', error.response.data, ' ', error.response.headers);
+        } else if (error.request) {
+          // The request was made but no response was received
+          formatedError.concat(error.request);
+        } else {
+          // Something happened in setting up the request that triggered an Error
+          formatedError.concat(error.message);
+        }
+
+        clientFb
+          .sendText('100000350602373', `Hello World : ${formatedError}`)
+          .then(() => {
+            console.log('sent');
+          })
+          .catch((error) => {
+            console.log(`FBMESSENGER error: ${error}`);
+          });
       });
-    client.sendMessage(canalEscolhido, mensagem).then(() => {
-      console.log('enviaNotificacaoSite Telegram message sent');
-    });
   }
 };
 
