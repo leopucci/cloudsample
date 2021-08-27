@@ -33,6 +33,7 @@ const setup = (store) => {
       const token = getAccessToken(store);
       if (token) {
         // config.headers["Authorization"] = 'Bearer ' + token;  // for Spring Boot back-end
+        // eslint-disable-next-line no-param-reassign
         config.headers["x-access-token"] = token; // for Node.js Express back-end
       }
       return config;

@@ -265,7 +265,6 @@ const forgotPassword = (userObj, recaptcha) => (dispatch) => {
   dispatch({
     type: SIGN_IN,
   });
-  const { email } = userObj;
   return api({
     method: "post",
     url: "/auth/forgot-password",
@@ -274,7 +273,7 @@ const forgotPassword = (userObj, recaptcha) => (dispatch) => {
       recaptcha,
     },
   })
-    .then((response) => {
+    .then(() => {
       // handle success
       dispatch(push(`/verifyemail`));
     })
@@ -297,6 +296,7 @@ const forgotPassword = (userObj, recaptcha) => (dispatch) => {
     });
 };
 
+// eslint-disable-next-line no-unused-vars
 const logOut = (userObj) => (dispatch, getState) => {
   const state = getState();
   let token;

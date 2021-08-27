@@ -45,6 +45,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+// eslint-disable-next-line react/prop-types
 export default function Header({ isLoggedIn }) {
   const dispatch = useDispatch();
   const classes = useStyles();
