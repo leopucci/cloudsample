@@ -13,7 +13,7 @@ const githubWebhookvalidation = {
     payload: Joi.string().required(),
   }),
 };
-const SECRET_CONFIGURADO_NO_GITHUB = 'SECRET_CONFIGURADO_NO_GITHUB';
+const SECRET_CONFIGURADO_NO_GITHUB = 'SECRET_CONFAIGURADO_NO_GITHUB';
 const githubWebhook = async (req, res) => {
   // console.log(req.body);
   console.log(req.body);
