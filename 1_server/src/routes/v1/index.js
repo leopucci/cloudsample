@@ -26,6 +26,7 @@ const devRoutes = [
 ];
 
 defaultRoutes.forEach((route) => {
+  console.log(`Configuring ${route.path}`);
   router.use(route.path, route.route);
 });
 

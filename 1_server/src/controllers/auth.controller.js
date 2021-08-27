@@ -2,7 +2,7 @@ const passport = require('passport');
 const httpStatus = require('http-status');
 const catchAsync = require('../utils/catchAsync');
 const { authService, userService, tokenService, emailService } = require('../services');
-const { enviaNotificacaoSite } = require('../utils/notify');
+const { enviaNotificacaoSite, enviaNotificacaoApi } = require('../utils/notify');
 
 const register = catchAsync(async (req, res) => {
   const user = await userService.createUser(req.body);
@@ -22,6 +22,7 @@ const login = catchAsync(async (req, res) => {
   }
   const userHasPassword = await authService.userHasPassword(email);
   if (!userHasPassword) {
+    enviaNotificacaoApi(`${email}  userHasPassword = false `);
     res
       .status(httpStatus.NOT_ACCEPTABLE)
       .send(
@@ -158,7 +159,6 @@ module.exports = {
   login,
   loginErrors,
   appleLoginOrCreateAccount,
-  appleSignInWebHook,
   googleLoginOrCreateAccount,
   logout,
   refreshTokens,
@@ -168,4 +168,5 @@ module.exports = {
   verifyEmail,
   authenticateGoogle,
   authenticateGoogleCallback,
+  appleSignInWebHook,
 };
