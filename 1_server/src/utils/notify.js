@@ -5,6 +5,14 @@ const canais = {
   PocketDeploy: { id: '-1001177781241' },
   PocketNovosClientes: { id: '-1001317116760' },
 };
+const bot = {
+  PocketBot: { username: 'Pocket_robot_bot', accessToken: '1942279280:AAEoxbNJvbJlG7ksHmI86pord-aMYxyFF60' },
+  FacebookAccessToken: {
+    accessToken:
+      'EAAJJRoq0aY4BAJKbWv7h4e2COW8MReQZB3JDiY6iDdM9OVrLUoQPUSJju4hRXEHAQVGNKy6rLPNy9oIh3ozwKcdpj9X6B65fkfaQ8flEIWYF9xGKIHRMQbQvNiIzJAqlkgA9uZCO4dbu4EXhIWxDo0yGGrp5GlMHDhf8IirOoaHXH5pvcckWjs1H0E1rTgODEJ6XchXQZDZD',
+  },
+};
+
 const { TelegramClient } = require('messaging-api-telegram');
 const { MessengerClient } = require('messaging-api-messenger');
 /**
@@ -17,7 +25,7 @@ const enviaNotificacaoApi = (mensagem, canal = '1', enviaTelegram = true) => {
   if (enviaTelegram) {
     const client = new TelegramClient({
       // PUBSHARE BOT accessToken: '1621388212:AAHVIiVUPKYzNidK5PdvMAQdRfDhaNATLwo',
-      accessToken: '1942279280:AAEoxbNJvbJlG7ksHmI86pord-aMYxyFF60', // PocketBot
+      accessToken: bot.PocketBot.accessToken, // PocketBot
     });
 
     let canalEscolhido;
@@ -39,8 +47,7 @@ const enviaNotificacaoApi = (mensagem, canal = '1', enviaTelegram = true) => {
       })
       .catch((error) => {
         const clientFb = new MessengerClient({
-          accessToken:
-            'EAAJJRoq0aY4BAJKbWv7h4e2COW8MReQZB3JDiY6iDdM9OVrLUoQPUSJju4hRXEHAQVGNKy6rLPNy9oIh3ozwKcdpj9X6B65fkfaQ8flEIWYF9xGKIHRMQbQvNiIzJAqlkgA9uZCO4dbu4EXhIWxDo0yGGrp5GlMHDhf8IirOoaHXH5pvcckWjs1H0E1rTgODEJ6XchXQZDZD',
+          accessToken: FacebookAccessToken.accessToken,
         });
 
         let formatedError;
@@ -76,7 +83,7 @@ const enviaNotificacaoApi = (mensagem, canal = '1', enviaTelegram = true) => {
 const enviaNotificacaoSite = (mensagem, canal = '1', enviaTelegram = true) => {
   const client = new TelegramClient({
     // PUBSHARE BOT accessToken: '1621388212:AAHVIiVUPKYzNidK5PdvMAQdRfDhaNATLwo',
-    accessToken: '1942279280:AAEoxbNJvbJlG7ksHmI86pord-aMYxyFF60', // PocketBot
+    accessToken: bot.PocketBot.accessToken, // PocketBot
   });
 
   if (enviaTelegram) {
@@ -105,8 +112,7 @@ const enviaNotificacaoSite = (mensagem, canal = '1', enviaTelegram = true) => {
       .catch((error) => {
         console.log('enviaNotificacaoSite Telegram message falhou');
         const clientFb = new MessengerClient({
-          accessToken:
-            'EAAJJRoq0aY4BAJKbWv7h4e2COW8MReQZB3JDiY6iDdM9OVrLUoQPUSJju4hRXEHAQVGNKy6rLPNy9oIh3ozwKcdpj9X6B65fkfaQ8flEIWYF9xGKIHRMQbQvNiIzJAqlkgA9uZCO4dbu4EXhIWxDo0yGGrp5GlMHDhf8IirOoaHXH5pvcckWjs1H0E1rTgODEJ6XchXQZDZD',
+          accessToken: FacebookAccessToken.accessToken,
         });
         const formatedError = [];
         if (error.response) {
@@ -141,7 +147,7 @@ const enviaNotificacaoSite = (mensagem, canal = '1', enviaTelegram = true) => {
 const enviaNotificacaoAplicativo = (mensagem, canal = '1', enviaTelegram = true) => {
   const client = new TelegramClient({
     // PUBSHARE BOT accessToken: '1621388212:AAHVIiVUPKYzNidK5PdvMAQdRfDhaNATLwo',
-    accessToken: '1942279280:AAEoxbNJvbJlG7ksHmI86pord-aMYxyFF60', // PocketBot
+    accessToken: bot.PocketBot.accessToken, // PocketBot
   });
 
   if (enviaTelegram) {
@@ -165,8 +171,7 @@ const enviaNotificacaoAplicativo = (mensagem, canal = '1', enviaTelegram = true)
       .catch((error) => {
         console.log('enviaNotificacaoSite Telegram message falhou');
         const clientFb = new MessengerClient({
-          accessToken:
-            'EAAJJRoq0aY4BAJKbWv7h4e2COW8MReQZB3JDiY6iDdM9OVrLUoQPUSJju4hRXEHAQVGNKy6rLPNy9oIh3ozwKcdpj9X6B65fkfaQ8flEIWYF9xGKIHRMQbQvNiIzJAqlkgA9uZCO4dbu4EXhIWxDo0yGGrp5GlMHDhf8IirOoaHXH5pvcckWjs1H0E1rTgODEJ6XchXQZDZD',
+          accessToken: FacebookAccessToken.accessToken,
         });
         const formatedError = [];
         if (error.response) {
