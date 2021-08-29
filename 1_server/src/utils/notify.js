@@ -1,3 +1,10 @@
+const canais = {
+  PocketApi: { id: '-1001334222644' },
+  PocketSite: { id: '-1001419540370' },
+  PocketAplicativo: { id: '-1001309705197' },
+  PocketDeploy: { id: '-1001177781241' },
+  PocketNovosClientes: { id: '-1001317116760' },
+};
 const { TelegramClient } = require('messaging-api-telegram');
 const { MessengerClient } = require('messaging-api-messenger');
 /**
@@ -19,10 +26,10 @@ const enviaNotificacaoApi = (mensagem, canal = '1', enviaTelegram = true) => {
     switch (canal) {
       case '1':
         // Pocket Api ==> -1001334222644
-        canalEscolhido = '-1001334222644';
+        canalEscolhido = canais.PocketApi.id;
         break;
       default:
-        canalEscolhido = '-1001334222644'; // Pocket Api
+        canalEscolhido = canais.PocketApi.id; // Pocket Api
     }
 
     client
@@ -79,15 +86,15 @@ const enviaNotificacaoSite = (mensagem, canal = '1', enviaTelegram = true) => {
     switch (canal) {
       case '1':
         // Pocket Site ==> -1001419540370
-        canalEscolhido = '-1001419540370';
+        canalEscolhido = canais.PocketSite.id;
         break;
       case '2':
         // Pocket Novos Clientes ==> -1001317116760
-        canalEscolhido = '-1001317116760';
+        canalEscolhido = canais.PocketNovosClientes.id;
         break;
 
       default:
-        canalEscolhido = '-1001419540370'; // Pocket Site
+        canalEscolhido = canais.PocketSite.id; // Pocket Site
     }
 
     client
@@ -144,10 +151,10 @@ const enviaNotificacaoAplicativo = (mensagem, canal = '1', enviaTelegram = true)
     switch (canal) {
       case '1':
         // Pocket Aplicativo ==> -1001309705197
-        canalEscolhido = '-1001309705197';
+        canalEscolhido = canais.PocketAplicativo.id;
         break;
       default:
-        canalEscolhido = '-1001309705197'; // Pocket Aplicativo
+        canalEscolhido = canais.PocketAplicativo.id; // Pocket Aplicativo
     }
 
     client
