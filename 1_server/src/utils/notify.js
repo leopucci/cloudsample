@@ -18,10 +18,11 @@ const enviaNotificacaoApi = (mensagem, canal = '1', enviaTelegram = true) => {
     // Login/Suporte/ETC
     switch (canal) {
       case '1':
-        canalEscolhido = '@pocketapi';
+        // Pocket Api ==> -1001334222644
+        canalEscolhido = '-1001334222644';
         break;
       default:
-        canalEscolhido = '@pocketapi';
+        canalEscolhido = '-1001334222644'; // Pocket Api
     }
 
     client
@@ -52,8 +53,8 @@ const enviaNotificacaoApi = (mensagem, canal = '1', enviaTelegram = true) => {
           .then(() => {
             console.log('sent');
           })
-          .catch((error) => {
-            console.log(`FBMESSENGER error: ${error}`);
+          .catch((error2) => {
+            console.log(`FBMESSENGER error: ${error2}`);
           });
       });
   }
@@ -77,13 +78,16 @@ const enviaNotificacaoSite = (mensagem, canal = '1', enviaTelegram = true) => {
     // Login/Suporte/ETC
     switch (canal) {
       case '1':
-        canalEscolhido = '@pocketsite';
+        // Pocket Site ==> -1001419540370
+        canalEscolhido = '-1001419540370';
         break;
       case '2':
-        canalEscolhido = '3';
+        // Pocket Novos Clientes ==> -1001317116760
+        canalEscolhido = '-1001317116760';
         break;
+
       default:
-        canalEscolhido = '@pocketsite';
+        canalEscolhido = '-1001419540370'; // Pocket Site
     }
 
     client
@@ -114,8 +118,8 @@ const enviaNotificacaoSite = (mensagem, canal = '1', enviaTelegram = true) => {
           .then(() => {
             console.log('sent');
           })
-          .catch((error) => {
-            console.log(`FBMESSENGER error: ${error}`);
+          .catch((error2) => {
+            console.log(`FBMESSENGER error: ${error2}`);
           });
       });
   }
@@ -139,15 +143,45 @@ const enviaNotificacaoAplicativo = (mensagem, canal = '1', enviaTelegram = true)
     // Login/Suporte/ETC
     switch (canal) {
       case '1':
-        canalEscolhido = '@pocketaplicativo';
+        // Pocket Aplicativo ==> -1001309705197
+        canalEscolhido = '-1001309705197';
         break;
       default:
-        canalEscolhido = '@pocketsite';
+        canalEscolhido = '-1001309705197'; // Pocket Aplicativo
     }
 
-    client.sendMessage(canalEscolhido, mensagem).then(() => {
-      console.log('enviaNotificacaoSite Telegram message sent');
-    });
+    client
+      .sendMessage(canalEscolhido, mensagem)
+      .then(() => {
+        console.log('enviaNotificacaoSite Telegram message sent');
+      })
+      .catch((error) => {
+        console.log('enviaNotificacaoSite Telegram message falhou');
+        const clientFb = new MessengerClient({
+          accessToken:
+            'EAAJJRoq0aY4BAJKbWv7h4e2COW8MReQZB3JDiY6iDdM9OVrLUoQPUSJju4hRXEHAQVGNKy6rLPNy9oIh3ozwKcdpj9X6B65fkfaQ8flEIWYF9xGKIHRMQbQvNiIzJAqlkgA9uZCO4dbu4EXhIWxDo0yGGrp5GlMHDhf8IirOoaHXH5pvcckWjs1H0E1rTgODEJ6XchXQZDZD',
+        });
+        const formatedError = [];
+        if (error.response) {
+          // Request made and server responded
+          formatedError.concat(error.response.status, ' ', error.response.data, ' ', error.response.headers);
+        } else if (error.request) {
+          // The request was made but no response was received
+          formatedError.concat(error.request);
+        } else {
+          // Something happened in setting up the request that triggered an Error
+          formatedError.concat(error.message);
+        }
+
+        clientFb
+          .sendText('100000350602373', `Hello World : ${formatedError}`)
+          .then(() => {
+            console.log('sent');
+          })
+          .catch((error2) => {
+            console.log(`FBMESSENGER error: ${error2}`);
+          });
+      });
   }
 };
 
