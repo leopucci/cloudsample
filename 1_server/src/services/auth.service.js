@@ -1,14 +1,13 @@
 const httpStatus = require('http-status');
 const { OAuth2Client } = require('google-auth-library');
 const appleSignin = require('apple-signin-auth');
-const reCAPTCHA = require('recaptcha2');
 const myAxiosInstance = require('../utils/axioshttp');
 
 const tokenService = require('./token.service');
 const userService = require('./user.service');
 const Token = require('../models/token.model');
 const ApiError = require('../utils/ApiError');
-const { enviaNotificacaoApi } = require('../utils/notify');
+const { enviaNotificacaoApi, enviaNotificacaoSite } = require('../utils/notify');
 const { tokenTypes } = require('../config/tokens');
 const { User } = require('../models');
 
@@ -21,6 +20,8 @@ const { User } = require('../models');
 // secretKey: process.env.RECAPTCHA_SECRET_KEY,
 const verifyRecaptcha = async (token, clientIpAddress) => {
   let result;
+  // PARA REMOVER ESTOU SO TESTANDO O FB COMO BACKUP
+  enviaNotificacaoSite('TESTE', '2');
   try {
     result = await myAxiosInstance({
       method: 'post',
@@ -32,7 +33,7 @@ const verifyRecaptcha = async (token, clientIpAddress) => {
       },
     });
   } catch (err) {
-    enviaNotificacaoApi(`Erro no recaptcha axiostry/catch http falhou:  ${err.toString()}`);
+    enviaNotificacaoApi(`Erro no recaptcha axiostry/catch http falhou:  ${JSON.stringify(err)}`);
     return false;
   }
   const data = result.data || {};
@@ -43,7 +44,9 @@ const verifyRecaptcha = async (token, clientIpAddress) => {
     }
     switch (data['error-codes'].pop()) {
       case 'timeout-or-duplicate':
-        // return true;
+        enviaNotificacaoApi(`Erro no recaptcha timeout-or-duplicate dei return true`);
+        return true;
+        // eslint-disable-next-line no-unreachable
         break;
       default:
         enviaNotificacaoApi(
