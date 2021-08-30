@@ -15,7 +15,7 @@ const register = catchAsync(async (req, res) => {
 const login = catchAsync(async (req, res) => {
   const { email, password, recaptcha } = req.body;
 
-  const recaptchaOK = await authService.verifyRecaptcha(recaptcha, req.connection.remoteAddress);
+  const recaptchaOK = await authService.verifyRecaptcha(recaptcha, req.ip);
   if (!recaptchaOK) {
     res.status(httpStatus.NOT_ACCEPTABLE).send('{"message": "Recaptcha Error"}');
     return;
@@ -37,7 +37,7 @@ const login = catchAsync(async (req, res) => {
 
 const appleLoginOrCreateAccount = catchAsync(async (req, res) => {
   const { authorization, appleUser, recaptcha } = req.body;
-  const recaptchaOK = await authService.verifyRecaptcha(recaptcha, req.connection.remoteAddress);
+  const recaptchaOK = await authService.verifyRecaptcha(recaptcha, req.ip);
   if (!recaptchaOK) {
     res.status(httpStatus.NOT_ACCEPTABLE).send('{"message": "Recaptcha Error"}');
     return;
@@ -60,7 +60,7 @@ const appleSignInWebHook = async (req, res) => {
 
 const googleLoginOrCreateAccount = catchAsync(async (req, res) => {
   const { token, recaptcha } = req.body;
-  const recaptchaOK = await authService.verifyRecaptcha(recaptcha, req.connection.remoteAddress);
+  const recaptchaOK = await authService.verifyRecaptcha(recaptcha, req.ip);
   if (!recaptchaOK) {
     res.status(httpStatus.NOT_ACCEPTABLE).send('{"message": "Recaptcha Error"}');
     return;
@@ -83,7 +83,7 @@ const loginErrors = catchAsync(async (req, res) => {
 
 const refreshTokens = catchAsync(async (req, res) => {
   const { refreshToken, recaptcha } = req.body;
-  const recaptchaOK = await authService.verifyRecaptcha(recaptcha, req.connection.remoteAddress);
+  const recaptchaOK = await authService.verifyRecaptcha(recaptcha, req.ip);
   if (!recaptchaOK) {
     res.status(httpStatus.NOT_ACCEPTABLE).send('{"message": "Recaptcha Error"}');
     return;
@@ -94,7 +94,7 @@ const refreshTokens = catchAsync(async (req, res) => {
 
 const forgotPassword = catchAsync(async (req, res) => {
   const { email, recaptcha } = req.body;
-  const recaptchaOK = await authService.verifyRecaptcha(recaptcha, req.connection.remoteAddress);
+  const recaptchaOK = await authService.verifyRecaptcha(recaptcha, req.ip);
   if (!recaptchaOK) {
     res.status(httpStatus.NOT_ACCEPTABLE).send('{"message": "Recaptcha Error"}');
     return;
