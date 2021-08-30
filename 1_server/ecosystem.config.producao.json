@@ -1,11 +1,11 @@
 {
   "apps": [
     {
-      "name": "PocketCloud Api",
-      "script": "/opt/POCKETCLOUD/BACKENDAPI/src/index.js",
+      "name": "PocketCloud Api PRODUCAO",
+      "script": "src/index.js",
       "instances": 1,
       "autorestart": true,
-      "watch": true,
+      "watch": false,
       "time": true,
       "env": {
         "NODE_ENV": "production"
