@@ -1,8 +1,8 @@
 {
   "apps": [
     {
-      "name": "PocketCloud Api ",
-      "script": "src/index.js",
+      "name": "PocketCloud Api",
+      "script": "/opt/POCKETCLOUD/BACKENDAPI/src/index.js",
       "instances": 1,
       "autorestart": true,
       "watch": true,

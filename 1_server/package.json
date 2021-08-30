@@ -107,5 +107,8 @@
     "nodemon": "^2.0.0",
     "prettier": "^2.0.5",
     "supertest": "^6.0.1"
+  },
+  "config": {
+    "chat_id": -1001177781241
   }
 }

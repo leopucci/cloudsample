@@ -2,7 +2,8 @@ const canais = {
   PocketApi: { id: '-1001334222644' },
   PocketSite: { id: '-1001419540370' },
   PocketAplicativo: { id: '-1001309705197' },
-  PocketDeploy: { id: '-1001177781241' },
+  PocketDeployApi: { id: '-1001163173913' },
+  PocketDeploySite: { id: '-1001177781241' },
   PocketNovosClientes: { id: '-1001317116760' },
 };
 const bot = {
