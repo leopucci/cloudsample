@@ -1,13 +1,9 @@
 const dotenv = require('dotenv');
 const path = require('path');
 const Joi = require('joi');
+const sleep = require('system-sleep');
 const { enviaNotificacaoSite, enviaNotificacaoApi } = require('../utils/notify');
 
-const sleep = function sleep(ms) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
-};
 dotenv.config({ path: path.join(__dirname, '../../.env') });
 
 const envVarsSchema = Joi.object()
@@ -37,7 +33,7 @@ const { value: envVars, error } = envVarsSchema.prefs({ errors: { label: 'key' }
 
 if (error) {
   enviaNotificacaoApi(`Config validation error: ${error.message}`);
-  sleep(1000 * 5);
+  sleep(5000); // 5 seconds
   throw new Error(`Config validation error: ${error.message}`);
 }
 
