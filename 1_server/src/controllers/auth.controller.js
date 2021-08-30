@@ -18,6 +18,7 @@ const login = catchAsync(async (req, res) => {
   const recaptchaOK = await authService.verifyRecaptcha(recaptcha, req.ip);
   if (!recaptchaOK) {
     res.status(httpStatus.NOT_ACCEPTABLE).send('{"message": "Recaptcha Error"}');
+    res.end();
     return;
   }
   const userHasPassword = await authService.userHasPassword(email);
@@ -40,6 +41,7 @@ const appleLoginOrCreateAccount = catchAsync(async (req, res) => {
   const recaptchaOK = await authService.verifyRecaptcha(recaptcha, req.ip);
   if (!recaptchaOK) {
     res.status(httpStatus.NOT_ACCEPTABLE).send('{"message": "Recaptcha Error"}');
+    res.end();
     return;
   }
   const user = await authService.appleLoginOrCreateAccount(authorization, appleUser);
@@ -63,6 +65,7 @@ const googleLoginOrCreateAccount = catchAsync(async (req, res) => {
   const recaptchaOK = await authService.verifyRecaptcha(recaptcha, req.ip);
   if (!recaptchaOK) {
     res.status(httpStatus.NOT_ACCEPTABLE).send('{"message": "Recaptcha Error"}');
+    res.end();
     return;
   }
   const user = await authService.googleLoginOrCreateAccount(token);
@@ -86,6 +89,7 @@ const refreshTokens = catchAsync(async (req, res) => {
   const recaptchaOK = await authService.verifyRecaptcha(recaptcha, req.ip);
   if (!recaptchaOK) {
     res.status(httpStatus.NOT_ACCEPTABLE).send('{"message": "Recaptcha Error"}');
+    res.end();
     return;
   }
   const tokens = await authService.refreshAuth(refreshToken);
@@ -97,6 +101,7 @@ const forgotPassword = catchAsync(async (req, res) => {
   const recaptchaOK = await authService.verifyRecaptcha(recaptcha, req.ip);
   if (!recaptchaOK) {
     res.status(httpStatus.NOT_ACCEPTABLE).send('{"message": "Recaptcha Error"}');
+    res.end();
     return;
   }
   const resetPasswordToken = await tokenService.generateResetPasswordToken(email);

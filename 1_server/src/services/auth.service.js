@@ -49,9 +49,10 @@ const verifyRecaptcha = async (token, clientIpAddress) => {
         // eslint-disable-next-line no-unreachable
         break;
       default:
+        console.log(data);
         // eslint-disable-next-line no-case-declarations
         const codes = JSON.stringify(data['error-codes']);
-        enviaNotificacaoApi(`Erro no recaptcha default:${codes} remoteIp: \${clientIpAddress}`);
+        enviaNotificacaoApi(`Erro no recaptcha default:${codes} remoteIp: ${clientIpAddress}`);
     }
     return false;
   }
