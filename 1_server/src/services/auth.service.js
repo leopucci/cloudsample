@@ -52,7 +52,11 @@ const verifyRecaptcha = async (token, clientIpAddress) => {
         console.log(data);
         // eslint-disable-next-line no-case-declarations
         const codes = JSON.stringify(data['error-codes']);
-        enviaNotificacaoApi(`Erro no recaptcha default:${codes} remoteIp: ${clientIpAddress}`);
+        if (data['error-codes'].length === 0) {
+          enviaNotificacaoApi(`Erro no recaptcha sem error-codes - remoteIp: ${clientIpAddress}`);
+        } else {
+          enviaNotificacaoApi(`Erro no recaptcha default:${codes} remoteIp: ${clientIpAddress}`);
+        }
     }
     return false;
   }
