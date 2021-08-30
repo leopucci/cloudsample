@@ -1,7 +1,7 @@
 {
   "apps": [
     {
-      "name": "PocketCloud Api PRODUCAO",
+      "name": "PktCloudApiPRODUCAO",
       "script": "src/index.js",
       "instances": 1,
       "autorestart": true,
