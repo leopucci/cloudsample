@@ -32,8 +32,8 @@ const envVarsSchema = Joi.object()
 const { value: envVars, error } = envVarsSchema.prefs({ errors: { label: 'key' } }).validate(process.env);
 
 if (error) {
-  enviaNotificacaoApi(`Config validation error: ${error.message}`);
-  sleep(5000); // 5 seconds
+  enviaNotificacaoApi(`STARTUP API: Config validation error: ${error.message}`, 2);
+  sleep(10000); // 5 seconds
   throw new Error(`Config validation error: ${error.message}`);
 }
 
