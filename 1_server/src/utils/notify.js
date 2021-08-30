@@ -22,7 +22,7 @@ const { MessengerClient } = require('messaging-api-messenger');
  * @param {canal} keys
  * @returns {true}
  */
-const enviaNotificacaoApi = (mensagem, canal = '1', enviaTelegram = true) => {
+const enviaNotificacaoApi = (mensagem, canal = 1, enviaTelegram = true) => {
   if (enviaTelegram) {
     const client = new TelegramClient({
       // PUBSHARE BOT accessToken: '1621388212:AAHVIiVUPKYzNidK5PdvMAQdRfDhaNATLwo',
@@ -33,11 +33,11 @@ const enviaNotificacaoApi = (mensagem, canal = '1', enviaTelegram = true) => {
     // Deixei isto aqui pra segmentar mensagens la do cliente.
     // Login/Suporte/ETC
     switch (canal) {
-      case '1':
+      case 1:
         // Pocket Api ==> -1001334222644
         canalEscolhido = canais.PocketApi.id;
         break;
-      case '2':
+      case 2:
         // Pocket DEPLOY Api ==>
         canalEscolhido = canais.PocketDeployApi.id;
         break;
