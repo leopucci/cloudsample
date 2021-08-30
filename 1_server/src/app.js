@@ -3,7 +3,6 @@ const helmet = require('helmet');
 const xss = require('xss-clean');
 const mongoSanitize = require('express-mongo-sanitize');
 const compression = require('compression');
-const requestIp = require('request-ip');
 const cors = require('cors');
 const passport = require('passport');
 const httpStatus = require('http-status');
@@ -18,14 +17,11 @@ const { errorConverter, errorHandler } = require('./middlewares/error');
 const ApiError = require('./utils/ApiError');
 
 const app = express();
-
+app.set('trust proxy', 'loopback');
 if (config.env !== 'test') {
   app.use(morgan.successHandler);
   app.use(morgan.errorHandler);
 }
-
-// Pegando o ip do nginx e setando em req.clientIp
-app.use(requestIp.mw());
 
 // set security HTTP headers
 app.use(helmet());
