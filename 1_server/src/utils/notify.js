@@ -37,6 +37,10 @@ const enviaNotificacaoApi = (mensagem, canal = '1', enviaTelegram = true) => {
         // Pocket Api ==> -1001334222644
         canalEscolhido = canais.PocketApi.id;
         break;
+      case '2':
+        // Pocket DEPLOY Api ==>
+        canalEscolhido = canais.PocketDeployApi.id;
+        break;
       default:
         canalEscolhido = canais.PocketApi.id; // Pocket Api
     }

@@ -33,7 +33,7 @@ const { value: envVars, error } = envVarsSchema.prefs({ errors: { label: 'key' }
 
 if (error) {
   enviaNotificacaoApi(`STARTUP API: Config validation error: ${error.message}`, 2);
-  sleep(10000); // 5 seconds
+  sleep(20000); // 20 seconds
   throw new Error(`Config validation error: ${error.message}`);
 }
 
