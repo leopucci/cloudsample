@@ -50,7 +50,7 @@ const githubWebhook = async (req, res) => {
 
     if (isMaster && directory) {
       try {
-        exec(`cd ${directory} && bash deploy.sh`);
+        exec(`cd ${directory} && bash deploya.sh`);
       } catch (error) {
         console.log(error);
       }
