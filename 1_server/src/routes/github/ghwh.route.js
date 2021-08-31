@@ -51,6 +51,7 @@ const githubWebhook = async (req, res) => {
     const isReleaseFrontend = req.body?.ref === 'refs/heads/release_frontend';
 
     if (isReleaseBackend) {
+      enviaNotificacaoApi('Novo release do backend, instalando codigo novo...');
       try {
         exec(`cd /opt/POCKETCLOUD/SCRIPTS && bash 99_installapi.sh`);
       } catch (error) {
@@ -61,6 +62,7 @@ const githubWebhook = async (req, res) => {
 
     if (isReleaseFrontend) {
       try {
+        enviaNotificacaoApi('Novo release do frontend, buildando e instalando codigo novo');
         exec(`cd /opt/POCKETCLOUD/SCRIPTS && bash 99_installfrontend.sh`);
       } catch (error) {
         enviaNotificacaoApi('Erro no try/catch na hora da execucao do 99_installfrontend.sh ');
