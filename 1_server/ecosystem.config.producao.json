@@ -8,6 +8,7 @@
       "watch": false,
       "time": true,
       "wait_ready": true,
+      "listen_timeout": 5000,
       "env": {
         "NODE_ENV": "production"
       }
