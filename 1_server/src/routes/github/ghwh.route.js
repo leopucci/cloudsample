@@ -44,20 +44,33 @@ const githubWebhook = async (req, res) => {
   const directory = GITHUB_REPOSITORIES_TO_DIR[req.body?.repository?.full_name];
 
   if (await verifySignature(req)) {
-    console.log(req.body);
+    // console.log(req.body);
 
     const isMaster = req.body?.ref === 'refs/heads/master';
-    console.log(isMaster);
+    const isReleaseBackend = req.body?.ref === 'refs/heads/release_backend';
+    const isReleaseFrontend = req.body?.ref === 'refs/heads/release_frontend';
 
     if (isReleaseBackend) {
+      try {
+        exec(`cd /opt/POCKETCLOUD/SCRIPTS && bash 99_installapi.sh`);
+      } catch (error) {
+        enviaNotificacaoApi('Erro no try/catch na hora da execucao do 99_installapi.sh ');
+        console.log(error);
+      }
     }
 
     if (isReleaseFrontend) {
+      try {
+        exec(`cd /opt/POCKETCLOUD/SCRIPTS && bash 99_installfrontend.sh`);
+      } catch (error) {
+        enviaNotificacaoApi('Erro no try/catch na hora da execucao do 99_installfrontend.sh ');
+        console.log(error);
+      }
     }
 
     if (isMaster && directory) {
       try {
-        exec(`cd ${directory} && bash deploya.sh`);
+        exec(`cd ${directory} && bash deployaa.sh`);
       } catch (error) {
         console.log(error);
       }
