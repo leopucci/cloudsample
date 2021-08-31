@@ -62,10 +62,10 @@ const githubWebhook = async (req, res) => {
 
     if (isReleaseFrontend) {
       try {
-        enviaNotificacaoApi('Novo release do frontend,a buildando e instalando codigo novo');
+        enviaNotificacaoSite('Novo release do frontend,a buildando e instalando codigo novo');
         exec(`cd /opt/POCKETCLOUD/SCRIPTS && bash 99_installfrontend.sh`);
       } catch (error) {
-        enviaNotificacaoApi('Erro no try/catch na hora da execucao do 99_installfrontend.sh ');
+        enviaNotificacaoSite('Erro no try/catch na hora da execucao do 99_installfrontend.sh ');
         console.log(error);
       }
     }
@@ -80,7 +80,8 @@ const githubWebhook = async (req, res) => {
 
     res.status(httpStatus.OK).send();
   } else {
-    console.log('ERRO NO VERI');
+    console.log('Erro na verificação de assinatura de comunicação com o github');
+    enviaNotificacaoApi('Erro na verificação de assinatura de comunicação com o github');
   }
 };
 
