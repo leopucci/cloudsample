@@ -62,7 +62,7 @@ const githubWebhook = async (req, res) => {
 
     if (isReleaseFrontend) {
       try {
-        enviaNotificacaoApi('Novo release do frontend, buildando e instalando codigo novo');
+        enviaNotificacaoApi('Novo release do frontend,a buildando e instalando codigo novo');
         exec(`cd /opt/POCKETCLOUD/SCRIPTS && bash 99_installfrontend.sh`);
       } catch (error) {
         enviaNotificacaoApi('Erro no try/catch na hora da execucao do 99_installfrontend.sh ');
