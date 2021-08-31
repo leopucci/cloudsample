@@ -41,7 +41,7 @@ if [ $? -eq 0 ]; then
     cd pocketcloud
     cd 1_server/
     cp -r 99_installapi.sh /opt/POCKETCLOUD/SCRIPTS/
-    cp -r ../4_website/99_installfrontend.sh /opt/POCKETCLOUD/SCRIPTS/
+    cp -r ../4_website/pockketcloud/99_installfrontend.sh /opt/POCKETCLOUD/SCRIPTS/
     chmod 755 /opt/POCKETCLOUD/SCRIPTS/99_installapi.sh
     cp -r /root/POCKETCLOUDCONF/envproducaoexpressapi ./.env
 
