@@ -39,9 +39,9 @@ gh repo clone pocketcloud
 if [ $? -eq 0 ]; then
 
     cd pocketcloud
+    cp -r 4_website/pocketcloud/99_installfrontend.sh /opt/POCKETCLOUD/SCRIPTS/
     cd 1_server/
     cp -r 99_installapi.sh /opt/POCKETCLOUD/SCRIPTS/
-    cp -r ../4_website/pockketcloud/99_installfrontend.sh /opt/POCKETCLOUD/SCRIPTS/
     chmod 755 /opt/POCKETCLOUD/SCRIPTS/99_installapi.sh
     cp -r /root/POCKETCLOUDCONF/envproducaoexpressapi ./.env
 
