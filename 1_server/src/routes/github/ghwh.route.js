@@ -7,10 +7,6 @@ const { enviaNotificacaoSite, enviaNotificacaoApi } = require('../../utils/notif
 
 const router = express.Router();
 const SECRET_CONFIGURADO_NO_GITHUB = 'SECRET_CONFIGURADO_NO_GITHUB';
-const GITHUB_REPOSITORIES_TO_DIR = {
-  'rwieruch/my-website-one-on-github': '/opt/reactbuildtemp',
-  'rwieruch/my-website-two-on-github': '/home/rwieruch/my-website-two',
-};
 
 const verifySignature = function (req, res, next) {
   const sign = signer({ algorithm: 'sha1', secret: SECRET_CONFIGURADO_NO_GITHUB });
@@ -41,13 +37,23 @@ const verifySignature = function (req, res, next) {
   return true;
 };
 const githubWebhook = async (req, res) => {
+  const GITHUB_REPOSITORIES_TO_DIR = {
+    'rwieruch/my-website-one-on-github': '/opt/reactbuildtemp',
+    'rwieruch/my-website-two-on-github': '/home/rwieruch/my-website-two',
+  };
+  const directory = GITHUB_REPOSITORIES_TO_DIR[req.body?.repository?.full_name];
+
   if (await verifySignature(req)) {
     console.log(req.body);
 
     const isMaster = req.body?.ref === 'refs/heads/master';
     console.log(isMaster);
 
-    const directory = GITHUB_REPOSITORIES_TO_DIR[req.body?.repository?.full_name];
+    if (isReleaseBackend) {
+    }
+
+    if (isReleaseFrontend) {
+    }
 
     if (isMaster && directory) {
       try {
