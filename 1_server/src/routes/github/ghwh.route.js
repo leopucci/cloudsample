@@ -3,7 +3,7 @@ const httpError = require('http-errors');
 const httpStatus = require('http-status');
 const { signer } = require('x-hub-signature');
 const { exec } = require('child_process');
-const { enviaNotificacaoSite, enviaNotificacaoApi } = require('../utils/notify');
+const { enviaNotificacaoSite, enviaNotificacaoApi } = require('../../utils/notify');
 
 const router = express.Router();
 const SECRET_CONFIGURADO_NO_GITHUB = 'SECRET_CONFIGURADO_NO_GITHUB';
