@@ -38,3 +38,9 @@ process.on('SIGTERM', () => {
     server.close();
   }
 });
+
+process.on('SIGINT', function () {
+  server.close(function () {
+    process.exit(0);
+  });
+});
