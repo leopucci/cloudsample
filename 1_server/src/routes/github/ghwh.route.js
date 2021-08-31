@@ -38,6 +38,7 @@ const verifySignature = function (req, res, next) {
       return next(httpError(400, 'Invalid X-Hub-Signature'));
     }
   }
+  return true;
 };
 const githubWebhook = async (req, res) => {
   if (await verifySignature(req)) {
@@ -58,6 +59,7 @@ const githubWebhook = async (req, res) => {
 
     res.status(httpStatus.OK).send();
   } else {
+    console.log('ERRO NO VERI');
   }
 };
 
