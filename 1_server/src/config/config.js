@@ -26,6 +26,7 @@ const envVarsSchema = Joi.object()
     SMTP_PASSWORD: Joi.string().description('password for email server'),
     EMAIL_FROM: Joi.string().description('the from field in the emails sent by the app'),
     EMAIL_WEBSITE_BASE_URL: Joi.string().description('the base website url for the links on the e-mail to be clicked'),
+    RECAPTCHA_SECRET_KEY: Joi.string().required().description('RECAPTCHA_SECRET_KEY not found in config file'),
   })
   .unknown();
 
