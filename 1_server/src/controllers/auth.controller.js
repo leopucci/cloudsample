@@ -2,7 +2,7 @@ const passport = require('passport');
 const httpStatus = require('http-status');
 const catchAsync = require('../utils/catchAsync');
 const { authService, userService, tokenService, emailService } = require('../services');
-const { enviaNotificacaoSite, enviaNotificacaoApi } = require('../utils/notify');
+const { enviaNotificacaoPorId, enviaNotificacaoSite, enviaNotificacaoApi, canais } = require('../utils/notify');
 
 const register = catchAsync(async (req, res) => {
   const user = await userService.createUser(req.body);
@@ -80,7 +80,8 @@ const logout = catchAsync(async (req, res) => {
 
 const loginErrors = catchAsync(async (req, res) => {
   const { message, channel } = req.body;
-  enviaNotificacaoSite(message, channel);
+
+  enviaNotificacaoPorId(message, channel);
   res.status(httpStatus.NO_CONTENT).send();
 });
 

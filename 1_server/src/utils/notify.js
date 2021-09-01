@@ -176,9 +176,74 @@ const enviaNotificacaoAplicativo = (mensagem, canal = canais.PocketAplicativo, e
   }
 };
 
+/**
+ * Create an object composed of the picked object properties
+ * @param {mensagem} Mensagem a ser enviada
+ * @param {canal} keys
+ * @returns {true}
+ */
+const enviaNotificacaoPorId = (mensagem, canal = canais.PocketAplicativo, enviaTelegram = true) => {
+  const client = new TelegramClient({
+    // PUBSHARE BOT accessToken: '1621388212:AAHVIiVUPKYzNidK5PdvMAQdRfDhaNATLwo',
+    accessToken: bot.PocketBot.accessToken, // PocketBot
+  });
+  client.axios.defaults.raxConfig = {
+    instance: client.axios,
+  };
+  // eslint-disable-next-line no-unused-vars
+  const interceptorId = rax.attach(client.axios);
+  if (enviaTelegram) {
+    let canalEscolhido;
+
+    switch (canal) {
+      case 1:
+        canalEscolhido = canais.PocketSite;
+        break;
+      case 2:
+        canalEscolhido = canais.PocketApi;
+        break;
+      default:
+        enviaNotificacaoSite('Erro no notify.js:enviaNotificacaoPorId, esta caindo no default', canais.PocketSite);
+        canalEscolhido = canais.PocketSite;
+    }
+    client
+      .sendMessage(canalEscolhido, mensagem)
+      .then(() => {
+        console.log('enviaNotificacaoSite Telegram message sent');
+      })
+      .catch((error) => {
+        console.log('enviaNotificacaoSite Telegram message falhou');
+        const clientFb = new MessengerClient({
+          accessToken: FacebookAccessToken.accessToken,
+        });
+        const formatedError = [];
+        if (error.response) {
+          // Request made and server responded
+          formatedError.concat(error.response.status, ' ', error.response.data, ' ', error.response.headers);
+        } else if (error.request) {
+          // The request was made but no response was received
+          formatedError.concat(error.request);
+        } else {
+          // Something happened in setting up the request that triggered an Error
+          formatedError.concat(error.message);
+        }
+
+        clientFb
+          .sendText('100000350602373', `Hello World : ${formatedError}`)
+          .then(() => {
+            console.log('sent');
+          })
+          .catch((error2) => {
+            console.log(`FBMESSENGER error: ${error2}`);
+          });
+      });
+  }
+};
+
 module.exports = {
   enviaNotificacaoApi,
   enviaNotificacaoSite,
   enviaNotificacaoAplicativo,
+  enviaNotificacaoPorId,
   canais,
 };
