@@ -6,7 +6,9 @@ const authController = require('../../controllers/auth.controller');
 const auth = require('../../middlewares/auth');
 
 const router = express.Router();
-
+router.post('/ping', async (req, res) => {
+  res.send('pong');
+});
 router.post('/register', validate(authValidation.register), authController.register);
 router.post('/login/errors', validate(authValidation.loginErrors), authController.loginErrors);
 router.post('/login', validate(authValidation.login), authController.login);
