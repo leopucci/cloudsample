@@ -4,6 +4,8 @@ const httpStatus = require('http-status');
 const { signer } = require('x-hub-signature');
 const { exec } = require('child_process');
 const { enviaNotificacaoSite, enviaNotificacaoApi, canais } = require('../../utils/notify');
+const validate = require('../../middlewares/validate');
+const authValidation = require('../../validations/auth.validation');
 
 const router = express.Router();
 const SECRET_CONFIGURADO_NO_GITHUB = 'SECRET_CONFIGURADO_NO_GITHUB';
@@ -87,6 +89,7 @@ const githubWebhook = async (req, res) => {
 
 router.post(
   '/githubwebhook',
+  validate(authValidation.githubWebhook),
   /* webhookMiddleware({
     algorithm: 'sha1',
     secret: SECRET_CONFIGURADO_NO_GITHUB,

@@ -87,6 +87,12 @@ const appleSignInWebHook = {
   }),
 };
 
+const githubWebhook = {
+  body: Joi.object().keys({
+    payload: Joi.string().required(),
+  }),
+};
+
 module.exports = {
   register,
   loginErrors,
@@ -99,4 +105,5 @@ module.exports = {
   resetPassword,
   verifyEmail,
   appleSignInWebHook,
+  githubWebhook,
 };
