@@ -6,7 +6,7 @@ const { exec } = require('child_process');
 const { enviaNotificacaoSite, enviaNotificacaoApi, canais } = require('../../utils/notify');
 const validate = require('../../middlewares/validate');
 const authValidation = require('../../validations/auth.validation');
-const catchAsync = require('../utils/catchAsync');
+const catchAsync = require('../../utils/catchAsync');
 
 const router = express.Router();
 const SECRET_CONFIGURADO_NO_GITHUB = 'SECRET_CONFIGURADO_NO_GITHUB';
