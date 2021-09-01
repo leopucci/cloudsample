@@ -7,7 +7,10 @@ const auth = require('../../middlewares/auth');
 
 const router = express.Router();
 router.post('/ping', async (req, res) => {
-  res.send('pong');
+  res.send('post pong');
+});
+router.get('/ping', async (req, res) => {
+  res.send('get pong');
 });
 router.post('/register', validate(authValidation.register), authController.register);
 router.post('/login/errors', validate(authValidation.loginErrors), authController.loginErrors);
