@@ -3,7 +3,7 @@ const httpError = require('http-errors');
 const httpStatus = require('http-status');
 const { signer } = require('x-hub-signature');
 const { exec } = require('child_process');
-const { enviaNotificacaoSite, enviaNotificacaoApi } = require('../../utils/notify');
+const { enviaNotificacaoSite, enviaNotificacaoApi, canais } = require('../../utils/notify');
 
 const router = express.Router();
 const SECRET_CONFIGURADO_NO_GITHUB = 'SECRET_CONFIGURADO_NO_GITHUB';
@@ -51,21 +51,21 @@ const githubWebhook = async (req, res) => {
     const isReleaseFrontend = req.body?.ref === 'refs/heads/release_frontend';
 
     if (isReleaseBackend) {
-      enviaNotificacaoApi('Novo release do backend, instalando codigo novo...');
+      enviaNotificacaoApi('Novo release do backend, instalando codigo novo...', canais.PocketDeployApi);
       try {
         exec(`cd /opt/POCKETCLOUD/SCRIPTS && bash 99_installapi.sh`);
       } catch (error) {
-        enviaNotificacaoApi('Erro no try/catch na hora da execucao do 99_installapi.sh ');
+        enviaNotificacaoApi('Erro no try/catch na hora da execucao do 99_installapi.sh ', canais.PocketDeployApi);
         console.log(error);
       }
     }
 
     if (isReleaseFrontend) {
       try {
-        enviaNotificacaoSite('Novo release do frontend,a buildando e instalando codigo novo');
+        enviaNotificacaoSite('Novo release do frontend,a buildando e instalando codigo novo', canais.PocketDeploySite);
         exec(`cd /opt/POCKETCLOUD/SCRIPTS && bash 99_installfrontend.sh`);
       } catch (error) {
-        enviaNotificacaoSite('Erro no try/catch na hora da execucao do 99_installfrontend.sh ');
+        enviaNotificacaoSite('Erro no try/catch na hora da execucao do 99_installfrontend.sh ', canais.PocketDeploySite);
         console.log(error);
       }
     }

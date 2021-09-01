@@ -1,17 +1,18 @@
 const canais = {
-  PocketApi: { id: '-1001334222644' },
-  PocketSite: { id: '-1001419540370' },
-  PocketAplicativo: { id: '-1001309705197' },
-  PocketDeployApi: { id: '-1001163173913' },
-  PocketDeploySite: { id: '-1001177781241' },
-  PocketNovosClientes: { id: '-1001317116760' },
+  PocketApi: '-1001334222644',
+  PocketSite: '-1001419540370',
+  PocketAplicativo: '-1001309705197',
+  PocketDeployApi: '-1001163173913',
+  PocketDeployApiPM2: '-1001507578888',
+  PocketDeploySite: '-1001177781241',
+  PocketNovosClientes: '-1001317116760',
 };
 const bot = {
   PocketBot: { username: 'Pocket_robot_bot', accessToken: '1942279280:AAEoxbNJvbJlG7ksHmI86pord-aMYxyFF60' },
-  FacebookAccessToken: {
-    accessToken:
-      'EAAJJRoq0aY4BAJKbWv7h4e2COW8MReQZB3JDiY6iDdM9OVrLUoQPUSJju4hRXEHAQVGNKy6rLPNy9oIh3ozwKcdpj9X6B65fkfaQ8flEIWYF9xGKIHRMQbQvNiIzJAqlkgA9uZCO4dbu4EXhIWxDo0yGGrp5GlMHDhf8IirOoaHXH5pvcckWjs1H0E1rTgODEJ6XchXQZDZD',
-  },
+};
+const FacebookAccessToken = {
+  accessToken:
+    'EAAJJRoq0aY4BAJKbWv7h4e2COW8MReQZB3JDiY6iDdM9OVrLUoQPUSJju4hRXEHAQVGNKy6rLPNy9oIh3ozwKcdpj9X6B65fkfaQ8flEIWYF9xGKIHRMQbQvNiIzJAqlkgA9uZCO4dbu4EXhIWxDo0yGGrp5GlMHDhf8IirOoaHXH5pvcckWjs1H0E1rTgODEJ6XchXQZDZD',
 };
 const rax = require('retry-axios');
 const { TelegramClient } = require('messaging-api-telegram');
@@ -22,7 +23,7 @@ const { MessengerClient } = require('messaging-api-messenger');
  * @param {canal} keys
  * @returns {true}
  */
-const enviaNotificacaoApi = (mensagem, canal = 1, enviaTelegram = true) => {
+const enviaNotificacaoApi = (mensagem, canal = canais.PocketApi, enviaTelegram = true) => {
   if (enviaTelegram) {
     const client = new TelegramClient({
       // PUBSHARE BOT accessToken: '1621388212:AAHVIiVUPKYzNidK5PdvMAQdRfDhaNATLwo',
@@ -33,21 +34,7 @@ const enviaNotificacaoApi = (mensagem, canal = 1, enviaTelegram = true) => {
     };
     // eslint-disable-next-line no-unused-vars
     const interceptorId = rax.attach(client.axios);
-    let canalEscolhido;
-    // Deixei isto aqui pra segmentar mensagens la do cliente.
-    // Login/Suporte/ETC
-    switch (canal) {
-      case 1:
-        // Pocket Api ==> -1001334222644
-        canalEscolhido = canais.PocketApi.id;
-        break;
-      case 2:
-        // Pocket DEPLOY Api ==>
-        canalEscolhido = canais.PocketDeployApi.id;
-        break;
-      default:
-        canalEscolhido = canais.PocketApi.id; // Pocket Api
-    }
+    const canalEscolhido = canal;
 
     client
       .sendMessage(canalEscolhido, mensagem)
@@ -89,7 +76,7 @@ const enviaNotificacaoApi = (mensagem, canal = 1, enviaTelegram = true) => {
  * @param {canal} keys
  * @returns {true}
  */
-const enviaNotificacaoSite = (mensagem, canal = 1, enviaTelegram = true) => {
+const enviaNotificacaoSite = (mensagem, canal = canais.PocketSite, enviaTelegram = true) => {
   const client = new TelegramClient({
     // PUBSHARE BOT accessToken: '1621388212:AAHVIiVUPKYzNidK5PdvMAQdRfDhaNATLwo',
     accessToken: bot.PocketBot.accessToken, // PocketBot
@@ -100,22 +87,7 @@ const enviaNotificacaoSite = (mensagem, canal = 1, enviaTelegram = true) => {
   // eslint-disable-next-line no-unused-vars
   const interceptorId = rax.attach(client.axios);
   if (enviaTelegram) {
-    let canalEscolhido;
-    // Deixei isto aqui pra segmentar mensagens la do cliente.
-    // Login/Suporte/ETC
-    switch (canal) {
-      case 1:
-        // Pocket Site ==> -1001419540370
-        canalEscolhido = canais.PocketSite.id;
-        break;
-      case 2:
-        // Pocket Novos Clientes ==> -1001317116760
-        canalEscolhido = canais.PocketNovosClientes.id;
-        break;
-
-      default:
-        canalEscolhido = canais.PocketSite.id; // Pocket Site
-    }
+    const canalEscolhido = canal;
 
     client
       .sendMessage(canalEscolhido, mensagem)
@@ -157,7 +129,7 @@ const enviaNotificacaoSite = (mensagem, canal = 1, enviaTelegram = true) => {
  * @param {canal} keys
  * @returns {true}
  */
-const enviaNotificacaoAplicativo = (mensagem, canal = 1, enviaTelegram = true) => {
+const enviaNotificacaoAplicativo = (mensagem, canal = canais.PocketAplicativo, enviaTelegram = true) => {
   const client = new TelegramClient({
     // PUBSHARE BOT accessToken: '1621388212:AAHVIiVUPKYzNidK5PdvMAQdRfDhaNATLwo',
     accessToken: bot.PocketBot.accessToken, // PocketBot
@@ -168,17 +140,7 @@ const enviaNotificacaoAplicativo = (mensagem, canal = 1, enviaTelegram = true) =
   // eslint-disable-next-line no-unused-vars
   const interceptorId = rax.attach(client.axios);
   if (enviaTelegram) {
-    let canalEscolhido;
-    // Deixei isto aqui pra segmentar mensagens la do cliente.
-    // Login/Suporte/ETC
-    switch (canal) {
-      case 1:
-        // Pocket Aplicativo ==> -1001309705197
-        canalEscolhido = canais.PocketAplicativo.id;
-        break;
-      default:
-        canalEscolhido = canais.PocketAplicativo.id; // Pocket Aplicativo
-    }
+    const canalEscolhido = canal;
 
     client
       .sendMessage(canalEscolhido, mensagem)
@@ -218,4 +180,5 @@ module.exports = {
   enviaNotificacaoApi,
   enviaNotificacaoSite,
   enviaNotificacaoAplicativo,
+  canais,
 };

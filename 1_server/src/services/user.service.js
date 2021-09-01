@@ -1,7 +1,7 @@
 const httpStatus = require('http-status');
 const { User } = require('../models');
 const ApiError = require('../utils/ApiError');
-const { enviaNotificacaoApi, enviaNotificacaoSite } = require('../utils/notify');
+const { enviaNotificacaoApi, enviaNotificacaoSite, canais } = require('../utils/notify');
 /**
  * Create a user
  * @param {Object} userBody
@@ -11,7 +11,10 @@ const createUser = async (userBody) => {
   if (await User.isEmailTaken(userBody.email)) {
     throw new ApiError(httpStatus.BAD_REQUEST, 'Email already taken');
   }
-  enviaNotificacaoSite(`Novo usuario: ${userBody.email} \n Nome ${userBody.firstName} \n Sobrenome ${userBody.lastName}`, 2);
+  enviaNotificacaoSite(
+    `Novo usuario: ${userBody.email} \n Nome ${userBody.firstName} \n Sobrenome ${userBody.lastName}`,
+    canais.PocketNovosClientes
+  );
   return User.create(userBody);
 };
 

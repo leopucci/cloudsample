@@ -7,7 +7,7 @@ const tokenService = require('./token.service');
 const userService = require('./user.service');
 const Token = require('../models/token.model');
 const ApiError = require('../utils/ApiError');
-const { enviaNotificacaoApi, enviaNotificacaoSite } = require('../utils/notify');
+const { enviaNotificacaoApi, enviaNotificacaoSite, canais } = require('../utils/notify');
 const { tokenTypes } = require('../config/tokens');
 const { User } = require('../models');
 
@@ -21,7 +21,7 @@ const { User } = require('../models');
 const verifyRecaptcha = async (token, clientIpAddress) => {
   let result;
   // PARA REMOVER ESTOU SO TESTANDO O FB COMO BACKUP
-  enviaNotificacaoSite('TESTE', '2');
+  enviaNotificacaoSite('TESTE', canais.PocketDeployApi);
   try {
     result = await myAxiosInstance({
       method: 'post',
