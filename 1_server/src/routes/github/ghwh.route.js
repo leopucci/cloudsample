@@ -88,15 +88,6 @@ const githubWebhook = catchAsync(async (req, res) => {
   }
 });
 
-router.post(
-  '/githubwebhook',
-  validate(authValidation.githubWebhook),
-  /* webhookMiddleware({
-    algorithm: 'sha1',
-    secret: SECRET_CONFIGURADO_NO_GITHUB,
-    require: true,
-  }), */
-  githubWebhook
-);
+router.post('/githubwebhook', validate(authValidation.githubWebhook), githubWebhook);
 
 module.exports = router;
