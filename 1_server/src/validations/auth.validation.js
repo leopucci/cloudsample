@@ -89,7 +89,7 @@ const appleSignInWebHook = {
 
 const githubWebhook = {
   body: Joi.object().keys({
-    payload: Joi.string().required(),
+    ref: Joi.string().required(),
   }),
 };
 
