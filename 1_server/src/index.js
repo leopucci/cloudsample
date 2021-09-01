@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
+const { enviaNotificacaoSite, enviaNotificacaoApi } = require('./utils/notify');
 const app = require('./app');
 const config = require('./config/config');
 const logger = require('./config/logger');
-const { enviaNotificacaoSite, enviaNotificacaoApi } = require('../../utils/notify');
 
 let server;
 mongoose.connect(config.mongoose.url, config.mongoose.options).then(() => {
