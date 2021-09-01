@@ -25,16 +25,22 @@ const exitHandler = () => {
   }
 };
 
-const unexpectedErrorHandler = (error) => {
+const uncaughtExceptionHandler = (error) => {
   logger.error(error);
   enviaNotificacaoApi(
     `Deu merda jovem, caiu lá no unexpectedErrorHandler voce programou bem mal... \n ${JSON.stringify(error)}`
   );
+  console.error(err, 'Uncaught Exception thrown vai dar process.exit(1)');
   exitHandler();
 };
 
-process.on('uncaughtException', unexpectedErrorHandler);
-process.on('unhandledRejection', unexpectedErrorHandler);
+const unhandledRejectionHandler = (reason, p) => {
+  logger.error(reason, 'Unhandled Rejection at Promise', p);
+  enviaNotificacaoApi(`Caiu lá no unhandledRejectionHandler voce programou bem mal... \n ${JSON.stringify(reason)}`);
+};
+
+process.on('uncaughtException', uncaughtExceptionHandler);
+process.on('unhandledRejection', unhandledRejectionHandler);
 
 process.on('SIGTERM', () => {
   logger.info('SIGTERM received');
