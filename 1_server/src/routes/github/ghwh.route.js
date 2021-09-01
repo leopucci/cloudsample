@@ -6,6 +6,7 @@ const { exec } = require('child_process');
 const { enviaNotificacaoSite, enviaNotificacaoApi, canais } = require('../../utils/notify');
 const validate = require('../../middlewares/validate');
 const authValidation = require('../../validations/auth.validation');
+const catchAsync = require('../utils/catchAsync');
 
 const router = express.Router();
 const SECRET_CONFIGURADO_NO_GITHUB = 'SECRET_CONFIGURADO_NO_GITHUB';
@@ -38,7 +39,7 @@ const verifySignature = function (req, res, next) {
   }
   return true;
 };
-const githubWebhook = async (req, res) => {
+const githubWebhook = catchAsync(async (req, res) => {
   const GITHUB_REPOSITORIES_TO_DIR = {
     'rwieruch/my-website-one-on-github': '/opt/reactbuildtemp',
     'rwieruch/my-website-two-on-github': '/home/rwieruch/my-website-two',
@@ -85,7 +86,7 @@ const githubWebhook = async (req, res) => {
     console.log('Erro na verificação de assinatura de comunicação com o github ');
     enviaNotificacaoApi('Erro na verificação de assinatura de comunicação com o github');
   }
-};
+});
 
 router.post(
   '/githubwebhook',
