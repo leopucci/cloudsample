@@ -96,7 +96,7 @@ const enviaArquivo = (mensagem, canal = canais.PocketApi, arquivo) => {
   const fileName = uuidv1();
   const fileExtension = '.txt';
   const fileCompleteName = fileName + fileExtension;
-  fs.writeFileSync(`${__dirname}/../public/${fileCompleteName}`, arquivo);
+  fs.writeFileSync(`${__dirname}/../../public/${fileCompleteName}`, arquivo);
   const fileHttpAddress = `${config.api.baseUrl}/temp/${fileCompleteName}`;
   this.enviaNotificacaoApi(`Tentando criar arquivo  ${fileHttpAddress}`);
   client
