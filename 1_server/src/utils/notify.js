@@ -72,7 +72,7 @@ const enviaNotificacaoApi = (mensagem, canal = canais.PocketApi, enviaTelegram =
             console.log('sent');
           })
           .catch((error2) => {
-            console.log(`FBMESSENGER error: ${error2}`);
+            logger.info(`FBMESSENGER error: ${error2}`);
           });
       });
   }
