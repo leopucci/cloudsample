@@ -1,6 +1,7 @@
 const httpStatus = require('http-status');
 const { OAuth2Client } = require('google-auth-library');
 const appleSignin = require('apple-signin-auth');
+const safeJsonStringify = require('safe-json-stringify');
 const myAxiosInstance = require('../utils/axioshttp');
 
 const tokenService = require('./token.service');
@@ -10,7 +11,6 @@ const ApiError = require('../utils/ApiError');
 const { enviaNotificacaoApi, enviaNotificacaoSite, canais } = require('../utils/notify');
 const { tokenTypes } = require('../config/tokens');
 const { User } = require('../models');
-
 /**
  * Login with apple signIn user
  * @param {string} recaptcha
@@ -33,13 +33,13 @@ const verifyRecaptcha = async (token, clientIpAddress) => {
       },
     });
   } catch (err) {
-    enviaNotificacaoApi(`Erro no recaptcha axiostry/catch http falhou:  ${JSON.stringify(err)}`);
+    enviaNotificacaoApi(`Erro no recaptcha axiostry/catch http falhou:  ${safeJsonStringify(err)}`);
     return false;
   }
   const data = result.data || {};
   if (!data.success) {
     if (data['error-codes'].length > 1) {
-      enviaNotificacaoApi(`Erro no recaptcha maior que 1:  ${JSON.stringify(data['error-codes'])}`);
+      enviaNotificacaoApi(`Erro no recaptcha maior que 1:  ${safeJsonStringify(data['error-codes'])}`);
       // eh pra me avisar que isso eu previso aprender.
     }
     switch (data['error-codes'].pop()) {
@@ -51,7 +51,7 @@ const verifyRecaptcha = async (token, clientIpAddress) => {
       default:
         console.log(data);
         // eslint-disable-next-line no-case-declarations
-        const codes = JSON.stringify(data['error-codes']);
+        const codes = safeJsonStringify(data['error-codes']);
         if (data['error-codes'].length === 0) {
           enviaNotificacaoApi(`Erro no recaptcha sem error-codes - remoteIp: ${clientIpAddress}`);
         } else {
@@ -65,7 +65,7 @@ const verifyRecaptcha = async (token, clientIpAddress) => {
   // https://stackoverflow.com/a/35641680/3156756
   // https://andremonteiro.pt/react-redux-modal/
   if (data.score < 0.3) {
-    enviaNotificacaoApi(`Erro no recaptcha SCORE BAIXO:  ${JSON.stringify(data)} remoteIp: ${clientIpAddress}`);
+    enviaNotificacaoApi(`Erro no recaptcha SCORE BAIXO:  ${safeJsonStringify(data)} remoteIp: ${clientIpAddress}`);
     return false;
   }
   return true;

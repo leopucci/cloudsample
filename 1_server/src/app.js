@@ -7,6 +7,7 @@ const cors = require('cors');
 const passport = require('passport');
 const httpStatus = require('http-status');
 const webhookMiddleware = require('x-hub-signature').middleware;
+const safeJsonStringify = require('safe-json-stringify');
 const config = require('./config/config');
 const morgan = require('./config/morgan');
 const { jwtStrategy, googleStrategy, appleStrategy } = require('./config/passport');

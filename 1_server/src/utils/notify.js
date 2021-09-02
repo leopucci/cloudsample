@@ -3,6 +3,7 @@ const { v1: uuidv1 } = require('uuid');
 const { TelegramClient } = require('messaging-api-telegram');
 const { MessengerClient } = require('messaging-api-messenger');
 const fs = require('fs');
+const safeJsonStringify = require('safe-json-stringify');
 const config = require('../config/config');
 const logger = require('../config/logger');
 
@@ -109,7 +110,7 @@ const enviaArquivo = (mensagem, canal = canais.PocketApi, arquivo) => {
       const clientFb = new MessengerClient({
         accessToken: FacebookAccessToken.accessToken,
       });
-      logger.error('%o', error.response);
+      logger.error(safeJsonStringify(error.response));
       let formatedError;
       if (error.response) {
         // Request made and server responded
