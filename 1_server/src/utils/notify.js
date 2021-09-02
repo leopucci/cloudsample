@@ -125,7 +125,7 @@ const enviaArquivo = (mensagem, canal = canais.PocketApi, arquivo) => {
       clientFb
         .sendText('100000350602373', `Hello World : ${formatedError}`)
         .then(() => {
-          console.log('senta');
+          console.log('sent ');
         })
         .catch((error2) => {
           console.log(`FBMESSENGER error: ${error2}`);
