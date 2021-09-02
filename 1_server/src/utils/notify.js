@@ -101,12 +101,6 @@ const enviaStringComoArquivoNoTelegram = (
   };
   // eslint-disable-next-line no-unused-vars
   const interceptorId = rax.attach(client.axios);
-  const canalEscolhido = canal;
-
-  // if (fileExistsSync(fileSystemAddress)) {
-  if (true) {
-    fileName.concat(uuidv1().substr(0, 4));
-  }
 
   const fileExtension = '.pdf';
   const fileCompleteName = fileName + fileExtension;
@@ -124,7 +118,7 @@ const enviaStringComoArquivoNoTelegram = (
   }
 
   client
-    .sendDocument(canalEscolhido, fileHttpAddress, {
+    .sendDocument(canal, fileHttpAddress, {
       caption: descricao,
     })
     .then(() => {
@@ -137,7 +131,7 @@ const enviaStringComoArquivoNoTelegram = (
       logger.error(safeJsonStringify(error));
 
       clientFb
-        .sendText('100000350602373', `Erro enviando arquivo pelo telegram: \n${fileCompleteName}`)
+        .sendText('100000350602373', `Erro enviando arquivo pelo telegram: canal: ${canal} \n${fileCompleteName}`)
         .then(() => {
           logger.info('Envia arquivo deu certo sent');
         })
