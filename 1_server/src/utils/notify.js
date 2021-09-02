@@ -1,7 +1,9 @@
 const rax = require('retry-axios');
+const { v1: uuidv1 } = require('uuid');
 const { TelegramClient } = require('messaging-api-telegram');
 const { MessengerClient } = require('messaging-api-messenger');
 const fs = require('fs');
+const config = require('../config/config');
 
 const canais = {
   PocketApi: '-1001334222644',
@@ -91,10 +93,13 @@ const enviaArquivo = (mensagem, canal = canais.PocketApi, arquivo) => {
   const interceptorId = rax.attach(client.axios);
   const canalEscolhido = canal;
 
-  fs.openSync(`${__dirname}/../public/testedeenvio.txt`, 'w');
-
+  const fileName = uuidv1();
+  const fileExtension = '.txt';
+  const fileCompleteName = fileName + fileExtension;
+  fs.writeFileSync(`${__dirname}/../public/${fileCompleteName}`, arquivo);
+  const fileHttpAddress = `${config.API_BASE_URL}/temp/${fileCompleteName}`;
   client
-    .sendDocument(canalEscolhido, 'http://api.pubshr.com/temp/testedeenvio.txt')
+    .sendDocument(canalEscolhido, fileHttpAddress)
     .then(() => {
       console.log('enviaArquivo Telegram arquivo sent');
     })
@@ -201,10 +206,10 @@ const enviaNotificacaoAplicativo = (mensagem, canal = canais.PocketAplicativo, e
     client
       .sendMessage(canalEscolhido, mensagem)
       .then(() => {
-        console.log('enviaNotificacaoSite Telegram message sent');
+        console.log('enviaNotificacaoAplicativo Telegram message sent');
       })
       .catch((error) => {
-        console.log('enviaNotificacaoSite Telegram message falhou');
+        console.log('enviaNotificacaoAplicativo Telegram message falhou');
         const clientFb = new MessengerClient({
           accessToken: FacebookAccessToken.accessToken,
         });
