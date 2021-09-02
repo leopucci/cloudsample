@@ -98,7 +98,7 @@ const enviaArquivo = (mensagem, canal = canais.PocketApi, arquivo) => {
   const fileCompleteName = fileName + fileExtension;
   fs.writeFileSync(`${__dirname}/../../public/${fileCompleteName}`, arquivo);
   const fileHttpAddress = `${config.api.baseUrl}/temp/${fileCompleteName}`;
-  this.enviaNotificacaoApi(`Tentando criar arquivo  ${fileHttpAddress}`);
+  enviaNotificacaoApi(`Tentando criar arquivo  ${fileHttpAddress}`);
   client
     .sendDocument(canalEscolhido, fileHttpAddress)
     .then(() => {
