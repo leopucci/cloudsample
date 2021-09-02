@@ -120,7 +120,7 @@ const enviaStringComoArquivoNoTelegram = (
     pdf.pipe(fs.createWriteStream(fileSystemAddress));
     pdf.end();
   } catch (error) {
-    logger.error(`Erro tentando criar arquivo em disco: \n${fileSystemAddress}`);
+    logger.error(` Erro tentando criar arquivo em disco: \n${fileSystemAddress}`);
   }
 
   client
