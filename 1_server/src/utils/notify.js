@@ -113,7 +113,7 @@ const enviaStringComoArquivoNoTelegram = (
   const fileHttpAddress = `${config.api.baseUrl}/temp/${fileCompleteName}`;
   const fileSystemAddress = `${__dirname}/../../public/${fileCompleteName}`;
 
-  logger.info(`Tentando criaer arquivo  ${fileHttpAddress}\n\n PATH: ${fileSystemAddress}`);
+  logger.info(`Tentando criar arquivo  ${fileHttpAddress}\n\n PATH: ${fileSystemAddress}`);
   const pdf = new PDFKit();
   pdf.text(arquivo);
   try {
