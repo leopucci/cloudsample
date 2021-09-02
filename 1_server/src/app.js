@@ -17,7 +17,11 @@ const { errorConverter, errorHandler } = require('./middlewares/error');
 const ApiError = require('./utils/ApiError');
 
 const app = express();
+// este trust aqui eh pra fazer com que o ip que vem do Nginx
+// via header seja usado como real, entao eu nao preciso modificar ou pegar o ip de lugar diferente
+// e isto corrige os logs
 app.set('trust proxy', 'loopback');
+
 if (config.env !== 'test') {
   app.use(morgan.successHandler);
   app.use(morgan.errorHandler);
@@ -72,6 +76,13 @@ if (config.env === 'production') {
 app.use('/v1', routes);
 
 app.use('/', githubwebhookroute);
+
+app.post('/ping', async (req, res) => {
+  res.send('POST pong');
+});
+app.get('/ping', async (req, res) => {
+  res.send('GET pong');
+});
 
 // send back a 404 error for any unknown api request
 app.use((req, res, next) => {
