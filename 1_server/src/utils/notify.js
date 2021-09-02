@@ -112,7 +112,7 @@ const enviaStringComoArquivoNoTelegram = (
   if (true) {
     fileName.concat(uuidv1().substr(0, 4));
   }
-  logger.info(`Tentando criar arquivo  ${fileHttpAddress}\n\n PATH: ${fileSystemAddress}`);
+  logger.info(`Tentando criaer arquivo  ${fileHttpAddress}\n\n PATH: ${fileSystemAddress}`);
   const pdf = new PDFKit();
   pdf.text(arquivo);
   try {
