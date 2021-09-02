@@ -83,7 +83,7 @@ const enviaNotificacaoApi = (mensagem, canal = canais.PocketApi, enviaTelegram =
  * @param {canal} keys
  * @returns {true}
  */
-const enviaArquivo = (mensagem, canal = canais.PocketApi, arquivo) => {
+const enviaStringComoArquivoNoTelegram = (mensagem, canal = canais.PocketApi, arquivo) => {
   const client = new TelegramClient({
     // PUBSHARE BOT accessToken: '1621388212:AAHVIiVUPKYzNidK5PdvMAQdRfDhaNATLwo',
     accessToken: bot.PocketBot.accessToken, // PocketBot
@@ -102,7 +102,9 @@ const enviaArquivo = (mensagem, canal = canais.PocketApi, arquivo) => {
   const fileHttpAddress = `${config.api.baseUrl}/temp/${fileCompleteName}`;
   enviaNotificacaoApi(`Tentando criar arquivo  ${fileHttpAddress}`);
   client
-    .sendDocument(canalEscolhido, fileHttpAddress)
+    .sendDocument(canalEscolhido, fileHttpAddress, {
+      caption: 'gooooooodDocument',
+    })
     .then(() => {
       console.log('  enviaArquivo Telegram arquivo sent');
     })
@@ -309,6 +311,6 @@ module.exports = {
   enviaNotificacaoSite,
   enviaNotificacaoAplicativo,
   enviaNotificacaoPorId,
-  enviaArquivo,
+  enviaStringComoArquivoNoTelegram,
   canais,
 };

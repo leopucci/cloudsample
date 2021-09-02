@@ -3,7 +3,12 @@ const httpError = require('http-errors');
 const httpStatus = require('http-status');
 const { signer } = require('x-hub-signature');
 const { exec } = require('child_process');
-const { enviaArquivo, enviaNotificacaoSite, enviaNotificacaoApi, canais } = require('../../utils/notify');
+const {
+  enviaStringComoArquivoNoTelegram,
+  enviaNotificacaoSite,
+  enviaNotificacaoApi,
+  canais,
+} = require('../../utils/notify');
 const validate = require('../../middlewares/validate');
 const authValidation = require('../../validations/auth.validation');
 const catchAsync = require('../../utils/catchAsync');
@@ -46,7 +51,7 @@ const githubWebhook = catchAsync(async (req, res) => {
   };
   const directory = GITHUB_REPOSITORIES_TO_DIR[req.body?.repository?.full_name];
 
-  enviaArquivo(canais.PocketDeployApi, canais.PocketDeployApi, 'ARQUIVO DE TESTE');
+  enviaStringComoArquivoNoTelegram(canais.PocketDeployApi, canais.PocketDeployApi, 'ARQUIVO DE TESTE\n');
   if (await verifySignature(req)) {
     // console.log(req.body);
 
