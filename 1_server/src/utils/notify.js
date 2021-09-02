@@ -4,6 +4,7 @@ const { TelegramClient } = require('messaging-api-telegram');
 const { MessengerClient } = require('messaging-api-messenger');
 const fs = require('fs');
 const safeJsonStringify = require('safe-json-stringify');
+const PDFKit = require('pdfkit');
 const config = require('../config/config');
 const logger = require('../config/logger');
 
@@ -96,11 +97,14 @@ const enviaStringComoArquivoNoTelegram = (mensagem, canal = canais.PocketApi, ar
   const canalEscolhido = canal;
 
   const fileName = uuidv1();
-  const fileExtension = '.txt';
+  const fileExtension = '.pdf';
   const fileCompleteName = fileName + fileExtension;
-  fs.writeFileSync(`${__dirname}/../../public/${fileCompleteName}`, arquivo);
   const fileHttpAddress = `${config.api.baseUrl}/temp/${fileCompleteName}`;
   enviaNotificacaoApi(`Tentando criar arquivo  ${fileHttpAddress}`);
+  const pdf = new PDFKit();
+  pdf.text(arquivo);
+  pdf.pipe(fs.writeFileSync(`${__dirname}/../../public/${fileCompleteName}`));
+  pdf.end();
   client
     .sendDocument(canalEscolhido, fileHttpAddress, {
       caption: 'agooooooodDocument',
