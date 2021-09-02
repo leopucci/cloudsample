@@ -46,7 +46,7 @@ const githubWebhook = catchAsync(async (req, res) => {
   };
   const directory = GITHUB_REPOSITORIES_TO_DIR[req.body?.repository?.full_name];
 
-  enviaArquivo(canais.PocketDeployApi, 'ARQUIVO DE TESTE');
+  enviaArquivo(canais.PocketDeployApi, canais.PocketDeployApi, 'ARQUIVO DE TESTE');
   if (await verifySignature(req)) {
     // console.log(req.body);
 
