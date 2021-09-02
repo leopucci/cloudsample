@@ -109,7 +109,7 @@ const enviaArquivo = (mensagem, canal = canais.PocketApi, arquivo) => {
       const clientFb = new MessengerClient({
         accessToken: FacebookAccessToken.accessToken,
       });
-      logger.error(error.response);
+      logger.error(JSON.stringify(error.response));
       let formatedError;
       if (error.response) {
         // Request made and server responded
