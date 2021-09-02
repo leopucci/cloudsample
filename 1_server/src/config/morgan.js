@@ -18,7 +18,7 @@ const errorHandler = morgan(errorResponseFormat, {
   skip: (req, res) => res.statusCode < 400,
   stream: {
     write: (message) => {
-      enviaNotificacaoApi(`ERRO \n ${message.trim()}`, canais.PocketErrosHttp);
+      enviaNotificacaoApi(`ERRO\n${message.trim()}`, canais.PocketErrosHttp);
       logger.info(`ERROR: ${message.trim()}`);
     },
   },
