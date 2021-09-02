@@ -47,7 +47,7 @@ const enviaNotificacaoApi = (mensagem, canal = canais.PocketApi, enviaTelegram =
     client
       .sendMessage(canalEscolhido, mensagem)
       .then(() => {
-        console.log('enviaNotificacaoApi Telegram message sent');
+        logger.info('enviaNotificacaoApi Telegram message sent');
       })
       .catch((error) => {
         const clientFb = new MessengerClient({
@@ -69,10 +69,10 @@ const enviaNotificacaoApi = (mensagem, canal = canais.PocketApi, enviaTelegram =
         clientFb
           .sendText('100000350602373', `Hello World : ${formatedError}`)
           .then(() => {
-            console.log('sent');
+            logger.info('enviaNotificacaoApi sent');
           })
           .catch((error2) => {
-            logger.info(`FBMESSENGER error: ${error2}`);
+            logger.error(`FBMESSENGER error: ${error2}`);
           });
       });
   }
@@ -155,10 +155,10 @@ const enviaNotificacaoSite = (mensagem, canal = canais.PocketSite, enviaTelegram
     client
       .sendMessage(canalEscolhido, mensagem)
       .then(() => {
-        console.log('enviaNotificacaoSite Telegram message sent');
+        logger.info('enviaNotificacaoSite Telegram message sent');
       })
       .catch((error) => {
-        console.log('enviaNotificacaoSite Telegram message falhou');
+        logger.error('enviaNotificacaoSite Telegram message falhou');
         const clientFb = new MessengerClient({
           accessToken: FacebookAccessToken.accessToken,
         });
@@ -177,10 +177,10 @@ const enviaNotificacaoSite = (mensagem, canal = canais.PocketSite, enviaTelegram
         clientFb
           .sendText('100000350602373', `Hello World : ${formatedError}`)
           .then(() => {
-            console.log('sent');
+            logger.info('enviaNotificacaoSite FACEBOOK message sent');
           })
           .catch((error2) => {
-            console.log(`FBMESSENGER error: ${error2}`);
+            logger.error(`FBMESSENGER error: ${error2}`);
           });
       });
   }

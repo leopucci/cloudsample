@@ -21,7 +21,7 @@ const { User } = require('../models');
 const verifyRecaptcha = async (token, clientIpAddress) => {
   let result;
   // PARA REMOVER ESTOU SO TESTANDO O FB COMO BACKUP
-  enviaNotificacaoSite('TESTE', canais.PocketDeployApi);
+  enviaNotificacaoSite('TESTE FB COMO BACKUP', '-1');
   try {
     result = await myAxiosInstance({
       method: 'post',
