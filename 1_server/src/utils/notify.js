@@ -97,7 +97,7 @@ const enviaArquivo = (mensagem, canal = canais.PocketApi, arquivo) => {
   const fileExtension = '.txt';
   const fileCompleteName = fileName + fileExtension;
   fs.writeFileSync(`${__dirname}/../public/${fileCompleteName}`, arquivo);
-  const fileHttpAddress = `${config.API_BASE_URL}/temp/${fileCompleteName}`;
+  const fileHttpAddress = `${config.api.baseUrl}/temp/${fileCompleteName}`;
   client
     .sendDocument(canalEscolhido, fileHttpAddress)
     .then(() => {
