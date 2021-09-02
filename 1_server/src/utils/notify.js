@@ -106,7 +106,7 @@ const enviaStringComoArquivoNoTelegram = (mensagem, canal = canais.PocketApi, ar
       caption: 'gooooooodDocument',
     })
     .then(() => {
-      console.log('  enviaArquivo Telegram arquivo sent');
+      console.log(' enviaArquivo Telegram arquivo sent');
     })
     .catch((error) => {
       const clientFb = new MessengerClient({
