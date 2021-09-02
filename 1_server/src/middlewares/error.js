@@ -7,7 +7,7 @@ const { enviaNotificacaoSite, enviaNotificacaoApi, canais } = require('../utils/
 
 const errorConverter = (err, req, res, next) => {
   const errString = JSON.stringify(err);
-  enviaNotificacaoApi(`Caiu no errorConverter \n${errString}`, canais.PocketErrosHttp);
+  // enviaNotificacaoApi(`Caiu no errorConverter \n${errString}`, canais.PocketErrosHttp);
   let error = err;
   if (!(error instanceof ApiError)) {
     const statusCode =
@@ -21,7 +21,7 @@ const errorConverter = (err, req, res, next) => {
 // eslint-disable-next-line no-unused-vars
 const errorHandler = (err, req, res, next) => {
   const errString = JSON.stringify(err);
-  enviaNotificacaoApi(`Caiu no errorHandler \n${errString}`, canais.PocketErrosHttp);
+  // enviaNotificacaoApi(`Caiu no errorHandler \n${errString}`, canais.PocketErrosHttp);
   let { statusCode, message } = err;
   if (config.env === 'production' && !err.isOperational) {
     statusCode = httpStatus.INTERNAL_SERVER_ERROR;
