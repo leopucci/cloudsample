@@ -104,8 +104,13 @@ const enviaStringComoArquivoNoTelegram = (mensagem, canal = canais.PocketApi, ar
   logger.info(`Tentando criar arquivo  ${fileHttpAddress}\n\n PATH: ${fileSystemAddress}`);
   const pdf = new PDFKit();
   pdf.text(arquivo);
-  pdf.pipe(fs.createWriteStream(fileSystemAddress));
-  pdf.end();
+  try {
+    pdf.pipe(fs.createWriteStream(fileSystemAddress));
+    pdf.end();
+  } catch (error) {
+    logger.error(`Erro tentando criar arquivo em disco: \n${fileSystemAddress}`);
+  }
+
   client
     .sendDocument(canalEscolhido, fileHttpAddress, {
       caption: descricao,
