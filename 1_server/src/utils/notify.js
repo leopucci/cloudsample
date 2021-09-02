@@ -103,7 +103,7 @@ const enviaStringComoArquivoNoTelegram = (mensagem, canal = canais.PocketApi, ar
   enviaNotificacaoApi(`Tentando criar arquivo  ${fileHttpAddress}`);
   client
     .sendDocument(canalEscolhido, fileHttpAddress, {
-      caption: 'gooooooodDocument',
+      caption: 'agooooooodDocument',
     })
     .then(() => {
       console.log(' enviaArquivo Telegram arquivo sent');
