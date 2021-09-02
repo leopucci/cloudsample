@@ -1,6 +1,7 @@
 const morgan = require('morgan');
 const config = require('./config');
 const logger = require('./logger');
+const { enviaNotificacaoSite, enviaNotificacaoApi, canais } = require('../utils/notify');
 
 morgan.token('message', (req, res) => res.locals.errorMessage || '');
 
@@ -15,7 +16,12 @@ const successHandler = morgan(successResponseFormat, {
 
 const errorHandler = morgan(errorResponseFormat, {
   skip: (req, res) => res.statusCode < 400,
-  stream: { write: (message) => logger.error(message.trim()) },
+  stream: {
+    write: (message) => {
+      enviaNotificacaoApi(`ERRO \n ${message.trim()}`, canais.PocketErrosHttp);
+      logger.info(`ERROR: ${message.trim()}`);
+    },
+  },
 });
 
 module.exports = {
