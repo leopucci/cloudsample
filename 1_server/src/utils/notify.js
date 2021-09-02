@@ -5,6 +5,7 @@ const { MessengerClient } = require('messaging-api-messenger');
 const fs = require('fs');
 const safeJsonStringify = require('safe-json-stringify');
 const PDFKit = require('pdfkit');
+const { fileExists, fileExistsSync, Options } = require('file-exists-safe');
 const config = require('../config/config');
 const logger = require('../config/logger');
 
@@ -84,7 +85,13 @@ const enviaNotificacaoApi = (mensagem, canal = canais.PocketApi, enviaTelegram =
  * @param {canal} keys
  * @returns {true}
  */
-const enviaStringComoArquivoNoTelegram = (mensagem, canal = canais.PocketApi, arquivo, descricao = 'Descricao') => {
+const enviaStringComoArquivoNoTelegram = (
+  mensagem,
+  canal = canais.PocketApi,
+  arquivo,
+  fileName = uuidv1(),
+  descricao = 'Descricao'
+) => {
   const client = new TelegramClient({
     // PUBSHARE BOT accessToken: '1621388212:AAHVIiVUPKYzNidK5PdvMAQdRfDhaNATLwo',
     accessToken: bot.PocketBot.accessToken, // PocketBot
@@ -96,11 +103,15 @@ const enviaStringComoArquivoNoTelegram = (mensagem, canal = canais.PocketApi, ar
   const interceptorId = rax.attach(client.axios);
   const canalEscolhido = canal;
 
-  const fileName = uuidv1();
   const fileExtension = '.pdf';
   const fileCompleteName = fileName + fileExtension;
   const fileHttpAddress = `${config.api.baseUrl}/temp/${fileCompleteName}`;
   const fileSystemAddress = `${__dirname}/../../public/${fileCompleteName}`;
+
+  // if (fileExistsSync(fileSystemAddress)) {
+  if (true) {
+    fileName.concat(uuidv1().substr(0, 4));
+  }
   logger.info(`Tentando criar arquivo  ${fileHttpAddress}\n\n PATH: ${fileSystemAddress}`);
   const pdf = new PDFKit();
   pdf.text(arquivo);
