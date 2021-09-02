@@ -1,7 +1,7 @@
 const morgan = require('morgan');
 const config = require('./config');
 const logger = require('./logger');
-const { enviaNotificacaoSite, enviaNotificacaoApi, canais } = require('../utils/notify');
+const { enviaNotificacaoApi, canais } = require('../utils/notify');
 
 morgan.token('message', (req, res) => res.locals.errorMessage || '');
 
