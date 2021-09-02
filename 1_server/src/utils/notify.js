@@ -100,7 +100,6 @@ const enviaStringComoArquivoNoTelegram = (mensagem, canal = canais.PocketApi, ar
   const fileExtension = '.pdf';
   const fileCompleteName = fileName + fileExtension;
   const fileHttpAddress = `${config.api.baseUrl}/temp/${fileCompleteName}`;
-  enviaNotificacaoApi(`Tentando criar arquivo  ${fileHttpAddress}`);
   const pdf = new PDFKit();
   pdf.text(arquivo);
   pdf.pipe(fs.createWriteStream(`${__dirname}/../../public/${fileCompleteName}`));
