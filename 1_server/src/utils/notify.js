@@ -84,7 +84,7 @@ const enviaNotificacaoApi = (mensagem, canal = canais.PocketApi, enviaTelegram =
  * @param {canal} keys
  * @returns {true}
  */
-const enviaStringComoArquivoNoTelegram = (mensagem, canal = canais.PocketApi, arquivo) => {
+const enviaStringComoArquivoNoTelegram = (mensagem, canal = canais.PocketApi, arquivo, descricao = 'Descricao') => {
   const client = new TelegramClient({
     // PUBSHARE BOT accessToken: '1621388212:AAHVIiVUPKYzNidK5PdvMAQdRfDhaNATLwo',
     accessToken: bot.PocketBot.accessToken, // PocketBot
@@ -107,35 +107,28 @@ const enviaStringComoArquivoNoTelegram = (mensagem, canal = canais.PocketApi, ar
   pdf.end();
   client
     .sendDocument(canalEscolhido, fileHttpAddress, {
-      caption: 'agooosoooodDocument',
+      caption: descricao,
     })
     .then(() => {
-      console.log('enviaArquivo Telegram arquivo sent');
+      logger.info('enviaArquivo Telegram arquivo sent');
     })
     .catch((error) => {
       const clientFb = new MessengerClient({
         accessToken: FacebookAccessToken.accessToken,
       });
-      logger.error(safeJsonStringify(error.response));
-      let formatedError;
-      if (error.response) {
-        // Request made and server responded
-        formatedError.concat(error.response.status || '', ' ', error.response.data || '', ' ', error.response.headers || '');
-      } else if (error.request) {
-        // The request was made but no response was received
-        formatedError.concat(error.request);
-      } else {
-        // Something happened in setting up the request that triggered an Error
-        formatedError.concat(error.message);
-      }
+      logger.error(safeJsonStringify(error));
 
       clientFb
-        .sendText('100000350602373', `Hello World : ${formatedError}`)
+        .sendText('100000350602373', `Erro enviando arquivo pelo telegram: \n${fileCompleteName}`)
         .then(() => {
-          console.log('sent  ');
+          logger.info('Envia arquivo deu certo sent');
         })
         .catch((error2) => {
-          console.log(`FBMESSENGER error: ${error2}`);
+          logger.error(
+            `ERRO no fallback pro facebook messenger, mensagem nao enviada ${fileCompleteName} \n ${safeJsonStringify(
+              error2
+            )}`
+          );
         });
     });
 };
