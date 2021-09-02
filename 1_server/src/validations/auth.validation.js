@@ -98,7 +98,7 @@ const githubWebhook = {
     created: Joi.boolean(),
     deleted: Joi.boolean(),
     forced: Joi.boolean(),
-    base_ref: Joi.string(),
+    base_ref: Joi.string().allow(null),
     compare: Joi.string(),
     commits: Joi.array(),
     head_commit: Joi.object(),
