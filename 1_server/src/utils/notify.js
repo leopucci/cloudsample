@@ -107,7 +107,7 @@ const enviaStringComoArquivoNoTelegram = (mensagem, canal = canais.PocketApi, ar
   pdf.end();
   client
     .sendDocument(canalEscolhido, fileHttpAddress, {
-      caption: 'agooooooodDocument',
+      caption: 'agooosoooodDocument',
     })
     .then(() => {
       console.log('enviaArquivo Telegram arquivo sent');
