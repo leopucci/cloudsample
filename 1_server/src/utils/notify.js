@@ -103,15 +103,16 @@ const enviaStringComoArquivoNoTelegram = (
   const interceptorId = rax.attach(client.axios);
   const canalEscolhido = canal;
 
+  // if (fileExistsSync(fileSystemAddress)) {
+  if (true) {
+    fileName.concat(uuidv1().substr(0, 4));
+  }
+
   const fileExtension = '.pdf';
   const fileCompleteName = fileName + fileExtension;
   const fileHttpAddress = `${config.api.baseUrl}/temp/${fileCompleteName}`;
   const fileSystemAddress = `${__dirname}/../../public/${fileCompleteName}`;
 
-  // if (fileExistsSync(fileSystemAddress)) {
-  if (true) {
-    fileName.concat(uuidv1().substr(0, 4));
-  }
   logger.info(`Tentando criaer arquivo  ${fileHttpAddress}\n\n PATH: ${fileSystemAddress}`);
   const pdf = new PDFKit();
   pdf.text(arquivo);
