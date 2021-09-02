@@ -2,7 +2,7 @@ const dotenv = require('dotenv');
 const path = require('path');
 const Joi = require('joi');
 const sleep = require('system-sleep');
-const { enviaNotificacaoSite, enviaNotificacaoApi } = require('../utils/notify');
+const { enviaNotificacaoApi } = require('../utils/notify');
 
 dotenv.config({ path: path.join(__dirname, '../../.env') });
 
@@ -42,6 +42,9 @@ if (error) {
 module.exports = {
   env: envVars.NODE_ENV,
   port: envVars.PORT,
+  api: {
+    baseUrl: envVars.API_BASE_URL.endsWith('/') ? envVars.API_BASE_URL.slice(0, -1) : envVars.API_BASE_URL,
+  },
   mongoose: {
     url: envVars.MONGODB_URL + (envVars.NODE_ENV === 'test' ? '-test' : ''),
     options: {
