@@ -1,3 +1,8 @@
+const rax = require('retry-axios');
+const { TelegramClient } = require('messaging-api-telegram');
+const { MessengerClient } = require('messaging-api-messenger');
+const fs = require('fs');
+
 const canais = {
   PocketApi: '-1001334222644',
   PocketSite: '-1001419540370',
@@ -15,9 +20,6 @@ const FacebookAccessToken = {
   accessToken:
     'EAAJJRoq0aY4BAJKbWv7h4e2COW8MReQZB3JDiY6iDdM9OVrLUoQPUSJju4hRXEHAQVGNKy6rLPNy9oIh3ozwKcdpj9X6B65fkfaQ8flEIWYF9xGKIHRMQbQvNiIzJAqlkgA9uZCO4dbu4EXhIWxDo0yGGrp5GlMHDhf8IirOoaHXH5pvcckWjs1H0E1rTgODEJ6XchXQZDZD',
 };
-const rax = require('retry-axios');
-const { TelegramClient } = require('messaging-api-telegram');
-const { MessengerClient } = require('messaging-api-messenger');
 /**
  * Create an object composed of the picked object properties
  * @param {mensagem} Mensagem a ser enviada
@@ -69,6 +71,59 @@ const enviaNotificacaoApi = (mensagem, canal = canais.PocketApi, enviaTelegram =
           });
       });
   }
+};
+
+/**
+ * Create an object composed of the picked object properties
+ * @param {mensagem} Mensagem a ser enviada
+ * @param {canal} keys
+ * @returns {true}
+ */
+const enviaArquivo = (mensagem, canal = canais.PocketApi, arquivo) => {
+  const client = new TelegramClient({
+    // PUBSHARE BOT accessToken: '1621388212:AAHVIiVUPKYzNidK5PdvMAQdRfDhaNATLwo',
+    accessToken: bot.PocketBot.accessToken, // PocketBot
+  });
+  client.axios.defaults.raxConfig = {
+    instance: client.axios,
+  };
+  // eslint-disable-next-line no-unused-vars
+  const interceptorId = rax.attach(client.axios);
+  const canalEscolhido = canal;
+
+  fs.openSync(`${__dirname}/../public/testedeenvio.txt`, 'w');
+
+  client
+    .sendDocument(canalEscolhido, 'http://api.pubshr.com/temp/testedeenvio.txt')
+    .then(() => {
+      console.log('enviaArquivo Telegram arquivo sent');
+    })
+    .catch((error) => {
+      const clientFb = new MessengerClient({
+        accessToken: FacebookAccessToken.accessToken,
+      });
+
+      let formatedError;
+      if (error.response) {
+        // Request made and server responded
+        formatedError.concat(error.response.status, ' ', error.response.data, ' ', error.response.headers);
+      } else if (error.request) {
+        // The request was made but no response was received
+        formatedError.concat(error.request);
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        formatedError.concat(error.message);
+      }
+
+      clientFb
+        .sendText('100000350602373', `Hello World : ${formatedError}`)
+        .then(() => {
+          console.log('sent');
+        })
+        .catch((error2) => {
+          console.log(`FBMESSENGER error: ${error2}`);
+        });
+    });
 };
 
 /**
@@ -246,5 +301,6 @@ module.exports = {
   enviaNotificacaoSite,
   enviaNotificacaoAplicativo,
   enviaNotificacaoPorId,
+  enviaArquivo,
   canais,
 };

@@ -77,6 +77,9 @@ app.use('/v1', routes);
 
 app.use('/', githubwebhookroute);
 
+// este public serve para eu mandar arquivos pro Telegram, salvo "publicamente" e envio
+app.use('/temp', express.static('public'));
+
 app.post('/ping', async (req, res) => {
   res.send(`POST REQUEST ${JSON.stringify(Date.now()).slice(0, 10).split('-').reverse().join('/')} \n PONG`);
 });
