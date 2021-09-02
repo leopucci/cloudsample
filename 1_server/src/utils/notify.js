@@ -100,9 +100,11 @@ const enviaStringComoArquivoNoTelegram = (mensagem, canal = canais.PocketApi, ar
   const fileExtension = '.pdf';
   const fileCompleteName = fileName + fileExtension;
   const fileHttpAddress = `${config.api.baseUrl}/temp/${fileCompleteName}`;
+  const fileSystemAddress = `${__dirname}/../../public/${fileCompleteName}`;
+  logger.info(`Tentando criar arquivo  ${fileHttpAddress}\n\n PATH: ${fileSystemAddress}`);
   const pdf = new PDFKit();
   pdf.text(arquivo);
-  pdf.pipe(fs.createWriteStream(`${__dirname}/../../public/${fileCompleteName}`));
+  pdf.pipe(fs.createWriteStream(fileSystemAddress));
   pdf.end();
   client
     .sendDocument(canalEscolhido, fileHttpAddress, {
