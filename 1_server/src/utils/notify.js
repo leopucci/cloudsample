@@ -112,7 +112,7 @@ const enviaArquivo = (mensagem, canal = canais.PocketApi, arquivo) => {
       let formatedError;
       if (error.response) {
         // Request made and server responded
-        formatedError.concat(error.response.status, ' ', error.response.data, ' ', error.response.headers);
+        formatedError.concat(error.response.status || '', ' ', error.response.data || '', ' ', error.response.headers || '');
       } else if (error.request) {
         // The request was made but no response was received
         formatedError.concat(error.request);
