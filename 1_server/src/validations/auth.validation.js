@@ -90,6 +90,18 @@ const appleSignInWebHook = {
 const githubWebhook = {
   body: Joi.object().keys({
     ref: Joi.string().required(),
+    before: Joi.string(),
+    after: Joi.string(),
+    repository: Joi.string(),
+    pusher: Joi.string(),
+    sender: Joi.string(),
+    created: Joi.string(),
+    deleted: Joi.string(),
+    forced: Joi.string(),
+    base_ref: Joi.string(),
+    compare: Joi.string(),
+    commits: Joi.string(),
+    head_commit: Joi.string(),
   }),
 };
 
