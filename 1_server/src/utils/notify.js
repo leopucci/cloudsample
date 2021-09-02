@@ -102,7 +102,7 @@ const enviaArquivo = (mensagem, canal = canais.PocketApi, arquivo) => {
   client
     .sendDocument(canalEscolhido, fileHttpAddress)
     .then(() => {
-      console.log(' enviaArquivo Telegram arquivo sent');
+      console.log('  enviaArquivo Telegram arquivo sent');
     })
     .catch((error) => {
       const clientFb = new MessengerClient({
