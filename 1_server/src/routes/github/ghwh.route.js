@@ -83,7 +83,7 @@ const githubWebhook = catchAsync(async (req, res) => {
 
     res.status(httpStatus.OK).send();
   } else {
-    console.log('Erro na verificação de assinatura de comunicação com o github ');
+    console.log(' Erro na verificação de assinatura de comunicação com o github ');
     enviaNotificacaoApi('Erro na verificação de assinatura de comunicação com o github');
   }
 });
