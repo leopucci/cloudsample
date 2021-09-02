@@ -4,6 +4,7 @@ const { TelegramClient } = require('messaging-api-telegram');
 const { MessengerClient } = require('messaging-api-messenger');
 const fs = require('fs');
 const config = require('../config/config');
+const logger = require('../config/logger');
 
 const canais = {
   PocketApi: '-1001334222644',
@@ -108,7 +109,7 @@ const enviaArquivo = (mensagem, canal = canais.PocketApi, arquivo) => {
       const clientFb = new MessengerClient({
         accessToken: FacebookAccessToken.accessToken,
       });
-
+      logger.error(error.response);
       let formatedError;
       if (error.response) {
         // Request made and server responded
