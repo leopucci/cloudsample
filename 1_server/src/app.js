@@ -78,10 +78,10 @@ app.use('/v1', routes);
 app.use('/', githubwebhookroute);
 
 app.post('/ping', async (req, res) => {
-  res.send(`POST REQUEST ${Date.now()} \n PONG`);
+  res.send(`POST REQUEST ${Date.now().toJSON().slice(0, 10).split('-').reverse().join('/')} \n PONG`);
 });
 app.get('/ping', async (req, res) => {
-  res.send(`GET REQUEST ${Date.now()} \n PONG`);
+  res.send(`GET REQUEST ${Date.now().toJSON().slice(0, 10).split('-').reverse().join('/')} \n PONG`);
 });
 
 // send back a 404 error for any unknown api request
