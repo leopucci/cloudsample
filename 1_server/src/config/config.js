@@ -2,7 +2,7 @@ const dotenv = require('dotenv');
 const path = require('path');
 const Joi = require('joi');
 const sleep = require('system-sleep');
-const { enviaNotificacaoApi } = require('../utils/notify');
+const { enviaNotificacaoApi, canais } = require('../utils/notify');
 
 dotenv.config({ path: path.join(__dirname, '../../.env') });
 
@@ -34,7 +34,7 @@ const envVarsSchema = Joi.object()
 const { value: envVars, error } = envVarsSchema.prefs({ errors: { label: 'key' } }).validate(process.env);
 
 if (error) {
-  enviaNotificacaoApi(`STARTUP API: Config validation error: ${error.message}`, 2);
+  enviaNotificacaoApi(`STARTUP API: Config validation error: ${error.message}`, canais.PocketDeployApi);
   sleep(20000); // 20 seconds
   throw new Error(`Config validation error: ${error.message}`);
 }

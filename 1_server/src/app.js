@@ -15,7 +15,7 @@ const { authLimiter } = require('./middlewares/rateLimiter');
 const routes = require('./routes/v1');
 const githubwebhookroute = require('./routes/github');
 const { errorConverter, errorHandler } = require('./middlewares/error');
-const ApiError = require('./utils/ApiError');
+const ApiNotFoundError = require('./utils/errors/ApiNotFoundError');
 
 const app = express();
 // este trust aqui eh pra fazer com que o ip que vem do Nginx
@@ -90,7 +90,7 @@ app.get('/ping', async (req, res) => {
 
 // send back a 404 error for any unknown api request
 app.use((req, res, next) => {
-  next(new ApiError(httpStatus.NOT_FOUND, 'Not found'));
+  next(new ApiNotFoundError(httpStatus.NOT_FOUND, 'Not found'));
 });
 
 // convert error to ApiError, if needed
