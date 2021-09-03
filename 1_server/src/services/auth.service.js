@@ -7,7 +7,8 @@ const myAxiosInstance = require('../utils/axioshttp');
 const tokenService = require('./token.service');
 const userService = require('./user.service');
 const Token = require('../models/token.model');
-const ApiError = require('../utils/errors/ApiError');
+const ClientError = require('../utils/errors/ClientError');
+const ClientUnauthorizedError = require('../utils/errors/ClientUnauthorizedError');
 const { enviaNotificacaoApi, enviaNotificacaoSite, canais } = require('../utils/notify');
 const { tokenTypes } = require('../config/tokens');
 const { User } = require('../models');
@@ -107,7 +108,7 @@ const appleLoginOrCreateAccount = async (authorization, appleUser) => {
       }
     );
   } catch (error) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid credentials');
+    throw new ClientUnauthorizedError('Invalid credentials');
   }
   let user = await userService.getUserByEmail(appleUser.email);
   if (!user) {
@@ -184,7 +185,7 @@ const googleLoginOrCreateAccount = async (token) => {
     });
     payload = ticket.getPayload();
   } catch (error) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid credentials');
+    throw new ClientUnauthorizedError('Invalid credentials');
   }
   let user = await userService.getUserByEmail(payload.email);
   if (!user) {
@@ -240,14 +241,13 @@ const userHasPassword = async (email) => {
 const loginUserWithEmailAndPassword = async (email, password) => {
   const user = await userService.getUserByEmail(email);
   if (user != null && 'isPasswordBlank' in user && user.isPasswordBlank === true) {
-    throw new ApiError(
-      httpStatus.UNAUTHORIZED,
+    throw new ClientUnauthorizedError(
       'You have logged in using Google or Apple Login, use them instead or click forgot password to generate a password'
     );
   }
 
   if (!user || !(await user.isPasswordMatch(password))) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, 'Incorrect email or password');
+    throw new ClientUnauthorizedError('Incorrect email or password');
   }
   return user;
 };
@@ -260,7 +260,7 @@ const loginUserWithEmailAndPassword = async (email, password) => {
 const logout = async (refreshToken) => {
   const refreshTokenDoc = await Token.findOne({ token: refreshToken, type: tokenTypes.REFRESH, blacklisted: false });
   if (!refreshTokenDoc) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'Not found');
+    throw new ClientError('Not found');
   }
   await refreshTokenDoc.remove();
 };
@@ -280,7 +280,7 @@ const refreshAuth = async (refreshToken) => {
     await refreshTokenDoc.remove();
     return tokenService.generateAuthTokens(user);
   } catch (error) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, 'Please authenticate');
+    throw new ClientUnauthorizedError('Please authenticate');
   }
 };
 
@@ -300,7 +300,7 @@ const resetPassword = async (resetPasswordToken, newPassword) => {
     await userService.updateUserById(user.id, { password: newPassword });
     await Token.deleteMany({ user: user.id, type: tokenTypes.RESET_PASSWORD });
   } catch (error) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, 'Password reset failed');
+    throw new ClientUnauthorizedError('Password reset failed');
   }
 };
 
@@ -319,7 +319,7 @@ const verifyEmail = async (verifyEmailToken) => {
     await Token.deleteMany({ user: user.id, type: tokenTypes.VERIFY_EMAIL });
     await userService.updateUserById(user.id, { isEmailVerified: true });
   } catch (error) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, 'Email verification failed');
+    throw new ClientUnauthorizedError('Email verification failed');
   }
 };
 
@@ -359,7 +359,7 @@ const appleSignInWebHookHandler = async (payload) => {
   } catch (err) {
     // Event token is not verified
     console.error(err);
-    throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid credentials');
+    throw new ClientUnauthorizedError('Invalid credentials');
   }
 };
 

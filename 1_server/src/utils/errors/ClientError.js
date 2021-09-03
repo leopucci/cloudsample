@@ -1,7 +1,7 @@
 const PocketCLoudHttpStatus = require('./PocketCLoudHttpStatus');
 
-class ApiNotFoundError extends Error {
-  constructor(message, statusCode = PocketCLoudHttpStatus.API_NOT_FOUND, isOperational = true, stack = '') {
+class ClientError extends Error {
+  constructor(message, statusCode = PocketCLoudHttpStatus.CLIENT_ERROR_BAD_REQUEST, isOperational = true, stack = '') {
     super(message);
     this.statusCode = statusCode;
     this.isOperational = isOperational;
@@ -13,4 +13,4 @@ class ApiNotFoundError extends Error {
   }
 }
 
-module.exports = ApiNotFoundError;
+module.exports = ClientError;

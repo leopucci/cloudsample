@@ -4,7 +4,7 @@ const httpStatus = require('http-status');
 const config = require('../config/config');
 const userService = require('./user.service');
 const { Token } = require('../models');
-const ApiError = require('../utils/errors/ApiError');
+const ClientError = require('../utils/errors/ClientError');
 const { tokenTypes } = require('../config/tokens');
 
 /**
@@ -93,7 +93,7 @@ const generateAuthTokens = async (user) => {
 const generateResetPasswordToken = async (email) => {
   const user = await userService.getUserByEmail(email);
   if (!user) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'No users found with this email');
+    throw new ClientError('No users found with this email');
   }
   const expires = moment().add(config.jwt.resetPasswordExpirationMinutes, 'minutes');
   const resetPasswordToken = generateToken(user.id, expires, tokenTypes.RESET_PASSWORD);

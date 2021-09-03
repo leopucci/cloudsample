@@ -100,7 +100,7 @@ app.get('/ping', async (req, res) => {
 
 // send back a 404 error for any unknown api request
 app.use((req, res, next) => {
-  next(new ApiNotFoundError(httpStatus.NOT_FOUND, 'Not found'));
+  next(new ApiNotFoundError('Not found'));
 });
 
 // convert error to ApiError, if needed

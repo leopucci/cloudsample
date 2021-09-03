@@ -5,17 +5,23 @@ const config = require('../config/config');
 const logger = require('../config/logger');
 const ApiError = require('../utils/errors/ApiError');
 const ApiNotFoundError = require('../utils/errors/ApiNotFoundError');
+const ClientError = require('../utils/errors/ClientError');
+const ClientUnauthorizedError = require('../utils/errors/ClientUnauthorizedError');
 const { enviaNotificacaoApi, canais } = require('../utils/notify');
 
 const errorConverter = (err, req, res, next) => {
   const errString = safeJsonStringify(err);
   // enviaNotificacaoApi(`Caiu no errorConverter \n${errString}`, canais.PocketErrosHttp);
   let error = err;
-  if (!(error instanceof ApiError) || !(error instanceof ApiNotFoundError)) {
+  if (
+    !(error instanceof ApiNotFoundError) ||
+    !(error instanceof ClientError) ||
+    !(error instanceof ClientUnauthorizedError)
+  ) {
     const statusCode =
       error.statusCode || error instanceof mongoose.Error ? httpStatus.BAD_REQUEST : httpStatus.INTERNAL_SERVER_ERROR;
     const message = error.message || httpStatus[statusCode];
-    error = new ApiError(statusCode, message, false, err.stack);
+    error = new ApiError(message, statusCode, false, err.stack);
   }
   next(error);
 };
