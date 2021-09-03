@@ -15,8 +15,7 @@ const { authLimiter } = require('./middlewares/rateLimiter');
 const routes = require('./routes/v1');
 const githubwebhookroute = require('./routes/github');
 const { errorConverter, errorHandler } = require('./middlewares/error');
-const ApiError = require('./utils/errors/ApiError');
-const ApiNotFoundError = require('./utils/errors/ApiNotFoundError');
+const ApiError = require('./utils/ApiError');
 
 const app = express();
 // este trust aqui eh pra fazer com que o ip que vem do Nginx
@@ -83,24 +82,16 @@ app.use('/', githubwebhookroute);
 app.use('/temp', express.static('public'));
 
 app.post('/ping', async (req, res) => {
-  res.send(`POST REQUEST ${safeJsonStringify(Date.now()).slice(0, 10).split('-').reverse().join('/')} \n PONG`);
+  res.send(`POST REQUEST ${JSON.stringify(Date.now()).slice(0, 10).split('-').reverse().join('/')} \n PONG`);
 });
 app.get('/ping', async (req, res) => {
-  res.send(`GET REQUEST ${safeJsonStringify(Date.now()).slice(0, 10).split('-').reverse().join('/')} \n PONG`);
+  res.send(`GET REQUEST ${JSON.stringify(Date.now()).slice(0, 10).split('-').reverse().join('/')} \n PONG`);
 });
 
 // send back a 404 error for any unknown api request
 app.use((req, res, next) => {
-  next(new ApiNotFoundError(httpStatus.NOT_FOUND, 'Not found'));
+  next(new ApiError(httpStatus.NOT_FOUND, 'Not found'));
 });
-
-// ERROS CONCEITO INTERESSANTE https://blog.restcase.com/rest-api-error-codes-101/
-/* 
-200 - OK
-400 - Bad Request (Client Error) - A json with error \ more details should return to the client.
-401 - Unauthorized
-500 - Internal Server Error - A json with an error should return to the client only when there is no security risk by doing that.
-*/
 
 // convert error to ApiError, if needed
 app.use(errorConverter);
