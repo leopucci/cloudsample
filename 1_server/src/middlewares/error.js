@@ -5,7 +5,7 @@ const config = require('../config/config');
 const logger = require('../config/logger');
 const ApiError = require('../utils/ApiError');
 const ApiNotFoundError = require('../utils/errors/ApiNotFoundError');
-const { enviaNotificacaoSite, enviaNotificacaoApi, canais } = require('../utils/notify');
+const { enviaNotificacaoApi, canais } = require('../utils/notify');
 
 const errorConverter = (err, req, res, next) => {
   const errString = safeJsonStringify(err);
