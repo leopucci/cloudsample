@@ -82,10 +82,20 @@ app.use('/', githubwebhookroute);
 app.use('/temp', express.static('public'));
 
 app.post('/ping', async (req, res) => {
-  res.send(`POST REQUEST ${JSON.stringify(Date.now()).slice(0, 10).split('-').reverse().join('/')} \n PONG`);
+  const date = new Date()
+    .toISOString()
+    .replace(/T/, ' ') // replace T with a space
+    .replace(/\..+/, ''); // delete the dot and everything after
+
+  res.send(`POST REQUEST ${date} \n PONG`);
 });
 app.get('/ping', async (req, res) => {
-  res.send(`GET REQUEST ${JSON.stringify(Date.now()).slice(0, 10).split('-').reverse().join('/')} \n PONG`);
+  const date = new Date()
+    .toISOString()
+    .replace(/T/, ' ') // replace T with a space
+    .replace(/\..+/, ''); // delete the dot and everything after
+
+  res.send(`GET REQUEST ${date} \n PONG`);
 });
 
 // send back a 404 error for any unknown api request
