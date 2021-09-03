@@ -17,7 +17,8 @@ const canais = {
   PocketDeployApiPM2: '-1001507578888',
   PocketDeploySite: '-1001177781241',
   PocketNovosClientes: '-1001317116760',
-  PocketErrosHttp: '-1001555803951',
+  PocketHttpErros: '-1001555803951',
+  PocketHttpNotFound: '-1001556443099',
 };
 const bot = {
   PocketBot: { username: 'Pocket_robot_bot', accessToken: '1942279280:AAEoxbNJvbJlG7ksHmI86pord-aMYxyFF60' },
