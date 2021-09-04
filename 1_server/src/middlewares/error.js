@@ -35,6 +35,8 @@ const errorHandler = (err, req, res, next) => {
   const errString = safeJsonStringify(err);
   // enviaNotificacaoApi(`Caiu no errorHandler \n${errString}`, canais.PocketErrosHttp);
   let { statusCode, message } = err;
+
+  logger.error(`Caiu no error handler err.isOperational: ${err.isOperational}`);
   if (config.env === 'production' && !err.isOperational) {
     statusCode = httpStatus.INTERNAL_SERVER_ERROR;
     message = httpStatus[httpStatus.INTERNAL_SERVER_ERROR];
