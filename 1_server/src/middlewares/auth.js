@@ -1,5 +1,4 @@
 const passport = require('passport');
-const httpStatus = require('http-status');
 const ClientUnauthorizedError = require('../utils/errors/ClientUnauthorizedError');
 const { roleRights } = require('../config/roles');
 

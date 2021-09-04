@@ -14,28 +14,28 @@ const errorConverter = (err, req, res, next) => {
   // enviaNotificacaoApi(`Caiu no errorConverter \n${errString}`, canais.PocketErrosHttp);
   let error = err;
   if (
-    !(error instanceof ApiError) ||
-    !(error instanceof ApiNotFoundError) ||
-    !(error instanceof ClientError) ||
-    !(error instanceof ClientUnauthorizedError)
+    !(
+      error instanceof ApiError ||
+      error instanceof ApiNotFoundError ||
+      error instanceof ClientError ||
+      error instanceof ClientUnauthorizedError
+    )
   ) {
     const statusCode =
       error.statusCode || error instanceof mongoose.Error ? httpStatus.BAD_REQUEST : httpStatus.INTERNAL_SERVER_ERROR;
     const message = error.message || httpStatus[statusCode];
     error = new ApiError(message, statusCode, false, err.stack);
   }
-  logger.error(`Tipo de erro: ${error.constructor.name}`);
-  logger.error(`err.isOperational: ${err.isOperational}`);
 
   next(error);
 };
 
 // eslint-disable-next-line no-unused-vars
 const errorHandler = (err, req, res, next) => {
-  const errString = safeJsonStringify(err);
+  // const errString = safeJsonStringify(err);
   // enviaNotificacaoApi(`Caiu no errorHandler \n${errString}`, canais.PocketErrosHttp);
   let { statusCode, message } = err;
-
+  logger.error(`Caiu no error handler Tipo de erro: ${err.constructor.name}`);
   logger.error(`Caiu no error handler err.isOperational: ${err.isOperational}`);
   if (config.env === 'production' && !err.isOperational) {
     statusCode = httpStatus.INTERNAL_SERVER_ERROR;

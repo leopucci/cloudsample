@@ -9,7 +9,7 @@ const logger = require('../../../src/config/logger');
 describe('Error middlewares', () => {
   describe('Error converter', () => {
     test('should return the same ClientError object it was called with', () => {
-      const error = new ClientError(httpStatus.BAD_REQUEST, 'Any error');
+      const error = new ClientError('Any error');
       const next = jest.fn();
 
       errorConverter(error, httpMocks.createRequest(), httpMocks.createResponse(), next);
