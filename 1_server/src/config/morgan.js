@@ -1,7 +1,18 @@
 const morgan = require('morgan');
+const dns = require('dns');
+const safeJsonStringify = require('safe-json-stringify');
 const config = require('./config');
 const logger = require('./logger');
 const { enviaNotificacaoApi, canais } = require('../utils/notify');
+
+function reverseLookup(ip) {
+  dns.reverse(ip, function (err, domains) {
+    if (err != null) {
+      return false;
+    }
+    return domains;
+  });
+}
 
 morgan.token('message', (req, res) => res.locals.errorMessage || '');
 
@@ -11,7 +22,11 @@ const errorResponseFormat = `${getIpFormat()}:method :url :status - :response-ti
 
 const successHandler = morgan(successResponseFormat, {
   skip: (req, res) => res.statusCode >= 400,
-  stream: { write: (message) => logger.info(message.trim()) },
+  stream: {
+    write: (message) => {
+      logger.info(message.trim());
+    },
+  },
 });
 
 const errorHandler = morgan(errorResponseFormat, {
