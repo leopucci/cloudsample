@@ -14,6 +14,7 @@ const errorConverter = (err, req, res, next) => {
   // enviaNotificacaoApi(`Caiu no errorConverter \n${errString}`, canais.PocketErrosHttp);
   let error = err;
   if (
+    !(error instanceof ApiError) ||
     !(error instanceof ApiNotFoundError) ||
     !(error instanceof ClientError) ||
     !(error instanceof ClientUnauthorizedError)
