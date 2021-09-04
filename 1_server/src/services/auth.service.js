@@ -3,7 +3,7 @@ const { OAuth2Client } = require('google-auth-library');
 const appleSignin = require('apple-signin-auth');
 const safeJsonStringify = require('safe-json-stringify');
 const myAxiosInstance = require('../utils/axioshttp');
-
+const config = require('../config/config');
 const tokenService = require('./token.service');
 const userService = require('./user.service');
 const Token = require('../models/token.model');
@@ -26,7 +26,7 @@ const verifyRecaptcha = async (token, clientIpAddress) => {
       method: 'post',
       url: 'https://www.google.com/recaptcha/api/siteverify',
       params: {
-        secret: process.env.RECAPTCHA_SECRET_KEY,
+        secret: config.recaptcha.secretKey,
         response: token,
         remoteIp: clientIpAddress,
       },
