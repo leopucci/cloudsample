@@ -25,6 +25,8 @@ const errorConverter = (err, req, res, next) => {
     error = new ApiError(message, statusCode, false, err.stack);
   }
   logger.error(`Tipo de erro: ${error.constructor.name}`);
+  logger.error(`err.isOperational: ${err.isOperational}`);
+
   next(error);
 };
 
