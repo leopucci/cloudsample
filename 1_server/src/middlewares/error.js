@@ -23,6 +23,7 @@ const errorConverter = (err, req, res, next) => {
     const message = error.message || httpStatus[statusCode];
     error = new ApiError(message, statusCode, false, err.stack);
   }
+  logger.error(`Tipo de erro: ${error.constructor.name}`);
   next(error);
 };
 

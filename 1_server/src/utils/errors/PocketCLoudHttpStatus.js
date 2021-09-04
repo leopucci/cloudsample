@@ -6,10 +6,10 @@
 500 - Internal Server Error - A json with an error should return to the client only when there is no security risk by doing that.
 */
 const PocketCloudHttpStatus = {
-  OK: '200',
-  CLIENT_ERROR_BAD_REQUEST: '400',
-  CLIENT_ERROR_UNAUTHORIZED: '401',
-  NOT_FOUND: '404',
-  INTERNAL_SERVER_ERROR: '500',
+  OK: 200,
+  CLIENT_ERROR_BAD_REQUEST: 400,
+  CLIENT_ERROR_UNAUTHORIZED: 401,
+  API_NOT_FOUND: 404,
+  INTERNAL_SERVER_ERROR: 500,
 };
 module.exports = { PocketCloudHttpStatus };
