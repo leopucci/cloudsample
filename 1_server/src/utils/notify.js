@@ -18,6 +18,7 @@ const canais = {
   PocketNovosClientes: '-1001317116760',
   PocketHttpErros: '-1001555803951',
   PocketHttpNotFound: '-1001556443099',
+  PocketHttpUnauthorized: '-1001505087466',
 };
 const bot = {
   PocketBot: { username: 'Pocket_robot_bot', accessToken: '1942279280:AAEoxbNJvbJlG7ksHmI86pord-aMYxyFF60' },
