@@ -20,7 +20,7 @@ const canais = {
   PocketHttp400BadRequest: '-1001515434153',
   PocketHttp401Unauthorized: '-1001505087466',
   PocketHttp404NotFound: '-1001556443099',
-  PocketHttp500InternalServerError: '-1001515434153',
+  PocketHttp500InternalServerError: '-1001569170107',
 };
 const bot = {
   PocketBot: { username: 'Pocket_robot_bot', accessToken: '1942279280:AAEoxbNJvbJlG7ksHmI86pord-aMYxyFF60' },
