@@ -11,7 +11,7 @@ const { enviaNotificacaoApi, canais } = require('../utils/notify');
 
 const errorConverter = (err, req, res, next) => {
   const errString = safeJsonStringify(err);
-  // enviaNotificacaoApi(`Caiu no errorConverter \n${errString}`, canais.PocketErrosHttp);
+  // enviaNotificacaoApi(`Caiu no errorConverter \n${errString}`, canais.PocketHttpErros);
   let error = err;
   if (
     !(
@@ -33,7 +33,7 @@ const errorConverter = (err, req, res, next) => {
 // eslint-disable-next-line no-unused-vars
 const errorHandler = (err, req, res, next) => {
   // const errString = safeJsonStringify(err);
-  // enviaNotificacaoApi(`Caiu no errorHandler \n${errString}`, canais.PocketErrosHttp);
+  // enviaNotificacaoApi(`Caiu no errorHandler \n${errString}`, canais.PocketHttpErros);
   let { statusCode, message } = err;
   logger.error(`Caiu no error handler Tipo de erro: ${err.constructor.name}`);
   logger.error(`Caiu no error handler err.isOperational: ${err.isOperational}`);

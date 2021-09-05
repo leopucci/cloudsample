@@ -18,7 +18,7 @@ morgan.token('message', (req, res) => res.locals.errorMessage || '');
 
 const getIpFormat = () => (config.env === 'production' ? ':remote-addr - ' : '');
 const successResponseFormat = `${getIpFormat()}:method :url :status - :response-time ms`;
-const errorResponseFormat = `${getIpFormat()}:method :url :status - :response-time ms - message: :message`;
+const errorResponseFormat = `${getIpFormat()}:method :url HTTPSTATUS :status - :response-time ms - message: :message`;
 
 const successHandler = morgan(successResponseFormat, {
   skip: (req, res) => res.statusCode >= 400,
@@ -33,8 +33,36 @@ const errorHandler = morgan(errorResponseFormat, {
   skip: (req, res) => res.statusCode < 400,
   stream: {
     write: (message) => {
-      enviaNotificacaoApi(`ERRO\n${message.trim()}`, canais.PocketErrosHttp);
-      logger.info(`ERROR: ${message.trim()}`);
+      const messageTrim = message.trim();
+      const myRegexp = /HTTPSTATUS ([0-9]+)/g;
+      const match = myRegexp.exec(messageTrim);
+
+      if (match != null && match.length > 1) {
+        switch (match[1]) {
+          case '400':
+            enviaNotificacaoApi(`ERRO 400\n${messageTrim}`, canais.PocketHttp400BadRequest);
+            logger.info(`ERROR 400: ${messageTrim}`);
+            break;
+          case '401':
+            enviaNotificacaoApi(`ERRO 401\n${messageTrim}`, canais.PocketHttp401Unauthorized);
+            logger.info(`ERROR 401: ${messageTrim}`);
+            break;
+          case '404':
+            enviaNotificacaoApi(`ERRO 404\n${messageTrim}`, canais.PocketHttp404NotFound);
+            logger.info(`ERROR 404: ${messageTrim}`);
+            break;
+          case '500':
+            enviaNotificacaoApi(`ERRO 500\n${messageTrim}`, canais.PocketHttp500InternalServerError);
+            logger.info(`ERROR 500: ${messageTrim}`);
+            break;
+          default:
+            enviaNotificacaoApi(`ERRO DEFAULT CORRIJA\n${messageTrim}`, canais.PocketHttpErros);
+            logger.info(`ERROR DEFAULT CORRIJA: ${messageTrim}`);
+        }
+      } else {
+        enviaNotificacaoApi(`ERRO FALHOU REGEXP CORRIJA \n${messageTrim}`, canais.PocketHttpErros);
+        logger.info(`ERRO FALHOU REGEXP CORRIJA  ${messageTrim}`);
+      }
     },
   },
 });
