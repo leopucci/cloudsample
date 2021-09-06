@@ -90,15 +90,17 @@ const githubWebhook = catchAsync(async (req, res) => {
     if (isReleaseBackend) {
       enviaNotificacaoApi('Novo release do backend, instalando codigo novo.....', canais.PocketDeployApi);
       try {
-        const exitCode = await passthru('bash 99_installapi.sh', [''], { cwd: '/opt/POCKETCLOUD/SCRIPTS' });
+        const exitCode = await passthru('sh /opt/POCKETCLOUD/SCRIPTS/99_installapi.sh', [''], {
+          cwd: '/opt/POCKETCLOUD/SCRIPTS',
+        });
         enviaNotificacaoApi(`exitCode:   ${exitCode}`, canais.PocketDeployApi);
-        exec(`cd /opt/POCKETCLOUD/SCRIPTS && ./99_installapi.sh`, function (error, stdout, stderr) {
+        /* exec(`cd /opt/POCKETCLOUD/SCRIPTS && ./99_installapi.sh`, function (error, stdout, stderr) {
           enviaNotificacaoApi(`stdout:   ${stdout}`, canais.PocketDeployApi);
           enviaNotificacaoApi(`stderr: ${stderr}`, canais.PocketDeployApi);
           if (error !== null) {
             enviaNotificacaoApi(`error: ${error}`, canais.PocketDeployApi);
           }
-        });
+        }); */
       } catch (error) {
         enviaNotificacaoApi('Erro no try/catch na hora da execucao do 99_installapi.sh ', canais.PocketDeployApi);
         console.log(error);
