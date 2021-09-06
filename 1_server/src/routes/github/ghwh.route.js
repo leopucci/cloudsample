@@ -12,6 +12,7 @@ const {
 const validate = require('../../middlewares/validate');
 const authValidation = require('../../validations/auth.validation');
 const catchAsync = require('../../utils/catchAsync');
+const logger = require('../../config/logger');
 
 const router = express.Router();
 const SECRET_CONFIGURADO_NO_GITHUB = 'SECRET_CONFIGURADO_NO_GITHUB';
@@ -46,24 +47,22 @@ const verifySignature = function (req, res, next) {
 };
 
 const passthru = catchAsync(async (exe, args, options) => {
-  return new Promise((resolve, reject) => {
-    const env = Object.create(process.env);
-    const child = spawn(exe, args, {
-      ...options,
-      env: {
-        ...env,
-        ...options.env,
-      },
-    });
-    child.stdout.setEncoding('utf8');
-    child.stderr.setEncoding('utf8');
-    child.stdout.on('data', (data) => console.log(data));
-    child.stderr.on('data', (data) => console.log(data));
-    child.on('error', (error) => reject(error));
-    child.on('close', (exitCode) => {
-      console.log('Exit code:', exitCode);
-      resolve(exitCode);
-    });
+  const env = Object.create(process.env);
+  const child = spawn(exe, args, {
+    ...options,
+    env: {
+      ...env,
+      ...options.env,
+    },
+  });
+  child.stdout.setEncoding('utf8');
+  child.stderr.setEncoding('utf8');
+  child.stdout.on('data', (data) => logger.info(data));
+  child.stderr.on('data', (data) => logger.info(data));
+  child.on('error', (error) => logger.error(error));
+  child.on('close', (exitCode) => {
+    logger.info('Exit code:', exitCode);
+    return exitCode;
   });
 });
 const githubWebhook = catchAsync(async (req, res) => {
