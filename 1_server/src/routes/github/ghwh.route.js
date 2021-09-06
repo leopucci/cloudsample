@@ -69,7 +69,7 @@ const githubWebhook = catchAsync(async (req, res) => {
       enviaNotificacaoApi('Novo release do backend, instalando codigo novo...', canais.PocketDeployApi);
       try {
         exec(`cd /opt/POCKETCLOUD/SCRIPTS && bash 99_installapi.sh`, function (error, stdout, stderr) {
-          enviaNotificacaoApi(`stdout: ${stdout}`, canais.PocketDeployApi);
+          enviaNotificacaoApi(`stdout:  ${stdout}`, canais.PocketDeployApi);
           enviaNotificacaoApi(`stderr: ${stderr}`, canais.PocketDeployApi);
           if (error !== null) {
             enviaNotificacaoApi(`error: ${error}`, canais.PocketDeployApi);
