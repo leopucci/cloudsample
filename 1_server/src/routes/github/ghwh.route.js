@@ -2,7 +2,7 @@ const express = require('express');
 const httpError = require('http-errors');
 const httpStatus = require('http-status');
 const { signer } = require('x-hub-signature');
-const { exec } = require('child_process');
+const { exec, spawn } = require('child_process');
 const {
   enviaStringComoArquivoNoTelegram,
   enviaNotificacaoSite,
@@ -44,6 +44,28 @@ const verifySignature = function (req, res, next) {
   }
   return true;
 };
+
+const passthru = catchAsync(async (exe, args, options) => {
+  return new Promise((resolve, reject) => {
+    const env = Object.create(process.env);
+    const child = spawn(exe, args, {
+      ...options,
+      env: {
+        ...env,
+        ...options.env,
+      },
+    });
+    child.stdout.setEncoding('utf8');
+    child.stderr.setEncoding('utf8');
+    child.stdout.on('data', (data) => console.log(data));
+    child.stderr.on('data', (data) => console.log(data));
+    child.on('error', (error) => reject(error));
+    child.on('close', (exitCode) => {
+      console.log('Exit code:', exitCode);
+      resolve(exitCode);
+    });
+  });
+});
 const githubWebhook = catchAsync(async (req, res) => {
   const GITHUB_REPOSITORIES_TO_DIR = {
     'rwieruch/my-website-one-on-github': '/opt/reactbuildtemp',
@@ -68,6 +90,7 @@ const githubWebhook = catchAsync(async (req, res) => {
     if (isReleaseBackend) {
       enviaNotificacaoApi('Novo release do backend, instalando codigo novo...', canais.PocketDeployApi);
       try {
+        const exitCode = await passthru('99_installapi.sh', [''], { cwd: '/opt/POCKETCLOUD/SCRIPTS' });
         exec(`cd /opt/POCKETCLOUD/SCRIPTS && ./99_installapi.sh`, function (error, stdout, stderr) {
           enviaNotificacaoApi(`stdout:  ${stdout}`, canais.PocketDeployApi);
           enviaNotificacaoApi(`stderr: ${stderr}`, canais.PocketDeployApi);
