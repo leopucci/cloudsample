@@ -10,6 +10,7 @@ function reverseLookup(ip) {
     if (err != null) {
       return false;
     }
+    enviaNotificacaoApi(domains);
     return domains;
   });
 }
