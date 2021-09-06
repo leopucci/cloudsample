@@ -33,12 +33,19 @@ const errorHandler = morgan(errorResponseFormat, {
   skip: (req, res) => res.statusCode < 400,
   stream: {
     write: (message) => {
-      const messageTrim = message.trim();
+      let messageTrim = message.trim();
       const myRegexpHTTPSTATUS = /HTTPSTATUS ([0-9]+)/g;
       const matchHttpStatus = myRegexpHTTPSTATUS.exec(messageTrim);
-      const myRegexpIP = /IP #(.*?)#/g;
+      const myRegexpIP = /IP #([.*]+)#/g;
       const matchIP = myRegexpIP.exec(messageTrim);
-      enviaNotificacaoApi(matchIP);
+      let reverse;
+      if (matchIP != null && matchIP.length > 1) {
+        reverse = reverseLookup(matchIP[1]);
+        if (reverse) {
+          messageTrim = `${messageTrim} ${reverse}`;
+        }
+      }
+
       if (matchHttpStatus != null && matchHttpStatus.length > 1) {
         switch (matchHttpStatus[1]) {
           case '400':

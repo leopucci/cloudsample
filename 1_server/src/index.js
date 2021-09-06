@@ -31,7 +31,7 @@ const uncaughtExceptionHandler = (error) => {
   enviaNotificacaoApi(
     `Deu merda jovem, caiu lá no unexpectedErrorHandler voce programou bem mal... \n ${safeJsonStringify(error)}`
   );
-  console.error(err, 'Uncaught Exception thrown vai dar process.exit(1)');
+  console.error(error, 'Uncaught Exception thrown vai dar process.exit(1)');
   exitHandler();
 };
 
