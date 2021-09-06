@@ -88,7 +88,7 @@ const githubWebhook = catchAsync(async (req, res) => {
     const isReleaseFrontend = req.body?.ref === 'refs/heads/release_frontend';
 
     if (isReleaseBackend) {
-      enviaNotificacaoApi('Novo release do backend, instalando codigo novo..', canais.PocketDeployApi);
+      enviaNotificacaoApi('Novo release do backend, instalando codigo novo...', canais.PocketDeployApi);
       try {
         const exitCode = await passthru('bash', ['/opt/POCKETCLOUD/SCRIPTS/99_installapi.sh'], {
           cwd: '/opt/POCKETCLOUD/SCRIPTS',
