@@ -6,12 +6,11 @@ const logger = require('./logger');
 const { enviaNotificacaoApi, canais } = require('../utils/notify');
 
 function reverseLookup(ip) {
-  enviaNotificacaoApi(ip);
   dns.reverse(ip, function (err, domains) {
     if (err != null) {
-      enviaNotificacaoApi(`Couldn't reverse IP ${ip}:`, err);
       return false;
     }
+    logger.info(domains);
     return domains;
   });
 }
@@ -38,14 +37,13 @@ const errorHandler = morgan(errorResponseFormat, {
       let messageTrim = message.trim();
       const myRegexpHTTPSTATUS = /HTTPSTATUS ([0-9]+)/g;
       const matchHttpStatus = myRegexpHTTPSTATUS.exec(messageTrim);
-      const myRegexpIP = /IP #([.*]+)#/g;
+      const myRegexpIP = /IP #(.*?)#/g;
       const matchIP = myRegexpIP.exec(messageTrim);
       let reverse;
       if (matchIP != null && matchIP.length > 1) {
         reverse = reverseLookup(matchIP[1]);
-        if (reverse) {
-          messageTrim = `${messageTrim} ${reverse}`;
-        }
+
+        messageTrim = `${messageTrim} ${reverse}`;
       }
 
       if (matchHttpStatus != null && matchHttpStatus.length > 1) {
