@@ -39,7 +39,6 @@ const verifyRecaptcha = async (token, clientIpAddress) => {
     return false;
   }
   const data = result.data || {};
-  enviaNotificacaoApi(`Erro no recaptcha axiostry/catch http falhou:  ${safeJsonStringify(data)}`);
   if (!data.success) {
     if (data['error-codes'].length > 1) {
       enviaNotificacaoApi(`Erro no recaptcha maior que 1:  ${safeJsonStringify(data['error-codes'])}`);
