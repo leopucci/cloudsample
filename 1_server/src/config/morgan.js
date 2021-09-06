@@ -18,8 +18,8 @@ function reverseLookup(ip) {
 morgan.token('message', (req, res) => res.locals.errorMessage || '');
 
 const getIpFormat = () => (config.env === 'production' ? ':remote-addr' : '');
-const successResponseFormat = `IP #${getIpFormat()}# - :method :url :status - :response-time ms :user-agent`;
-const errorResponseFormat = `IP #${getIpFormat()}# - :method :url HTTPSTATUS :status - :response-time ms - message: :message :user-agent`;
+const successResponseFormat = `IP #${getIpFormat()}# - :method :url :status - :response-time ms UA::user-agent`;
+const errorResponseFormat = `IP #${getIpFormat()}# - :method :url HTTPSTATUS :status - :response-time ms - message: :message UA::user-agent`;
 
 const successHandler = morgan(successResponseFormat, {
   skip: (req, res) => res.statusCode >= 400,
