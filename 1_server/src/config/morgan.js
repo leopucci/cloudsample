@@ -8,9 +8,9 @@ const { enviaNotificacaoApi, canais } = require('../utils/notify');
 function reverseLookup(ip) {
   dns.reverse(ip, function (err, domains) {
     if (err != null) {
+      enviaNotificacaoApi(`Couldn't reverse IP ${ip}:`, err);
       return false;
     }
-    enviaNotificacaoApi(domains);
     return domains;
   });
 }
