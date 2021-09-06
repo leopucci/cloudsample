@@ -6,6 +6,7 @@ const logger = require('./logger');
 const { enviaNotificacaoApi, canais } = require('../utils/notify');
 
 function reverseLookup(ip) {
+  enviaNotificacaoApi(ip);
   dns.reverse(ip, function (err, domains) {
     if (err != null) {
       enviaNotificacaoApi(`Couldn't reverse IP ${ip}:`, err);
