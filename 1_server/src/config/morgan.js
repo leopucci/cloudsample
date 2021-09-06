@@ -16,9 +16,9 @@ function reverseLookup(ip) {
 
 morgan.token('message', (req, res) => res.locals.errorMessage || '');
 
-const getIpFormat = () => (config.env === 'production' ? ':remote-addr - ' : '');
-const successResponseFormat = `${getIpFormat()}:method :url :status - :response-time ms`;
-const errorResponseFormat = `${getIpFormat()}:method :url HTTPSTATUS :status - :response-time ms - message: :message`;
+const getIpFormat = () => (config.env === 'production' ? ':remote-addr' : '');
+const successResponseFormat = `IP #${getIpFormat()}# - :method :url :status - :response-time ms`;
+const errorResponseFormat = `IP #${getIpFormat()}# - :method :url HTTPSTATUS :status - :response-time ms - message: :message`;
 
 const successHandler = morgan(successResponseFormat, {
   skip: (req, res) => res.statusCode >= 400,
@@ -34,11 +34,13 @@ const errorHandler = morgan(errorResponseFormat, {
   stream: {
     write: (message) => {
       const messageTrim = message.trim();
-      const myRegexp = /HTTPSTATUS ([0-9]+)/g;
-      const match = myRegexp.exec(messageTrim);
-
-      if (match != null && match.length > 1) {
-        switch (match[1]) {
+      const myRegexpHTTPSTATUS = /HTTPSTATUS ([0-9]+)/g;
+      const matchHttpStatus = myRegexpHTTPSTATUS.exec(messageTrim);
+      const myRegexpIP = /IP #(.*?)#/g;
+      const matchIP = myRegexpIP.exec(messageTrim);
+      enviaNotificacaoApi(matchIP);
+      if (matchHttpStatus != null && matchHttpStatus.length > 1) {
+        switch (matchHttpStatus[1]) {
           case '400':
             enviaNotificacaoApi(`ERRO 400\n${messageTrim}`, canais.PocketHttp400BadRequest);
             logger.info(`ERROR 400: ${messageTrim}`);
