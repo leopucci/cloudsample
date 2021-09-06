@@ -87,6 +87,24 @@ const appleSignInWebHook = {
   }),
 };
 
+const githubWebhook = {
+  body: Joi.object().keys({
+    ref: Joi.string().required(),
+    before: Joi.string(),
+    after: Joi.string(),
+    repository: Joi.object(),
+    pusher: Joi.object(),
+    sender: Joi.object(),
+    created: Joi.boolean(),
+    deleted: Joi.boolean(),
+    forced: Joi.boolean(),
+    base_ref: Joi.string().allow(null),
+    compare: Joi.string(),
+    commits: Joi.array(),
+    head_commit: Joi.object(),
+  }),
+};
+
 module.exports = {
   register,
   loginErrors,
@@ -99,4 +117,5 @@ module.exports = {
   resetPassword,
   verifyEmail,
   appleSignInWebHook,
+  githubWebhook,
 };

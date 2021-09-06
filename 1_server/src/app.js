@@ -7,6 +7,7 @@ const cors = require('cors');
 const passport = require('passport');
 const httpStatus = require('http-status');
 const webhookMiddleware = require('x-hub-signature').middleware;
+const safeJsonStringify = require('safe-json-stringify');
 const config = require('./config/config');
 const morgan = require('./config/morgan');
 const { jwtStrategy, googleStrategy, appleStrategy } = require('./config/passport');
@@ -14,10 +15,14 @@ const { authLimiter } = require('./middlewares/rateLimiter');
 const routes = require('./routes/v1');
 const githubwebhookroute = require('./routes/github');
 const { errorConverter, errorHandler } = require('./middlewares/error');
-const ApiError = require('./utils/ApiError');
+const ApiNotFoundError = require('./utils/errors/ApiNotFoundError');
 
 const app = express();
+// este trust aqui eh pra fazer com que o ip que vem do Nginx
+// via header seja usado como real, entao eu nao preciso modificar ou pegar o ip de lugar diferente
+// e isto corrige os logs
 app.set('trust proxy', 'loopback');
+
 if (config.env !== 'test') {
   app.use(morgan.successHandler);
   app.use(morgan.errorHandler);
@@ -73,9 +78,29 @@ app.use('/v1', routes);
 
 app.use('/', githubwebhookroute);
 
+// este public serve para eu mandar arquivos pro Telegram, salvo "publicamente" e envio
+app.use('/temp', express.static('public'));
+
+app.post('/ping', async (req, res) => {
+  const date = new Date()
+    .toISOString()
+    .replace(/T/, ' ') // replace T with a space
+    .replace(/\..+/, ''); // delete the dot and everything after
+
+  res.send(`POST REQUEST ${date} \n PONG`);
+});
+app.get('/ping', async (req, res) => {
+  const date = new Date()
+    .toISOString()
+    .replace(/T/, ' ') // replace T with a space
+    .replace(/\..+/, ''); // delete the dot and everything after
+
+  res.send(`GET REQUEST ${date} \n PONG`);
+});
+
 // send back a 404 error for any unknown api request
 app.use((req, res, next) => {
-  next(new ApiError(httpStatus.NOT_FOUND, 'Not found'));
+  next(new ApiNotFoundError('Not found'));
 });
 
 // convert error to ApiError, if needed

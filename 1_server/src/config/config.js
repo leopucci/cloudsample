@@ -2,7 +2,7 @@ const dotenv = require('dotenv');
 const path = require('path');
 const Joi = require('joi');
 const sleep = require('system-sleep');
-const { enviaNotificacaoSite, enviaNotificacaoApi } = require('../utils/notify');
+const { enviaNotificacaoApi, canais } = require('../utils/notify');
 
 dotenv.config({ path: path.join(__dirname, '../../.env') });
 
@@ -25,6 +25,7 @@ const envVarsSchema = Joi.object()
     SMTP_USERNAME: Joi.string().description('username for email server'),
     SMTP_PASSWORD: Joi.string().description('password for email server'),
     EMAIL_FROM: Joi.string().description('the from field in the emails sent by the app'),
+    API_BASE_URL: Joi.string().description('the base api url for the links on the telegram files to be clicked'),
     EMAIL_WEBSITE_BASE_URL: Joi.string().description('the base website url for the links on the e-mail to be clicked'),
     RECAPTCHA_SECRET_KEY: Joi.string().required().description('RECAPTCHA_SECRET_KEY not found in config file'),
   })
@@ -33,7 +34,7 @@ const envVarsSchema = Joi.object()
 const { value: envVars, error } = envVarsSchema.prefs({ errors: { label: 'key' } }).validate(process.env);
 
 if (error) {
-  enviaNotificacaoApi(`STARTUP API: Config validation error: ${error.message}`, 2);
+  enviaNotificacaoApi(`STARTUP API: Config validation error: ${error.message}`, canais.PocketDeployApi);
   sleep(20000); // 20 seconds
   throw new Error(`Config validation error: ${error.message}`);
 }
@@ -41,6 +42,9 @@ if (error) {
 module.exports = {
   env: envVars.NODE_ENV,
   port: envVars.PORT,
+  api: {
+    baseUrl: envVars.API_BASE_URL.endsWith('/') ? envVars.API_BASE_URL.slice(0, -1) : envVars.API_BASE_URL,
+  },
   mongoose: {
     url: envVars.MONGODB_URL + (envVars.NODE_ENV === 'test' ? '-test' : ''),
     options: {
@@ -56,6 +60,7 @@ module.exports = {
     resetPasswordExpirationMinutes: envVars.JWT_RESET_PASSWORD_EXPIRATION_MINUTES,
     verifyEmailExpirationMinutes: envVars.JWT_VERIFY_EMAIL_EXPIRATION_MINUTES,
   },
+  recaptcha: { secretKey: envVars.RECAPTCHA_SECRET_KEY },
   email: {
     smtp: {
       host: envVars.SMTP_HOST,

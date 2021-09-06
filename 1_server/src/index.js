@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const safeJsonStringify = require('safe-json-stringify');
+const { enviaNotificacaoSite, enviaNotificacaoApi } = require('./utils/notify');
 const app = require('./app');
 const config = require('./config/config');
 const logger = require('./config/logger');
@@ -24,13 +26,22 @@ const exitHandler = () => {
   }
 };
 
-const unexpectedErrorHandler = (error) => {
+const uncaughtExceptionHandler = (error) => {
   logger.error(error);
+  enviaNotificacaoApi(
+    `Deu merda jovem, caiu lá no unexpectedErrorHandler voce programou bem mal... \n ${safeJsonStringify(error)}`
+  );
+  console.error(error, 'Uncaught Exception thrown vai dar process.exit(1)');
   exitHandler();
 };
 
-process.on('uncaughtException', unexpectedErrorHandler);
-process.on('unhandledRejection', unexpectedErrorHandler);
+const unhandledRejectionHandler = (reason, p) => {
+  logger.error(reason, 'Unhandled Rejection at Promise', p);
+  enviaNotificacaoApi(`Caiu lá no unhandledRejectionHandler voce programou bem mal... \n ${safeJsonStringify(reason)}`);
+};
+
+process.on('uncaughtException', uncaughtExceptionHandler);
+process.on('unhandledRejection', unhandledRejectionHandler);
 
 process.on('SIGTERM', () => {
   logger.info('SIGTERM received');

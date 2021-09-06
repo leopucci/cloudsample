@@ -39,9 +39,9 @@ gh repo clone pocketcloud
 if [ $? -eq 0 ]; then
 
     cd pocketcloud
+    cp -r 4_website/pocketcloud/99_installfrontend.sh /opt/POCKETCLOUD/SCRIPTS/
     cd 1_server/
     cp -r 99_installapi.sh /opt/POCKETCLOUD/SCRIPTS/
-    cp -r ../4_website/pockketcloud/99_installfrontend.sh /opt/POCKETCLOUD/SCRIPTS/
     chmod 755 /opt/POCKETCLOUD/SCRIPTS/99_installapi.sh
     cp -r /root/POCKETCLOUDCONF/envproducaoexpressapi ./.env
 
@@ -52,13 +52,13 @@ if [ $? -eq 0 ]; then
     npm install
     if [ $? -eq 0 ]; then
         echo "NPM INSTALL OK, AGORA COPIAR E APONTAR"
-        pm2 install pm2-server-monit
+        #pm2 install pm2-server-monit
         #pm2 install pm2-telegram-notification
         #pm2 set pm2-telegram-notification:bot_token 1942279280:AAEoxbNJvbJlG7ksHmI86pord-aMYxyFF60
-        #pm2 set pm2-telegram-notification:chat_id g-1001163173913
-        pm2 install leopucci/pm2-telegram-notify
-        pm2 set pm2-telegram-notify:telegram_url https://api.telegram.org/bot1942279280:AAEoxbNJvbJlG7ksHmI86pord-aMYxyFF60/sendMessage
-        pm2 set pm2-telegram-notify:chat_id g-1001163173913
+        #pm2 set pm2-telegram-notification:chat_id g-1001507578888
+        ##pm2 install leopucci/pm2-telegram-notify
+        #pm2 set pm2-telegram-notify:telegram_url https://api.telegram.org/bot1942279280:AAEoxbNJvbJlG7ksHmI86pord-aMYxyFF60/sendMessage
+        #pm2 set pm2-telegram-notify:chat_id g-1001507578888
         pm2 delete PktCloudApiPRODUCAO &
         pm2 save
         pm2 start ecosystem.config.producao.json

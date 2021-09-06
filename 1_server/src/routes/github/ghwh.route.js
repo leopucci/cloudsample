@@ -3,7 +3,15 @@ const httpError = require('http-errors');
 const httpStatus = require('http-status');
 const { signer } = require('x-hub-signature');
 const { exec } = require('child_process');
-const { enviaNotificacaoSite, enviaNotificacaoApi } = require('../../utils/notify');
+const {
+  enviaStringComoArquivoNoTelegram,
+  enviaNotificacaoSite,
+  enviaNotificacaoApi,
+  canais,
+} = require('../../utils/notify');
+const validate = require('../../middlewares/validate');
+const authValidation = require('../../validations/auth.validation');
+const catchAsync = require('../../utils/catchAsync');
 
 const router = express.Router();
 const SECRET_CONFIGURADO_NO_GITHUB = 'SECRET_CONFIGURADO_NO_GITHUB';
@@ -36,13 +44,20 @@ const verifySignature = function (req, res, next) {
   }
   return true;
 };
-const githubWebhook = async (req, res) => {
+const githubWebhook = catchAsync(async (req, res) => {
   const GITHUB_REPOSITORIES_TO_DIR = {
     'rwieruch/my-website-one-on-github': '/opt/reactbuildtemp',
     'rwieruch/my-website-two-on-github': '/home/rwieruch/my-website-two',
   };
   const directory = GITHUB_REPOSITORIES_TO_DIR[req.body?.repository?.full_name];
 
+  enviaStringComoArquivoNoTelegram(
+    canais.PocketDeployApi,
+    canais.PocketDeployApi,
+    'ARQUIVO DE TESTE\n SEGUNDA LINHA',
+    'testedenome',
+    'Descricao'
+  );
   if (await verifySignature(req)) {
     // console.log(req.body);
 
@@ -51,21 +66,26 @@ const githubWebhook = async (req, res) => {
     const isReleaseFrontend = req.body?.ref === 'refs/heads/release_frontend';
 
     if (isReleaseBackend) {
-      enviaNotificacaoApi('Novo release do backend, instalando codigo novo...');
+      enviaNotificacaoApi('Novo release do backend, instalando codigo novo...', canais.PocketDeployApi);
       try {
-        exec(`cd /opt/POCKETCLOUD/SCRIPTS && bash 99_installapi.sh`);
+        exec(`cd /opt/POCKETCLOUD/SCRIPTS && bash 99_installapi.sh`, function (error, stdout, stderr) {
+          enviaNotificacaoApi(`stdout: ${stdout}`, canais.PocketDeployApi);
+          if (error !== null) {
+            enviaNotificacaoApi(`error: ${error}`, canais.PocketDeployApi);
+          }
+        });
       } catch (error) {
-        enviaNotificacaoApi('Erro no try/catch na hora da execucao do 99_installapi.sh ');
+        enviaNotificacaoApi('Erro no try/catch na hora da execucao do 99_installapi.sh ', canais.PocketDeployApi);
         console.log(error);
       }
     }
 
     if (isReleaseFrontend) {
       try {
-        enviaNotificacaoSite('Novo release do frontend,a buildando e instalando codigo novo');
+        enviaNotificacaoSite('Novo release do frontend,a buildando e instalando codigo novo', canais.PocketDeploySite);
         exec(`cd /opt/POCKETCLOUD/SCRIPTS && bash 99_installfrontend.sh`);
       } catch (error) {
-        enviaNotificacaoSite('Erro no try/catch na hora da execucao do 99_installfrontend.sh ');
+        enviaNotificacaoSite('Erro no try/catch na hora da execucao do 99_installfrontend.sh ', canais.PocketDeploySite);
         console.log(error);
       }
     }
@@ -83,16 +103,8 @@ const githubWebhook = async (req, res) => {
     console.log('Erro na verificação de assinatura de comunicação com o github ');
     enviaNotificacaoApi('Erro na verificação de assinatura de comunicação com o github');
   }
-};
+});
 
-router.post(
-  '/githubwebhook',
-  /* webhookMiddleware({
-    algorithm: 'sha1',
-    secret: SECRET_CONFIGURADO_NO_GITHUB,
-    require: true,
-  }), */
-  githubWebhook
-);
+router.post('/githubwebhook', validate(authValidation.githubWebhook), githubWebhook);
 
 module.exports = router;

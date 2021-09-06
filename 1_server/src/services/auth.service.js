@@ -1,16 +1,17 @@
 const httpStatus = require('http-status');
 const { OAuth2Client } = require('google-auth-library');
 const appleSignin = require('apple-signin-auth');
+const safeJsonStringify = require('safe-json-stringify');
 const myAxiosInstance = require('../utils/axioshttp');
-
+const config = require('../config/config');
 const tokenService = require('./token.service');
 const userService = require('./user.service');
 const Token = require('../models/token.model');
-const ApiError = require('../utils/ApiError');
-const { enviaNotificacaoApi, enviaNotificacaoSite } = require('../utils/notify');
+const ClientError = require('../utils/errors/ClientError');
+const ClientUnauthorizedError = require('../utils/errors/ClientUnauthorizedError');
+const { enviaNotificacaoApi, enviaNotificacaoSite, canais } = require('../utils/notify');
 const { tokenTypes } = require('../config/tokens');
 const { User } = require('../models');
-
 /**
  * Login with apple signIn user
  * @param {string} recaptcha
@@ -19,27 +20,28 @@ const { User } = require('../models');
 // siteKey: process.env.RECAPTCHA_SITE_KEY,
 // secretKey: process.env.RECAPTCHA_SECRET_KEY,
 const verifyRecaptcha = async (token, clientIpAddress) => {
+  enviaNotificacaoApi(
+    `Vai verificar \n SECRET:${config.recaptcha.secretKey}\n TOKEN: ${token}\n REMOTEIP: ${clientIpAddress}`
+  );
   let result;
-  // PARA REMOVER ESTOU SO TESTANDO O FB COMO BACKUP
-  enviaNotificacaoSite('TESTE', '2');
   try {
     result = await myAxiosInstance({
       method: 'post',
       url: 'https://www.google.com/recaptcha/api/siteverify',
       params: {
-        secret: process.env.RECAPTCHA_SECRET_KEY,
+        secret: config.recaptcha.secretKey,
         response: token,
         remoteIp: clientIpAddress,
       },
     });
   } catch (err) {
-    enviaNotificacaoApi(`Erro no recaptcha axiostry/catch http falhou:  ${JSON.stringify(err)}`);
+    enviaNotificacaoApi(`Erro no recaptcha axiostry/catch http falhou:  ${safeJsonStringify(err)}`);
     return false;
   }
   const data = result.data || {};
   if (!data.success) {
     if (data['error-codes'].length > 1) {
-      enviaNotificacaoApi(`Erro no recaptcha maior que 1:  ${JSON.stringify(data['error-codes'])}`);
+      enviaNotificacaoApi(`Erro no recaptcha maior que 1:  ${safeJsonStringify(data['error-codes'])}`);
       // eh pra me avisar que isso eu previso aprender.
     }
     switch (data['error-codes'].pop()) {
@@ -51,7 +53,7 @@ const verifyRecaptcha = async (token, clientIpAddress) => {
       default:
         console.log(data);
         // eslint-disable-next-line no-case-declarations
-        const codes = JSON.stringify(data['error-codes']);
+        const codes = safeJsonStringify(data['error-codes']);
         if (data['error-codes'].length === 0) {
           enviaNotificacaoApi(`Erro no recaptcha sem error-codes - remoteIp: ${clientIpAddress}`);
         } else {
@@ -65,7 +67,7 @@ const verifyRecaptcha = async (token, clientIpAddress) => {
   // https://stackoverflow.com/a/35641680/3156756
   // https://andremonteiro.pt/react-redux-modal/
   if (data.score < 0.3) {
-    enviaNotificacaoApi(`Erro no recaptcha SCORE BAIXO:  ${JSON.stringify(data)} remoteIp: ${clientIpAddress}`);
+    enviaNotificacaoApi(`Erro no recaptcha SCORE BAIXO:  ${safeJsonStringify(data)} remoteIp: ${clientIpAddress}`);
     return false;
   }
   return true;
@@ -107,7 +109,7 @@ const appleLoginOrCreateAccount = async (authorization, appleUser) => {
       }
     );
   } catch (error) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid credentials');
+    throw new ClientUnauthorizedError('Invalid credentials');
   }
   let user = await userService.getUserByEmail(appleUser.email);
   if (!user) {
@@ -184,7 +186,7 @@ const googleLoginOrCreateAccount = async (token) => {
     });
     payload = ticket.getPayload();
   } catch (error) {
-    throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid credentials');
+    throw new ClientUnauthorizedError('Invalid credentials');
   }
   let user = await userService.getUserByEmail(payload.email);
   if (!user) {
@@ -240,14 +242,13 @@ const userHasPassword = async (email) => {
 const loginUserWithEmailAndPassword = async (email, password) => {
   const user = await userService.getUserByEmail(email);
   if (user != null && 'isPasswordBlank' in user && user.isPasswordBlank === true) {
-    throw new ApiError(
-      httpStatus.UNAUTHORIZED,
+    throw new ClientUnauthorizedError(
       'You have logged in using Google or Apple Login, use them instead or click forgot password to generate a password'
     );
   }
 
   if (!user || !(await user.isPasswordMatch(password))) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, 'Incorrect email or password');
+    throw new ClientUnauthorizedError('Incorrect email or password');
   }
   return user;
 };
@@ -260,7 +261,7 @@ const loginUserWithEmailAndPassword = async (email, password) => {
 const logout = async (refreshToken) => {
   const refreshTokenDoc = await Token.findOne({ token: refreshToken, type: tokenTypes.REFRESH, blacklisted: false });
   if (!refreshTokenDoc) {
-    throw new ApiError(httpStatus.NOT_FOUND, 'Not found');
+    throw new ClientError('Not found');
   }
   await refreshTokenDoc.remove();
 };
@@ -280,7 +281,7 @@ const refreshAuth = async (refreshToken) => {
     await refreshTokenDoc.remove();
     return tokenService.generateAuthTokens(user);
   } catch (error) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, 'Please authenticate');
+    throw new ClientUnauthorizedError('Please authenticate');
   }
 };
 
@@ -300,7 +301,7 @@ const resetPassword = async (resetPasswordToken, newPassword) => {
     await userService.updateUserById(user.id, { password: newPassword });
     await Token.deleteMany({ user: user.id, type: tokenTypes.RESET_PASSWORD });
   } catch (error) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, 'Password reset failed');
+    throw new ClientUnauthorizedError('Password reset failed');
   }
 };
 
@@ -319,7 +320,7 @@ const verifyEmail = async (verifyEmailToken) => {
     await Token.deleteMany({ user: user.id, type: tokenTypes.VERIFY_EMAIL });
     await userService.updateUserById(user.id, { isEmailVerified: true });
   } catch (error) {
-    throw new ApiError(httpStatus.UNAUTHORIZED, 'Email verification failed');
+    throw new ClientUnauthorizedError('Email verification failed');
   }
 };
 
@@ -359,7 +360,7 @@ const appleSignInWebHookHandler = async (payload) => {
   } catch (err) {
     // Event token is not verified
     console.error(err);
-    throw new ApiError(httpStatus.BAD_REQUEST, 'Invalid credentials');
+    throw new ClientUnauthorizedError('Invalid credentials');
   }
 };
 
