@@ -90,9 +90,7 @@ const githubWebhook = catchAsync(async (req, res) => {
     if (isReleaseBackend) {
       enviaNotificacaoApi('Novo release do backend, instalando codigo novo...', canais.PocketDeployApi);
       try {
-        const exitCode = await passthru('bash', ['/opt/POCKETCLOUD/SCRIPTS/99_installapi.sh'], {
-          cwd: '/opt/POCKETCLOUD/SCRIPTS',
-        });
+        const exitCode = await passthru('bash', ['/opt/POCKETCLOUD/SCRIPTS/99_installapi.sh']);
         /* exec(`cd /opt/POCKETCLOUD/SCRIPTS && ./99_installapi.sh`, function (error, stdout, stderr) {
           enviaNotificacaoApi(`stdout:   ${stdout}`, canais.PocketDeployApi);
           enviaNotificacaoApi(`stderr: ${stderr}`, canais.PocketDeployApi);
