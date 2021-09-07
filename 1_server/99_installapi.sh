@@ -18,8 +18,7 @@ mkdir -p /opt/POCKETCLOUD/TEMP/
 cd /opt/POCKETCLOUD/TEMP
 mkdir $THEDATE
 cd $THEDATE
-export GITHUB_TOKEN=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
-gh repo clone pocketcloud
+git clone https://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@github.com/leopucci/pocketcloud.git #--branch release_backend
 if [ $? -eq 0 ]; then
 
     cd pocketcloud
