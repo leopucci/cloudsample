@@ -64,7 +64,7 @@ const executaComandoShell = async function (exe, args, options) {
   child.stderr.on('data', (data) => logger.info(`executaComandoShell:stderr ${data}`));
   child.on('error', (error) => logger.error(`executaComandoShell: error: ${error}`));
   child.on('close', (exitCode) => {
-    logger.info('executaComandoShell: close: Exit code: ', exitCode);
+    logger.info('executaComandoShell: close: Exit code:  ', exitCode);
     return exitCode;
   });
 };
