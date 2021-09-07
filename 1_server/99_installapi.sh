@@ -18,7 +18,7 @@ mkdir -p /opt/POCKETCLOUD/TEMP/
 cd /opt/POCKETCLOUD/TEMP
 mkdir $THEDATE
 cd $THEDATE
-gh auth login --with-token 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
+export GITHUB_TOKEN=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
 gh repo clone pocketcloud
 if [ $? -eq 0 ]; then
 
