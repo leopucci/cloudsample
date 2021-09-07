@@ -47,7 +47,7 @@ const verifySignature = function (req, res, next) {
 };
 
 // https://stackoverflow.com/a/63124906/3156756
-const passthru = async (exe, args, options) => {
+const passthru = async function (exe, args, options) {
   const env = Object.create(process.env);
   const child = spawn(exe, args, {
     ...options,
@@ -90,7 +90,7 @@ const githubWebhook = catchAsync(async (req, res) => {
     if (isReleaseBackend) {
       enviaNotificacaoApi('Novo release do backend, instalando codigo novo...', canais.PocketDeployApi);
       try {
-        const exitCode = await passthru('bash', ['/opt/POCKETCLOUD/SCRIPTS/99_installapi.sh']);
+        passthru('bash', ['/opt/POCKETCLOUD/SCRIPTS/99_installapi.sh']);
         /* exec(`cd /opt/POCKETCLOUD/SCRIPTS && ./99_installapi.sh`, function (error, stdout, stderr) {
           enviaNotificacaoApi(`stdout:   ${stdout}`, canais.PocketDeployApi);
           enviaNotificacaoApi(`stderr: ${stderr}`, canais.PocketDeployApi);
@@ -100,7 +100,7 @@ const githubWebhook = catchAsync(async (req, res) => {
         }); */
       } catch (error) {
         enviaNotificacaoApi('Erro no try/catch na hora da execucao do 99_installapi.sh ', canais.PocketDeployApi);
-        console.log(error);
+        logger.error(error);
       }
     }
 
@@ -110,7 +110,7 @@ const githubWebhook = catchAsync(async (req, res) => {
         exec(`cd /opt/POCKETCLOUD/SCRIPTS && bash 99_installfrontend.sh`);
       } catch (error) {
         enviaNotificacaoSite('Erro no try/catch na hora da execucao do 99_installfrontend.sh ', canais.PocketDeploySite);
-        console.log(error);
+        logger.error(error);
       }
     }
 
@@ -118,13 +118,13 @@ const githubWebhook = catchAsync(async (req, res) => {
       try {
         exec(`cd ${directory} && bash deployaa.sh`);
       } catch (error) {
-        console.log(error);
+        logger.error(error);
       }
     }
 
     res.status(httpStatus.OK).send();
   } else {
-    console.log('Erro na verificação de assinatura de comunicação com o github ');
+    logger.error('Erro na verificação de assinatura de comunicação com o github ');
     enviaNotificacaoApi('Erro na verificação de assinatura de comunicação com o github');
   }
 });
