@@ -1,5 +1,5 @@
 {
-  "name": "Pocket Cloud API",
+  "name": "pocketcloudapi",
   "version": "1.0.1",
   "description": "Create a Node.js app for building production-ready RESTful APIs using Express, by running one command",
   "bin": "bin/createNodejsApp.js",
