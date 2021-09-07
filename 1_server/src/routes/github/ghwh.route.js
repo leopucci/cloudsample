@@ -62,7 +62,7 @@ const passthru = async function (exe, args, options) {
   child.stderr.on('data', (data) => logger.info(data));
   child.on('error', (error) => logger.error(error));
   child.on('close', (exitCode) => {
-    logger.info('Exit code:', exitCode);
+    logger.info('Exit code: ', exitCode);
     return exitCode;
   });
 };
