@@ -53,7 +53,7 @@ const passthru = async function (exe, args, options) {
     ...options,
     env: {
       ...env,
-      ...options.env,
+      // ...options.env,
     },
   });
   child.stdout.setEncoding('utf8');
