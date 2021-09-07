@@ -47,8 +47,9 @@ const verifySignature = function (req, res, next) {
 };
 
 // https://stackoverflow.com/a/63124906/3156756
-const passthru = async function (exe, args, options) {
+const executaComandoShell = async function (exe, args, options) {
   const env = Object.create(process.env);
+  logger.info(`executaComandoShell: Iniciando comando shell: ${exe} ${args} ${options}`);
   const child = spawn(exe, args, {
     ...options,
     env: {
@@ -59,11 +60,11 @@ const passthru = async function (exe, args, options) {
   });
   child.stdout.setEncoding('utf8');
   child.stderr.setEncoding('utf8');
-  child.stdout.on('data', (data) => logger.info(data));
-  child.stderr.on('data', (data) => logger.info(data));
-  child.on('error', (error) => logger.error(error));
+  child.stdout.on('data', (data) => logger.info(`executaComandoShell:stdout: ${data}`));
+  child.stderr.on('data', (data) => logger.info(`executaComandoShell:stderr ${data}`));
+  child.on('error', (error) => logger.error(`executaComandoShell: error: ${error}`));
   child.on('close', (exitCode) => {
-    logger.info('Exit code: ', exitCode);
+    logger.info('executaComandoShell: close: Exit code: ', exitCode);
     return exitCode;
   });
 };
@@ -91,7 +92,7 @@ const githubWebhook = catchAsync(async (req, res) => {
     if (isReleaseBackend) {
       enviaNotificacaoApi('Novo release do backend, instalando codigo novo...', canais.PocketDeployApi);
       try {
-        passthru('bash', ['/opt/POCKETCLOUD/SCRIPTS/99_installapi.sh']);
+        executaComandoShell('bash', ['/opt/POCKETCLOUD/SCRIPTS/99_installapi.sh']);
         /* exec(`cd /opt/POCKETCLOUD/SCRIPTS && ./99_installapi.sh`, function (error, stdout, stderr) {
           enviaNotificacaoApi(`stdout:   ${stdout}`, canais.PocketDeployApi);
           enviaNotificacaoApi(`stderr: ${stderr}`, canais.PocketDeployApi);
