@@ -5,7 +5,6 @@ const { MessengerClient } = require('messaging-api-messenger');
 const fs = require('fs');
 const safeJsonStringify = require('safe-json-stringify');
 const PDFKit = require('pdfkit');
-const config = require('../config/config');
 const logger = require('../config/logger');
 
 const canais = {
@@ -107,7 +106,9 @@ const enviaStringComoArquivoNoTelegram = (
 
   const fileExtension = '.pdf';
   const fileCompleteName = fileName + fileExtension;
-  const fileHttpAddress = `${config.api.baseUrl}/temp/${fileCompleteName}`;
+  const fileHttpAddress = `${
+    process.env.API_BASE_URL.endsWith('/') ? process.env.API_BASE_URL.slice(0, -1) : process.env.API_BASE_URL
+  }/temp/${fileCompleteName}`;
   const fileSystemAddress = `${__dirname}/../../public/${fileCompleteName}`;
 
   logger.info(`Tentando criar arquivo  ${fileHttpAddress}\n\n PATH: ${fileSystemAddress}`);
@@ -119,7 +120,10 @@ const enviaStringComoArquivoNoTelegram = (
   } catch (error) {
     logger.error(` Erro tentando criar arquivo em disco: \n${fileSystemAddress}`);
   }
-
+  if (fileHttpAddress.contains('localhost')) {
+    logger.info(` Erro tentando criar documento para telegram, localhost nao é acessivel. Ignorando... `);
+    return;
+  }
   client
     .sendDocument(canal, fileHttpAddress, {
       caption: descricao,
