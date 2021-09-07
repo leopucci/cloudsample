@@ -2,6 +2,7 @@ const dotenv = require('dotenv');
 const path = require('path');
 const Joi = require('joi');
 const sleep = require('system-sleep');
+const ApiError = require('../utils/errors/ApiError');
 const { enviaNotificacaoApi, canais } = require('../utils/notify');
 
 dotenv.config({ path: path.join(__dirname, '../../.env') });
@@ -36,15 +37,12 @@ const { value: envVars, error } = envVarsSchema.prefs({ errors: { label: 'key' }
 if (error) {
   enviaNotificacaoApi(`STARTUP API: Config validation error: ${error.message}`, canais.PocketDeployApi);
   sleep(20000); // 20 seconds
-  throw new Error(`Config validation error: ${error.message}`);
+  throw new ApiError(error.message`Config validation error: ${error.message}`);
 }
 
 module.exports = {
   env: envVars.NODE_ENV,
   port: envVars.PORT,
-  api: {
-    baseUrl: envVars.API_BASE_URL.endsWith('/') ? envVars.API_BASE_URL.slice(0, -1) : envVars.API_BASE_URL,
-  },
   mongoose: {
     url: envVars.MONGODB_URL + (envVars.NODE_ENV === 'test' ? '-test' : ''),
     options: {
