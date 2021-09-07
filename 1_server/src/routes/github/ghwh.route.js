@@ -47,7 +47,7 @@ const verifySignature = function (req, res, next) {
 };
 
 // https://stackoverflow.com/a/63124906/3156756
-const passthru = catchAsync(async (exe, args, options) => {
+const passthru = async (exe, args, options) => {
   const env = Object.create(process.env);
   const child = spawn(exe, args, {
     ...options,
@@ -65,7 +65,7 @@ const passthru = catchAsync(async (exe, args, options) => {
     logger.info('Exit code:', exitCode);
     return exitCode;
   });
-});
+};
 const githubWebhook = catchAsync(async (req, res) => {
   const GITHUB_REPOSITORIES_TO_DIR = {
     'rwieruch/my-website-one-on-github': '/opt/reactbuildtemp',
