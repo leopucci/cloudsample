@@ -53,6 +53,7 @@ const passthru = async function (exe, args, options) {
     ...options,
     env: {
       ...env,
+      PATH: process.env.PATH,
       // ...options.env,
     },
   });
