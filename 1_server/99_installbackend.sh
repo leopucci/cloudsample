@@ -18,14 +18,15 @@ mkdir -p /opt/POCKETCLOUD/TEMP/
 cd /opt/POCKETCLOUD/TEMP
 mkdir $THEDATE
 cd $THEDATE
-git clone https://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@github.com/leopucci/pocketcloud.git #--branch release_backend
+git clone https://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@github.com/leopucci/pocketcloud.git # --branch release_backend
 if [ $? -eq 0 ]; then
 
     cd pocketcloud
     cp -r 4_website/pocketcloud/99_installfrontend.sh /opt/POCKETCLOUD/SCRIPTS/
     cd 1_server/
-    cp -r 99_installapi.sh /opt/POCKETCLOUD/SCRIPTS/
-    chmod 755 /opt/POCKETCLOUD/SCRIPTS/99_installapi.sh
+    cp -r 99_installbackend.sh /opt/POCKETCLOUD/SCRIPTS/
+    chmod 755 /opt/POCKETCLOUD/SCRIPTS/99_installbackend.sh
+    chmod 755 /opt/POCKETCLOUD/SCRIPTS/99_installfrontend.sh
     cp -r /root/POCKETCLOUDCONF/envproducaoexpressapi ./.env
 
     mkdir -p /opt/POCKETCLOUD/BACKENDAPI/$THEDATE
@@ -43,6 +44,7 @@ if [ $? -eq 0 ]; then
         #pm2 set pm2-telegram-notify:telegram_url https://api.telegram.org/bot1942279280:AAEoxbNJvbJlG7ksHmI86pord-aMYxyFF60/sendMessage
         #pm2 set pm2-telegram-notify:chat_id g-1001507578888
         pm2 delete PktCloudApiPRODUCAO &
+        sleep 1
         pm2 save
         pm2 start ecosystem.config.producao.json
         pm2 save
