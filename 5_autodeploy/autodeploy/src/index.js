@@ -8,7 +8,7 @@ const USER_PATH = '/opt/POCKETCLOUD/';
 // COPIADO DE https://github.com/rwieruch/github-webhook-automatic-blog-deployment
 const GITHUB_TO_DIR = {
   'leopucci/pocketcloud': [
-    `${USER_PATH}/BACKENDAPI/server`,
+    `${USER_PATH}/SCRIPTS`,
   ],
 };
 
