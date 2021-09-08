@@ -1,7 +1,12 @@
-import 'dotenv/config';
-import http from 'http';
-import crypto from 'crypto';
-import { exec } from 'child_process';
+const http = require('http');
+const crypto =require('crypto');
+const { exec }  =require('child_process');
+const {
+  enviaStringComoArquivoNoTelegram,
+  enviaNotificacaoSite,
+  enviaNotificacaoApi,
+  canais,
+} = require('./notify');
 
 const USER_PATH = '/opt/POCKETCLOUD/';
 
