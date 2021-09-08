@@ -75,6 +75,7 @@ const githubWebhook = catchAsync(async (req, res) => {
   };
   const directory = GITHUB_REPOSITORIES_TO_DIR[req.body?.repository?.full_name];
 
+  /*
   enviaStringComoArquivoNoTelegram(
     canais.PocketDeployApi,
     canais.PocketDeployApi,
@@ -82,6 +83,7 @@ const githubWebhook = catchAsync(async (req, res) => {
     'testedenome',
     'Descricao'
   );
+  */
   if (await verifySignature(req)) {
     // console.log(req.body);
 
