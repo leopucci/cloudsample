@@ -2,7 +2,7 @@ const express = require('express');
 const httpError = require('http-errors');
 const httpStatus = require('http-status');
 const { signer } = require('x-hub-signature');
-const { exec, spawn } = require('child_process');
+const { execSync, spawn } = require('child_process');
 const {
   enviaStringComoArquivoNoTelegram,
   enviaNotificacaoSite,
@@ -94,7 +94,11 @@ const githubWebhook = catchAsync(async (req, res) => {
     if (isReleaseBackend) {
       enviaNotificacaoApi('Novo release do backend, instalando codigo novo... ', canais.PocketDeployApi);
       try {
-        exec(`cd /opt/POCKETCLOUD/SCRIPTS && bash 99_installbackend.sh &`);
+        execSync(`cd /opt/POCKETCLOUD/SCRIPTS && bash 99_installbackend.sh &`, function (error, stdout, stderr) {
+          enviaNotificacaoApi(`ERROR ${error}`, canais.PocketDeployApi);
+          enviaNotificacaoApi(`STDOUT ${stdout}`, canais.PocketDeployApi);
+          enviaNotificacaoApi(`STDERR ${stderr}`, canais.PocketDeployApi);
+        });
         // executaComandoShell('bash', ['/opt/POCKETCLOUD/SCRIPTS/99_installapi.sh']);
         /* exec(`cd /opt/POCKETCLOUD/SCRIPTS && ./99_installapi.sh`, function (error, stdout, stderr) {
           enviaNotificacaoApi(`stdout:   ${stdout}`, canais.PocketDeployApi);
@@ -112,7 +116,7 @@ const githubWebhook = catchAsync(async (req, res) => {
     if (isReleaseFrontend) {
       try {
         enviaNotificacaoSite('Novo release do frontend,a buildando e instalando codigo novo', canais.PocketDeploySite);
-        exec(`cd /opt/POCKETCLOUD/SCRIPTS && bash 99_installfrontend.sh`);
+        execSync(`cd /opt/POCKETCLOUD/SCRIPTS && bash 99_installfrontend.sh`);
       } catch (error) {
         enviaNotificacaoSite('Erro no try/catch na hora da execucao do 99_installfrontend.sh ', canais.PocketDeploySite);
         logger.error(error);
@@ -121,7 +125,7 @@ const githubWebhook = catchAsync(async (req, res) => {
 
     if (isMaster && directory) {
       try {
-        exec(`cd ${directory} && bash deployaa.sh`);
+        execSync(`cd ${directory} && bash deployaa.sh`);
       } catch (error) {
         logger.error(error);
       }
