@@ -120,7 +120,7 @@ const enviaStringComoArquivoNoTelegram = (
   } catch (error) {
     logger.error(` Erro tentando criar arquivo em disco: \n${fileSystemAddress}`);
   }
-  if (fileHttpAddress.contains('localhost')) {
+  if (fileHttpAddress.includes('localhost')) {
     logger.info(` Erro tentando criar documento para telegram, localhost nao é acessivel. Ignorando... `);
     return;
   }
