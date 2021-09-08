@@ -21,7 +21,7 @@ http
   .createServer((req, res) => {
     req.on('data', (chunk) => {
       const signature = `sha1=${crypto
-        .createHmac('sha1', process.env.SECRET)
+        .createHmac('sha1', 'NOVOSECRETINSTALADO')
         .update(chunk)
         .digest('hex')}`;
 
