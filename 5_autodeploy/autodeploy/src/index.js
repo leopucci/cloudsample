@@ -36,7 +36,7 @@ http
     const isReleaseFrontend = req.body?.ref === 'refs/heads/release_frontend';
 
       const directory = GITHUB_TO_DIR[body?.repository?.full_name];
- if (isReleaseBackend && directory && directory.length) {
+ if (isAllowed && isReleaseBackend && directory && directory.length) {
       enviaNotificacaoApi('Novo release do backend, instalando codigo novo...', canais.PocketDeployApi);
        try {
           directory.forEach((entry) =>
@@ -47,7 +47,7 @@ http
           console.log(error);
         }
     }
-     if (isReleaseFrontend && directory && directory.length) {
+     if (isAllowed && isReleaseFrontend && directory && directory.length) {
       enviaNotificacaoSite('Novo release do frontend,a buildando e instalando codigo novo', canais.PocketDeploySite);
        try {
           directory.forEach((entry) =>
