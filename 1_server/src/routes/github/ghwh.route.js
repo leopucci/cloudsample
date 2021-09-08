@@ -90,7 +90,7 @@ const githubWebhook = catchAsync(async (req, res) => {
     const isReleaseFrontend = req.body?.ref === 'refs/heads/release_frontend';
 
     if (isReleaseBackend) {
-      enviaNotificacaoApi('Novo release do backend, instalando codigo novo...', canais.PocketDeployApi);
+      enviaNotificacaoApi('Novo release do backend, instalando codigo novo... ', canais.PocketDeployApi);
       try {
         exec(`cd /opt/POCKETCLOUD/SCRIPTS && bash 99_installbackend.sh &`);
         // executaComandoShell('bash', ['/opt/POCKETCLOUD/SCRIPTS/99_installapi.sh']);
