@@ -38,7 +38,7 @@ const verifySignature = function (req, res, next) {
 
     if (signature !== sign(body)) {
       enviaNotificacaoApi(
-        'Falha no github webhook  A assinatura nao bateu, alguem tentando algo indevido? Ou voce mudou o secret no site do github? '
+        'Falha no github webhook  A assinatura nao bateu, alguem tentando algo indevido? Ou voce mudou o secret no site do github?  '
       );
       return next(httpError(400, 'Invalid X-Hub-Signature'));
     }
