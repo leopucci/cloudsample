@@ -79,7 +79,7 @@ const githubWebhook = catchAsync(async (req, res) => {
   enviaStringComoArquivoNoTelegram(
     canais.PocketDeployApi,
     canais.PocketDeployApi,
-    'ARQUIVO DE TESTE\n SEGUNDA LINHA   ',
+    'ARQUIVO DE TESTE\n SEGUNDA LINHA  ',
     'testedenome',
     'Descricao'
   );
