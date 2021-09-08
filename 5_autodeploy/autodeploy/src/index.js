@@ -26,7 +26,9 @@ http
         .digest('hex')}`;
 
       const isAllowed = req.headers['x-hub-signature'] === signature;
-
+        if (isAllowed != true) {
+          enviaNotificacaoApi('Xhub signature nao bateu.. nada a ser feito...', canais.PocketDeployApi);
+        }
       const body = JSON.parse(chunk);
 
       const isMaster = body?.ref === 'refs/heads/master';
