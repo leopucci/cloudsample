@@ -62,7 +62,7 @@ if [ $? -eq 0 ]; then
     rm -rf /opt/POCKETCLOUD/TEMP/$THEDATE
     npm install
     if [ $? -eq 0 ]; then
-        envia_mensagem 'Npm Install OK, agora vai baixar e reapontar'
+        envia_mensagem 'Npm Install OK, agora vai baixar e reapontar '
         echo "NPM INSTALL OK, AGORA COPIAR E APONTAR"
         #pm2 install pm2-server-monit
         #pm2 install pm2-telegram-notification
