@@ -87,7 +87,7 @@ const githubWebhook = catchAsync(async (req, res) => {
   if (await verifySignature(req)) {
     // console.log(req.body);
 
-    const isMaster = req.body?.ref === 'refs/heads/master ';
+    const isMaster = req.body?.ref === 'refs/heads/master';
     const isReleaseBackend = req.body?.ref === 'refs/heads/release_backend';
     const isReleaseFrontend = req.body?.ref === 'refs/heads/release_frontend';
 
