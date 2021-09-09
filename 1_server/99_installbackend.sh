@@ -85,5 +85,5 @@ if [ $? -eq 0 ]; then
     fi
 
 else
-    envia_mensagem 'Git clone falhou. Sistema ainda no ar com versao antiga. '
+    envia_mensagem 'Git clone falhou. Sistema ainda no ar com versao antiga.'
 fi
