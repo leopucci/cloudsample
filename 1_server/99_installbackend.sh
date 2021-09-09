@@ -51,9 +51,9 @@ if [ $? -eq 0 ]; then
     envia_mensagem 'Clone OK! Dando npm install'
     cd pocketcloud
     cp -r 4_website/pocketcloud/99_installfrontend.sh /opt/POCKETCLOUD/SCRIPTS/
-    cp -r 4_website/pocketcloud/99_sendlog.sh /opt/POCKETCLOUD/SCRIPTS/
     cd 1_server/
     cp -r 99_installbackend.sh /opt/POCKETCLOUD/SCRIPTS/
+    cp -r 99_sendlog.sh /opt/POCKETCLOUD/SCRIPTS/
     chmod 755 /opt/POCKETCLOUD/SCRIPTS/99_installbackend.sh
     chmod 755 /opt/POCKETCLOUD/SCRIPTS/99_installfrontend.sh
     cp -r /root/POCKETCLOUDCONF/envproducaoexpressapi ./.env
