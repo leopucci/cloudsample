@@ -5,10 +5,6 @@
     "command-working-directory": "/opt/POCKETCLOUD/SCRIPTS",
     "pass-arguments-to-command":
     [
-      { "source": "string",
-         "envname": "SOMETHING",
-          "name": "2>>&1 logexecucao.txt" 
-      },
       {
         "source": "payload",  
         "name": "head_commit.message"

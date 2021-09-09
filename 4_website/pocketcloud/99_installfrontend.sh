@@ -96,3 +96,4 @@ else
     echo "Git clone falhou. Sistema ainda no ar com versao antiga."
     envia_mensagem 'Git clone falhou. Sistema ainda no ar com versao antiga.'
 fi
+/opt/POCKETCLOUD/SCRIPTS/99_sendlog.sh 2 &

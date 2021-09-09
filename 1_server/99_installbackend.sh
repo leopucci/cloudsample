@@ -51,6 +51,7 @@ if [ $? -eq 0 ]; then
     envia_mensagem 'Clone OK! Dando npm install'
     cd pocketcloud
     cp -r 4_website/pocketcloud/99_installfrontend.sh /opt/POCKETCLOUD/SCRIPTS/
+    cp -r 4_website/pocketcloud/99_sendlog.sh /opt/POCKETCLOUD/SCRIPTS/
     cd 1_server/
     cp -r 99_installbackend.sh /opt/POCKETCLOUD/SCRIPTS/
     chmod 755 /opt/POCKETCLOUD/SCRIPTS/99_installbackend.sh
@@ -113,3 +114,4 @@ else
     echo "Git clone falhou. Sistema ainda no ar com versao antiga."
     envia_mensagem 'Git clone falhou. Sistema ainda no ar com versao antiga.'
 fi
+/opt/POCKETCLOUD/SCRIPTS/99_sendlog.sh 1 &
