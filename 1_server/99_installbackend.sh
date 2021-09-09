@@ -13,7 +13,7 @@ envia_mensagem() {
 }
 
 err_report() {
-    /opt/POCKETCLOUD/SCRIPTS/99_sendlog.sh 1 &
+    nohup /opt/POCKETCLOUD/SCRIPTS/99_sendlog.sh 1 &
     datahoravoltou=$(date +"%d-%m-%y %H:%M:%S")
 
     n=0

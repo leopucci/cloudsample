@@ -15,7 +15,7 @@ envia_mensagem() {
     else
         n=0
         until [ "$n" -ge 900000 ]; do
-            response=$(curl --write-out '%{http_code}' --silent --output /dev/null https://api.telegram.org/bot1942279280:AAEoxbNJvbJlG7ksHmI86pord-aMYxyFF60/sendDocument -d chat_id=-1001177781241 -F document=@"/opt/POCKETCLOUD/SCRIPTS/DeployLog.txt" -F caption="")
+            response=$(curl --write-out '%{http_code}' --silent --output /dev/null https://api.telegram.org/bot1942279280:AAEoxbNJvbJlG7ksHmI86pord-aMYxyFF60/sendDocument -F chat_id=-1001177781241 -F document=@"/opt/POCKETCLOUD/SCRIPTS/DeployLog.txt" -F caption="")
             if [ "${response}" -ge "200" ]; then
                 break
             fi
