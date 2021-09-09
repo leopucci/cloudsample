@@ -34,6 +34,8 @@ trap 'err_report $LINENO' ERR
 
 THEDATE=$(date +%Y%m%d_%H%M%S)
 RUNNINGUSER=$(whoami)
+RUNNINGFOLDER=$(basename /opt/POCKETCLOUD/BACKENDAPI/*)
+
 envia_mensagem "DEPLOY INICIADO 99_installbackend.sh \n Commit trigger: $1 \n From user $2"
 
 mkdir -p /opt/POCKETCLOUD/BACKENDAPI/
@@ -77,14 +79,31 @@ if [ $? -eq 0 ]; then
         pm2 save
         envia_mensagem 'Feito... Pm2 Esta no ar (?) Apagando diretorios antigos...'
         status_code=$(curl --head --write-out %{http_code} --silent --output /dev/null https://api.pubshr.com/ping)
-        if [[ "$status_code" -ne 200 ]]; then
+        if [[ "$status_code" -eq 200 ]]; then
             envia_mensagem "Verificando acesso http - pingou ok! $status_code"
+            # Aqui eu consigo pegar o diretorio que tem no disco, verificar o status do pm2, se der merda consigo voltar o antigo
+            $(find /opt/POCKETCLOUD/BACKENDAPI/* ! -name $THEDATE -maxdepth 0 -type d -exec rm -rf {} +)
+            envia_mensagem 'Deploy terminado'
         else
             envia_mensagem "Falha na verificacao de acesso da api. Http Status code:  $status_code \n Ambiente fora do ar, necessaria intervençao manual"
+            envia_mensagem 'Voltando servidor pra pasta antiga...'
+            pm2 delete PktCloudApiPRODUCAO &
+            sleep 1
+            pm2 save
+            cd /opt/POCKETCLOUD/BACKENDAPI/$RUNNINGFOLDER
+            pm2 start ecosystem.config.producao.json
+            pm2 save
+            rm -rf /opt/POCKETCLOUD/BACKENDAPI/$THEDATE
+            status_code2=$(curl --head --write-out %{http_code} --silent --output /dev/null https://api.pubshr.com/ping)
+            if [[ "$status_code" -eq 200 ]]; then
+                envia_mensagem "Verificando acesso http - pingou ok! $status_code"
+            else
+                envia_mensagem "Falha na verificacao de acesso da api. Http Status code:  $status_code \n Ambiente fora do ar, necessaria intervençao manual"
+                envia_mensagem 'Eu tentei, voltei o backup, mesmo assim deu merda, necessaria intervencao manual'
+            fi
+            envia_mensagem 'Deploy terminado'
         fi
-        # Aqui eu consigo pegar o diretorio que tem no disco, verificar o status do pm2, se der merda consigo voltar o antigo
-        $(find /opt/POCKETCLOUD/BACKENDAPI/* ! -name $THEDATE -maxdepth 0 -type d -exec rm -rf {} +)
-        envia_mensagem 'Deploy terminado'
+
     else
         echo "Falha no build. NPM INSTALL FALHOU. Sistema ainda no ar com versao antiga."
         envia_mensagem 'Falha no build. NPM INSTALL FALHOU. Sistema ainda no ar com versao antiga. '
