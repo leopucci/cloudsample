@@ -47,8 +47,12 @@ app.use(mongoSanitize());
 app.use(compression());
 
 // enable cors
-app.use(cors());
-app.options('*', cors());
+const corsOptions = {
+  origin: 'http://pubshr.com',
+  optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
+};
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 
 // Pra renderizar a pagina do login no electron.
 app.set('view engine', 'ejs');
