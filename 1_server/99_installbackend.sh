@@ -76,7 +76,8 @@ if [ $? -eq 0 ]; then
         pm2 save
         pm2 start ecosystem.config.producao.json
         pm2 save
-        envia_mensagem 'Apagando diretorios antigos...'
+        envia_mensagem 'Feito... Pm2 Esta no ar (?) Apagando diretorios antigos...'
+        # Aqui eu consigo pegar o diretorio que tem no disco, verificar o status do pm2, se der merda consigo voltar o antigo
         $(find /opt/POCKETCLOUD/BACKENDAPI/* ! -name $THEDATE -maxdepth 0 -type d -exec rm -rf {} +)
         envia_mensagem 'Deploy terminado'
     else
@@ -85,5 +86,6 @@ if [ $? -eq 0 ]; then
     fi
 
 else
+    echo "Git clone falhou. Sistema ainda no ar com versao antiga."
     envia_mensagem 'Git clone falhou. Sistema ainda no ar com versao antiga.'
 fi
