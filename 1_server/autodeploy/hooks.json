@@ -51,7 +51,7 @@
   },
   {
     "id": "redeploy-pocketcloud-frontend",
-    "execute-command": "/opt/POCKETCLOUD/SCRIPTS/99_installfrontend.sh",
+    "execute-command": "99_installfrontend.sh",
     "command-working-directory": "/opt/POCKETCLOUD/SCRIPTS",
     "pass-arguments-to-command":
     [
