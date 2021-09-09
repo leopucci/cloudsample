@@ -36,7 +36,7 @@ THEDATE=$(date +%Y%m%d_%H%M%S)
 RUNNINGUSER=$(whoami)
 RUNNINGFOLDER=$(basename /opt/POCKETCLOUD/BACKENDAPI/*)
 
-envia_mensagem "DEPLOY INICIADO 99_installbackend.sh \n Commit trigger: $1 \n From user $2"
+envia_mensagem "DEPLOY INICIADO 99_installbackend.sh %0A Commit  trigger: $1 %0A From user $2 %0A Rodando como usuario: $RUNNINGUSER"
 
 mkdir -p /opt/POCKETCLOUD/BACKENDAPI/
 mkdir -p /opt/POCKETCLOUD/FRONTENDREACT/
