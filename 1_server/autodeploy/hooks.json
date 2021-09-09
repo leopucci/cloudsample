@@ -1,6 +1,6 @@
 [
   {
-    "id": "redeploy-pocketcloud",
+    "id": "redeploy-pocketcloud-backend",
     "execute-command": "/opt/POCKETCLOUD/SCRIPTS/99_installbackend.sh",
     "command-working-directory": "/opt/POCKETCLOUD/SCRIPTS",
     "pass-arguments-to-command":
@@ -50,7 +50,7 @@
     }
   },
   {
-    "id": "redeploy-pocketcloud",
+    "id": "redeploy-pocketcloud-frontend",
     "execute-command": "/opt/POCKETCLOUD/SCRIPTS/99_installfrontend.sh",
     "command-working-directory": "/opt/POCKETCLOUD/SCRIPTS",
     "pass-arguments-to-command":
