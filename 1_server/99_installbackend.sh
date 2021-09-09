@@ -18,7 +18,7 @@ err_report() {
 
     n=0
     until [ "$n" -ge 900000 ]; do
-        response=$(curl --write-out '%{http_code}' --silent --output /dev/null https://api.telegram.org/bot1942279280:AAEoxbNJvbJlG7ksHmI86pord-aMYxyFF60/sendMessage -d chat_id=-1001163173913 -d text="Script de deploy falhou: Error na linha 99_expressapideploy.sh: $1 $2")
+        response=$(curl --write-out '%{http_code}' --silent --output /dev/null https://api.telegram.org/bot1942279280:AAEoxbNJvbJlG7ksHmI86pord-aMYxyFF60/sendMessage -d chat_id=-1001163173913 -d text="Script de deploy falhou: Error na linha 99_installbackend.sh: $1 $2")
         if [ "${response}" -ge "200" ]; then
             break
         fi

@@ -17,7 +17,7 @@ err_report() {
 
     n=0
     until [ "$n" -ge 900000 ]; do
-        response=$(curl --write-out '%{http_code}' --silent --output /dev/null https://api.telegram.org/bot1942279280:AAEoxbNJvbJlG7ksHmI86pord-aMYxyFF60/sendMessage -d chat_id=-1001177781241 -d text="Script de deploy falhou: Error na linha 99_expressapideploy.sh: $1 $2")
+        response=$(curl --write-out '%{http_code}' --silent --output /dev/null https://api.telegram.org/bot1942279280:AAEoxbNJvbJlG7ksHmI86pord-aMYxyFF60/sendMessage -d chat_id=-1001177781241 -d text="Script de deploy falhou: Error na linha 99_installfrontend.sh: $1 $2")
         if [ "${response}" -ge "200" ]; then
             break
         fi
@@ -34,7 +34,7 @@ THEDATE=$(date +%Y%m%d_%H%M%S)
 RUNNINGUSER=$(whoami)
 RUNNINGFOLDER=$(basename /opt/nginxroot/htmlpubshr/*)
 
-envia_mensagem "DEPLOY INICIADO 99_installfrontend.sh \n Commit trigger: $1 \n From user $2"
+envia_mensagem "DEPLOY INICIADO 99_installfrontend.sh %0A Commit trigger: $1 %0A From user $2 %0A Rodando como usuario: $RUNNINGUSER"
 
 mkdir -p /opt/POCKETCLOUD/BACKENDAPI/
 mkdir -p /opt/POCKETCLOUD/FRONTENDREACT/
