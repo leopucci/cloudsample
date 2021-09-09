@@ -56,6 +56,7 @@ if [ $? -eq 0 ]; then
     cp -r 99_sendlog.sh /opt/POCKETCLOUD/SCRIPTS/
     chmod 755 /opt/POCKETCLOUD/SCRIPTS/99_installbackend.sh
     chmod 755 /opt/POCKETCLOUD/SCRIPTS/99_installfrontend.sh
+    chmod 755 /opt/POCKETCLOUD/SCRIPTS/99_sendlog.sh
     cp -r /root/POCKETCLOUDCONF/envproducaoexpressapi ./.env
 
     mkdir -p /opt/POCKETCLOUD/BACKENDAPI/$THEDATE
