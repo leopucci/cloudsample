@@ -34,8 +34,7 @@ trap 'err_report $LINENO' ERR
 
 THEDATE=$(date +%Y%m%d_%H%M%S)
 RUNNINGUSER=$(whoami)
-
-envia_mensagem "DEPLOY INICIADO 99_installbackend.sh"
+envia_mensagem "DEPLOY INICIADO 99_installbackend.sh Commit: $1 user $2"
 
 mkdir -p /opt/POCKETCLOUD/BACKENDAPI/
 mkdir -p /opt/POCKETCLOUD/FRONTENDREACT/
