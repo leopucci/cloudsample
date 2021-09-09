@@ -86,7 +86,7 @@ if [ $? -eq 0 ]; then
             envia_mensagem 'Deploy terminado'
         else
             envia_mensagem "Falha na verificacao de acesso da api. Http Status code:  $status_code \n Ambiente fora do ar, necessaria intervençao manual"
-            envia_mensagem 'Voltando servidor pra pasta antiga...'
+            envia_mensagem 'Voltando servidor pra pasta antiga....'
             pm2 delete PktCloudApiPRODUCAO &
             sleep 1
             pm2 save
