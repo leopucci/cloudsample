@@ -76,6 +76,12 @@ if [ $? -eq 0 ]; then
         pm2 start ecosystem.config.producao.json
         pm2 save
         envia_mensagem 'Feito... Pm2 Esta no ar (?) Apagando diretorios antigos...'
+        status_code=$(curl --head --write-out %{http_code} --silent --output /dev/null https://api.pubshr.com/ping)
+        if [[ "$status_code" -ne 200 ]]; then
+            envia_mensagem "Verificando acesso http - pingou ok! $status_code"
+        else
+            envia_mensagem "Falha na verificacao de acesso da api. Http Status code:  $status_code \n Ambiente fora do ar, necessaria intervençao manual"
+        fi
         # Aqui eu consigo pegar o diretorio que tem no disco, verificar o status do pm2, se der merda consigo voltar o antigo
         $(find /opt/POCKETCLOUD/BACKENDAPI/* ! -name $THEDATE -maxdepth 0 -type d -exec rm -rf {} +)
         envia_mensagem 'Deploy terminado'
