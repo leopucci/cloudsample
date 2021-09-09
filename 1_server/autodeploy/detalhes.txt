@@ -1,0 +1,15 @@
+
+
+
+
+rodando com supervisord configurado. 
+https://github.com/adnanh/webhook
+os detalhes estao no arquivo .ini que é do supervisor d
+
+a instalacao foi feita com binario, copiei pra /usr/bin
+https://dzone.com/articles/how-to-deploy-react-apps-using-webhooks-and-integr
+
+sudo mv webhook-linux-amd64/webhook /usr/local/bin
+sudo mkdir /opt/scripts
+
+# sudo mkdir /opt/hooks
