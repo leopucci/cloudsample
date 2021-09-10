@@ -46,11 +46,18 @@ app.use(mongoSanitize());
 // gzip compression
 app.use(compression());
 
-// enable cors
-const corsOptions = {
-  origin: 'http://www.pubshr.com',
-  optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
-};
+let corsOptions;
+if (config.env === 'production') {
+  corsOptions = {
+    origin: 'http://www.pubshr.com',
+    optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
+  };
+} else {
+  corsOptions = {
+    origin: '*',
+    optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
+  };
+}
 app.use(cors(corsOptions));
 app.options('*', cors(corsOptions));
 
