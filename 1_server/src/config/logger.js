@@ -7,21 +7,6 @@ const enumerateErrorFormat = winston.format((info) => {
   return info;
 });
 
-const OLDlogger = winston.createLogger({
-  level: process.env.NODE_ENV === 'development' ? 'debug' : 'info',
-  format: winston.format.combine(
-    enumerateErrorFormat(),
-    process.env.NODE_ENV === 'development' ? winston.format.colorize() : winston.format.uncolorize(),
-    winston.format.splat(),
-    winston.format.printf(({ level, message }) => `${level}: ${message}`)
-  ),
-  transports: [
-    new winston.transports.Console({
-      stderrLevels: ['error'],
-    }),
-  ],
-});
-
 // Define your severity levels.
 // With them, You can create log files,
 // see or hide levels based on the running ENV.
@@ -60,6 +45,7 @@ winston.addColors(colors);
 
 // Chose the aspect of your log customizing the log format.
 const format = winston.format.combine(
+  enumerateErrorFormat(),
   // Add the message timestamp with the preferred format
   winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss:ms' }),
   // Tell Winston that the logs must be colored
