@@ -39,18 +39,39 @@ const errorHandler = (err, req, res, next) => {
     statusCode = httpStatus.INTERNAL_SERVER_ERROR;
     message = httpStatus[httpStatus.INTERNAL_SERVER_ERROR];
   }
-
   res.locals.errorMessage = err.message;
-
   const response = {
     code: statusCode,
     message,
     ...(config.env === 'development' && { stack: err.stack }),
   };
-
-  // logger.error(err);
-  enviaNotificacaoApi(`Caiu no errorHandler \n${safeJsonStringify(err)}`, canais.PocketHttpErros);
   res.status(statusCode).send(response);
+
+  const ErrorName = err.constructor.name;
+  switch (ErrorName) {
+    case 'ApiError':
+      enviaNotificacaoApi(`ERRO 500\n${err.message}\n${err.stack}`, canais.PocketHttp500InternalServerError);
+      logger.info(`ERROR 500: ${err.message}\n${err.stack}`);
+      break;
+    /*
+    case 'ApiNotFoundError':
+      enviaNotificacaoApi(`ERRO 404\n${err.message}`, canais.PocketHttp404NotFound);
+      logger.info(`ERROR 404: ${err.message}`);
+      break;
+    case 'ClientError':
+      enviaNotificacaoApi(`ERRO 400\n${err.message}`, canais.PocketHttp400BadRequest);
+      logger.info(`ERROR 400: ${err.message}`);
+      // expected output: "Mangoes and papayas are $2.79 a pound."
+      break;
+    case 'ClientUnauthorizedError':
+      enviaNotificacaoApi(`ERRO 401\n${err.message}`, canais.PocketHttp401Unauthorized);
+      logger.info(`ERROR 401: ${err.message}`);
+      // expected output: "Mangoes and papayas are $2.79 a pound."
+      break;
+      */
+    default:
+      enviaNotificacaoApi(`ERROR.js DEFAULT CORRIJA\n${err.message}`, canais.PocketHttpErros);
+  }
 };
 
 module.exports = {
