@@ -60,6 +60,7 @@ const transports = [
   // Allow the use the console to print the messages
   new winston.transports.Console(),
   // Allow to print all the error level messages inside the error.log file
+  // AQUI TEM COMO RODAR LOG https://jojozhuang.github.io/tutorial/express-combine-morgan-and-winston/
   new winston.transports.File({
     filename: 'logs/error.log',
     level: 'error',
