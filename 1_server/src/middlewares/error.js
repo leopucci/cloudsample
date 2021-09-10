@@ -33,7 +33,7 @@ const errorConverter = (err, req, res, next) => {
 // eslint-disable-next-line no-unused-vars
 const errorHandler = (err, req, res, next) => {
   // const errString = safeJsonStringify(err);
-  // enviaNotificacaoApi(`Caiu no errorHandler \n${errString}`, canais.PocketHttpErros);
+
   let { statusCode, message } = err;
   if (config.env === 'production' && !err.isOperational) {
     statusCode = httpStatus.INTERNAL_SERVER_ERROR;
@@ -49,7 +49,7 @@ const errorHandler = (err, req, res, next) => {
   };
 
   logger.error(err);
-
+  enviaNotificacaoApi(`Caiu no errorHandler \n${safeJsonStringify(err)}`, canais.PocketHttpErros);
   res.status(statusCode).send(response);
 };
 
