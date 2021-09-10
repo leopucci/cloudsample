@@ -322,6 +322,11 @@ const logOut = (userObj) => (dispatch, getState) => {
         // handle error
         let errorMessage = "Network Error";
         if (error.response) {
+          if (error.response.status === 400) {
+            dispatch({
+              type: LOG_OUT,
+            });
+          }
           errorMessage = error.response.data.message;
           errorMessage =
             errorMessage === "USERNAME_IS_NOT_AVAILABLE"
