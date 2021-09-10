@@ -20,9 +20,6 @@ const { User } = require('../models');
 // siteKey: process.env.RECAPTCHA_SITE_KEY,
 // secretKey: process.env.RECAPTCHA_SECRET_KEY,
 const verifyRecaptcha = async (token, clientIpAddress) => {
-  enviaNotificacaoApi(
-    `Vai verificar \n SECRET:${config.recaptcha.secretKey}\n TOKEN: ${token}\n REMOTEIP: ${clientIpAddress}`
-  );
   let result;
   try {
     result = await myAxiosInstance({
