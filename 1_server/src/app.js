@@ -49,7 +49,7 @@ app.use(compression());
 let corsOptions;
 if (config.env === 'production') {
   corsOptions = {
-    origin: 'http://www.pubshr.com',
+    origin: 'https://www.pubshr.com',
     optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
   };
 } else {
