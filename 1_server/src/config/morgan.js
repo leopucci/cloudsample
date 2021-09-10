@@ -6,12 +6,14 @@ const logger = require('./logger');
 const { enviaNotificacaoApi, canais } = require('../utils/notify');
 
 function reverseLookup(ip) {
-  dns.reverse(ip, function (err, domains) {
-    if (err != null) {
-      return false;
-    }
-    return domains;
-  });
+  try {
+    dns.reverse(ip, function (err, domains) {
+      if (err != null) {
+        return false;
+      }
+      return domains;
+    });
+  } catch (error) {}
 }
 
 morgan.token('message', (req, res) => res.locals.errorMessage || '');

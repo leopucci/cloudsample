@@ -76,6 +76,8 @@ if [ $? -eq 0 ]; then
         #pm2 set pm2-telegram-notify:chat_id g-1001507578888
         pm2 delete PktCloudApiPRODUCAO &
         sleep 1
+        pm2 kill
+        sleep 1
         pm2 save
         pm2 start ecosystem.config.producao.json
         pm2 save
