@@ -67,7 +67,7 @@ export default function Version() {
           <Typography component="h1" variant="subtitle1">
             <FormattedMessage
               id="versionScreeen.VersionH1Text"
-              defaultMessage="App Name: {name} App Version {version}"
+              defaultMessage="App Name: {name}  App Version {version}"
               description="App Version"
               values={{
                 name: process.env.REACT_APP_NAME,
