@@ -6,6 +6,7 @@ import LogIn from "./LogIn/LogIn";
 import ForgotPassword from "./ForgotPassword/ForgotPassword";
 import VerifyEmail from "./VerifyEmail/VerifyEmail";
 import Register from "./Register/Register";
+import Version from "./Version/Version";
 import Home from "./Home/Home";
 import Public from "./PublicPage/Public";
 import NotFound from "./NotFound/NotFound";
@@ -41,6 +42,7 @@ export default function App() {
         <Route path="/register" component={Register} />
         <Route path="/forgotpassword" component={ForgotPassword} />
         <Route path="/verifyemail" component={VerifyEmail} />
+        <Route path="/version" component={Version} />
         <PrivateRoute path="/Home" component={Home} />
         <Route component={NotFound} />
       </Switch>
