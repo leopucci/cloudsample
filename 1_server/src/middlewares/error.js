@@ -48,7 +48,7 @@ const errorHandler = (err, req, res, next) => {
     ...(config.env === 'development' && { stack: err.stack }),
   };
 
-  logger.error(err);
+  // logger.error(err);
   enviaNotificacaoApi(`Caiu no errorHandler \n${safeJsonStringify(err)}`, canais.PocketHttpErros);
   res.status(statusCode).send(response);
 };
