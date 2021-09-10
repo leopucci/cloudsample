@@ -1,4 +1,6 @@
 const winston = require('winston');
+const path = require('path');
+const fs = require('fs');
 
 // PEGUEI DAQUI https://levelup.gitconnected.com/better-logs-for-expressjs-using-winston-and-morgan-with-typescript-1c31c1ab9342
 
@@ -56,6 +58,25 @@ const format = winston.format.combine(
   winston.format.printf((info) => `${info.timestamp} ${info.level}: ${info.message}`)
 );
 
+const isWin = process.platform === 'win32';
+const isLinux = process.platform === 'linux';
+const getRootDir = () => path.parse(process.cwd()).root;
+let logDir;
+if (isWin) {
+  logDir = path.join(getRootDir(), 'POCKETCLOUD', 'LOGS'); // directory path you want to set
+} else if (isLinux) {
+  logDir = path.join(getRootDir(), 'opt', 'POCKETCLOUD', 'LOGS'); // directory path you want to set
+}
+if (!fs.existsSync(logDir)) {
+  // Create the directory if it does not exist
+  try {
+    fs.mkdirSync(logDir, { recursive: true });
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.log(`ERRO tentando criar diretorios de log: ${logDir}`);
+  }
+}
+
 // Define which transports the logger must use to print out messages.
 // In this example, we are using three different transports
 const transports = [
@@ -64,7 +85,7 @@ const transports = [
   // Allow to print all the error level messages inside the error.log file
   // AQUI TEM COMO RODAR LOG https://jojozhuang.github.io/tutorial/express-combine-morgan-and-winston/
   new winston.transports.File({
-    filename: 'logs/error.log',
+    filename: path.join(logDir, 'error.log'),
     level: 'error',
   }),
   // Allow to print all the error message inside the all.log file
