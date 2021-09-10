@@ -48,7 +48,7 @@ app.use(compression());
 
 // enable cors
 const corsOptions = {
-  origin: 'http://pubshr.com',
+  origin: 'http://www.pubshr.com',
   optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
 };
 app.use(cors(corsOptions));
