@@ -109,6 +109,22 @@ app.get('/ping', async (req, res) => {
   res.send(`GET REQUEST ${date} \n PONG`);
 });
 
+app.post('/version', async (req, res) => {
+  const date = new Date()
+    .toISOString()
+    .replace(/T/, ' ') // replace T with a space
+    .replace(/\..+/, ''); // delete the dot and everything after
+
+  res.send(`${date} %0A Name ${process.env.EXPRESS_APP_NAME} Version ${process.env.REACT_APP_VERSION}`);
+});
+app.get('/version', async (req, res) => {
+  const date = new Date()
+    .toISOString()
+    .replace(/T/, ' ') // replace T with a space
+    .replace(/\..+/, ''); // delete the dot and everything after
+  res.send(`${date} %0A Name ${process.env.EXPRESS_APP_NAME} Version ${process.env.REACT_APP_VERSION}`);
+});
+
 // send back a 404 error for any unknown api request
 app.use((req, res, next) => {
   next(new ApiNotFoundError('Not found'));
