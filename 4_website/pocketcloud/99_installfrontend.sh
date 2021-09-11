@@ -66,7 +66,7 @@ if [ $? -eq 0 ]; then
             ln -sf /opt/nginxroot/htmlpubshr/$THEDATE /opt/nginxroot/htmlpubshr/locationdinamico
             service nginx reload
             envia_mensagem "Feito... Esta no ar (?) Apagando diretorios antigos..."
-            status_code=$(curl --head --write-out %{http_code} --silent --output /dev/null https://www.pubshr.com/)
+            status_code=$(curl --retry 3 --retry-delay 1 --head --write-out %{http_code} --silent --output /dev/null https://www.pubshr.com/)
             if [[ "$status_code" -eq 200 ]]; then
                 envia_mensagem "Verificando acesso http - pingou ok! $status_code"
                 # Aqui eu consigo pegar o diretorio que tem no disco, verificar o status do pm2, se der merda consigo voltar o antigo
@@ -80,8 +80,7 @@ if [ $? -eq 0 ]; then
                 ln -sf /opt/nginxroot/htmlpubshr/$RUNNINGFOLDER /opt/nginxroot/htmlpubshr/locationdinamico
                 service nginx reload
                 rm -rf /opt/nginxroot/htmlpubshr/$THEDATE
-                sleep 1
-                status_code2=$(curl --head --write-out %{http_code} --silent --output /dev/null https://www.pubshr.com/)
+                status_code2=$(curl --retry 4 --retry-delay 1 --head --write-out %{http_code} --silent --output /dev/null https://www.pubshr.com/)
                 if [[ "$status_code" -eq 200 ]]; then
                     envia_mensagem "Verificando acesso http - pingou ok! $status_code"
                 else

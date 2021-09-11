@@ -83,8 +83,7 @@ if [ $? -eq 0 ]; then
         pm2 start ecosystem.config.producao.json
         pm2 save
         envia_mensagem "Feito... Pm2 Esta no ar (?) Apagando diretorios antigos..."
-        sleep 1
-        status_code=$(curl --head --write-out %{http_code} --silent --output /dev/null https://api.pubshr.com/ping)
+        status_code=$(curl --retry 4 --retry-delay 1 --head --write-out %{http_code} --silent --output /dev/null https://api.pubshr.com/ping)
         if [[ "$status_code" -eq 200 ]]; then
             envia_mensagem "Verificando acesso http - pingou ok! $status_code"
             # Aqui eu consigo pegar o diretorio que tem no disco, verificar o status do pm2, se der merda consigo voltar o antigo
@@ -95,15 +94,13 @@ if [ $? -eq 0 ]; then
             envia_mensagem "Voltando servidor pra pasta antiga....."
             pm2 delete PktCloudApiPRODUCAO &
             sleep 1
-            pm2 save
             pm2 kill
             sleep 1
             cd /opt/POCKETCLOUD/BACKENDAPI/$RUNNINGFOLDER
             pm2 start ecosystem.config.producao.json
             pm2 save
             rm -rf /opt/POCKETCLOUD/BACKENDAPI/$THEDATE
-            sleep 1
-            status_code2=$(curl --head --write-out %{http_code} --silent --output /dev/null https://api.pubshr.com/ping)
+            status_code2=$(curl --retry 4 --retry-delay 1 --head --write-out %{http_code} --silent --output /dev/null https://api.pubshr.com/ping)
             if [[ "$status_code" -eq 200 ]]; then
                 envia_mensagem "Verificando acesso http - pingou ok! $status_code"
             else
