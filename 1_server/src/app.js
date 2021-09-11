@@ -115,14 +115,7 @@ app.post('/version', async (req, res) => {
     .replace(/T/, ' ') // replace T with a space
     .replace(/\..+/, ''); // delete the dot and everything after
 
-  res.send(`${date} %0A Name ${process.env.EXPRESS_APP_NAME} Version ${process.env.REACT_APP_VERSION}`);
-});
-app.get('/version', async (req, res) => {
-  const date = new Date()
-    .toISOString()
-    .replace(/T/, ' ') // replace T with a space
-    .replace(/\..+/, ''); // delete the dot and everything after
-  res.send(`${date} %0A Name ${process.env.EXPRESS_APP_NAME} Version ${process.env.REACT_APP_VERSION}`);
+  res.send(`${date} %0A Name ${config.appName} Version ${config.appVersion}`);
 });
 
 // send back a 404 error for any unknown api request

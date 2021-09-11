@@ -3,6 +3,7 @@ const path = require('path');
 const Joi = require('joi');
 const sleep = require('system-sleep');
 const ApiError = require('../utils/errors/ApiError');
+const { name, version } = require('../../package.json');
 const { enviaNotificacaoApi, canais } = require('../utils/notify');
 
 dotenv.config({ path: path.join(__dirname, '../../.env') });
@@ -41,6 +42,8 @@ if (error) {
 }
 
 module.exports = {
+  appName: name,
+  appVersion: version,
   env: envVars.NODE_ENV,
   port: envVars.PORT,
   mongoose: {
