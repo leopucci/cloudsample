@@ -33,7 +33,7 @@ const verifyRecaptcha = async (token, clientIpAddress) => {
     });
   } catch (err) {
     enviaNotificacaoApi(`Erro no recaptcha axiostry/catch http falhou:  ${safeJsonStringify(err)}`);
-    return false;
+    throw new ClientError('Error #10-1200');
   }
   const data = result.data || {};
   if (!data.success) {
@@ -57,7 +57,7 @@ const verifyRecaptcha = async (token, clientIpAddress) => {
           enviaNotificacaoApi(`Erro no recaptcha default:${codes} remoteIp: ${clientIpAddress}`);
         }
     }
-    return false;
+    throw new ClientError('Error #10-1201');
   }
   // Deixar em 0.3 por um tempo e só aumentar pra 0.5 quando madurar.
   // o certo é retornar um erro especifico e abrir um recaptcha pra ser preenchido.
@@ -65,7 +65,7 @@ const verifyRecaptcha = async (token, clientIpAddress) => {
   // https://andremonteiro.pt/react-redux-modal/
   if (data.score < 0.3) {
     enviaNotificacaoApi(`Erro no recaptcha SCORE BAIXO:  ${safeJsonStringify(data)} remoteIp: ${clientIpAddress}`);
-    return false;
+    throw new ClientError('Error #10-1202');
   }
   return true;
 };

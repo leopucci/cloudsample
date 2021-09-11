@@ -1,5 +1,6 @@
 const passport = require('passport');
 const httpStatus = require('http-status');
+const ClientError = require('../utils/errors/ClientError');
 const catchAsync = require('../utils/catchAsync');
 const { authService, userService, tokenService, emailService } = require('../services');
 const { enviaNotificacaoPorId, enviaNotificacaoSite, enviaNotificacaoApi, canais } = require('../utils/notify');
@@ -15,21 +16,15 @@ const register = catchAsync(async (req, res) => {
 const login = catchAsync(async (req, res) => {
   const { email, password, recaptcha } = req.body;
 
-  const recaptchaOK = await authService.verifyRecaptcha(recaptcha, req.ip);
-  if (!recaptchaOK) {
-    res.status(httpStatus.NOT_ACCEPTABLE).send('{"message": "Recaptcha Error"}');
-    res.end();
-    return;
-  }
+  // RECAPTCHA DA TRHOW
+  await authService.verifyRecaptcha(recaptcha, req.ip);
+
   const userHasPassword = await authService.userHasPassword(email);
   if (!userHasPassword) {
     enviaNotificacaoApi(`${email}  userHasPassword = false `);
-    res
-      .status(httpStatus.NOT_ACCEPTABLE)
-      .send(
-        '{"message": "You have logged in using Google or Apple Login, use them instead or click forgot password to generate a password"}'
-      );
-    return;
+    throw new ClientError(
+      'You have logged in using Google or Apple Login, use them instead or click forgot password to generate a password'
+    );
   }
   const user = await authService.loginUserWithEmailAndPassword(email, password);
   const tokens = await tokenService.generateAuthTokens(user);
@@ -38,12 +33,9 @@ const login = catchAsync(async (req, res) => {
 
 const appleLoginOrCreateAccount = catchAsync(async (req, res) => {
   const { authorization, appleUser, recaptcha } = req.body;
-  const recaptchaOK = await authService.verifyRecaptcha(recaptcha, req.ip);
-  if (!recaptchaOK) {
-    res.status(httpStatus.NOT_ACCEPTABLE).send('{"message": "Recaptcha Error"}');
-    res.end();
-    return;
-  }
+  // RECAPTCHA DA TRHOW
+  await authService.verifyRecaptcha(recaptcha, req.ip);
+
   const user = await authService.appleLoginOrCreateAccount(authorization, appleUser);
   const tokens = await tokenService.generateAuthTokens(user);
   res.send({ user, tokens });
@@ -62,12 +54,9 @@ const appleSignInWebHook = async (req, res) => {
 
 const googleLoginOrCreateAccount = catchAsync(async (req, res) => {
   const { token, recaptcha } = req.body;
-  const recaptchaOK = await authService.verifyRecaptcha(recaptcha, req.ip);
-  if (!recaptchaOK) {
-    res.status(httpStatus.NOT_ACCEPTABLE).send('{"message": "Recaptcha Error"}');
-    res.end();
-    return;
-  }
+  // RECAPTCHA DA TRHOW
+  await authService.verifyRecaptcha(recaptcha, req.ip);
+
   const user = await authService.googleLoginOrCreateAccount(token);
   const tokens = await tokenService.generateAuthTokens(user);
   res.send({ user, tokens });
@@ -87,24 +76,18 @@ const loginErrors = catchAsync(async (req, res) => {
 
 const refreshTokens = catchAsync(async (req, res) => {
   const { refreshToken, recaptcha } = req.body;
-  const recaptchaOK = await authService.verifyRecaptcha(recaptcha, req.ip);
-  if (!recaptchaOK) {
-    res.status(httpStatus.NOT_ACCEPTABLE).send('{"message": "Recaptcha Error"}');
-    res.end();
-    return;
-  }
+  // RECAPTCHA DA TRHOW
+  await authService.verifyRecaptcha(recaptcha, req.ip);
+
   const tokens = await authService.refreshAuth(refreshToken);
   res.send({ ...tokens });
 });
 
 const forgotPassword = catchAsync(async (req, res) => {
   const { email, recaptcha } = req.body;
-  const recaptchaOK = await authService.verifyRecaptcha(recaptcha, req.ip);
-  if (!recaptchaOK) {
-    res.status(httpStatus.NOT_ACCEPTABLE).send('{"message": "Recaptcha Error"}');
-    res.end();
-    return;
-  }
+  // RECAPTCHA DA TRHOW
+  await authService.verifyRecaptcha(recaptcha, req.ip);
+
   const resetPasswordToken = await tokenService.generateResetPasswordToken(email);
   await emailService.sendResetPasswordEmail(req.body.email, resetPasswordToken);
   res.status(httpStatus.NO_CONTENT).send();
