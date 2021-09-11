@@ -33,7 +33,7 @@ err_report() {
     exit
 }
 trap 'err_report $LINENO' ERR
-THEDATE=$(date +%Y%m%d_%H%M%S)
+THEDATE=$(date +%Y%m%d_%H%M_%S)
 RUNNINGUSER=$(whoami)
 RUNNINGFOLDER=$(basename /opt/nginxroot/htmlpubshr/*)
 
