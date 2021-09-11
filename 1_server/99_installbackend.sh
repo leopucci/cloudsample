@@ -47,10 +47,10 @@ mkdir -p /opt/POCKETCLOUD/TEMP/
 cd /opt/POCKETCLOUD/TEMP
 mkdir $THEDATE
 cd $THEDATE
-envia_mensagem 'Clonando repositorio'
+envia_mensagem "Clonando repositorio"
 git clone https://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@github.com/leopucci/pocketcloud.git # --branch release_backend
 if [ $? -eq 0 ]; then
-    envia_mensagem 'Clone OK! Dando npm install'
+    envia_mensagem "Clone OK! Dando npm install"
     cd pocketcloud
     cp -r 4_website/pocketcloud/99_installfrontend.sh /opt/POCKETCLOUD/SCRIPTS/
     cd 1_server/
@@ -67,7 +67,7 @@ if [ $? -eq 0 ]; then
     rm -rf /opt/POCKETCLOUD/TEMP/$THEDATE
     npm install
     if [ $? -eq 0 ]; then
-        envia_mensagem 'Npm Install OK, agora vai baixar e reapontar '
+        envia_mensagem "Npm Install OK, agora vai baixar e reapontar "
         echo "NPM INSTALL OK, AGORA COPIAR E APONTAR"
         #pm2 install pm2-server-monit
         #pm2 install pm2-telegram-notification
@@ -82,17 +82,17 @@ if [ $? -eq 0 ]; then
         sleep 1
         pm2 start ecosystem.config.producao.json
         pm2 save
-        envia_mensagem 'Feito... Pm2 Esta no ar (?) Apagando diretorios antigos...'
+        envia_mensagem "Feito... Pm2 Esta no ar (?) Apagando diretorios antigos..."
         sleep 1
         status_code=$(curl --head --write-out %{http_code} --silent --output /dev/null https://api.pubshr.com/ping)
         if [[ "$status_code" -eq 200 ]]; then
             envia_mensagem "Verificando acesso http - pingou ok! $status_code"
             # Aqui eu consigo pegar o diretorio que tem no disco, verificar o status do pm2, se der merda consigo voltar o antigo
             $(find /opt/POCKETCLOUD/BACKENDAPI/* ! -name $THEDATE -maxdepth 0 -type d -exec rm -rf {} +)
-            envia_mensagem 'Deploy terminado'
+            envia_mensagem "Deploy terminado"
         else
             envia_mensagem "Falha na verificacao de acesso da api. Http Status code:  $status_code \n Ambiente fora do ar, necessaria intervençao manual"
-            envia_mensagem 'Voltando servidor pra pasta antiga.....'
+            envia_mensagem "Voltando servidor pra pasta antiga....."
             pm2 delete PktCloudApiPRODUCAO &
             sleep 1
             pm2 save
@@ -108,20 +108,20 @@ if [ $? -eq 0 ]; then
                 envia_mensagem "Verificando acesso http - pingou ok! $status_code"
             else
                 envia_mensagem "Falha na verificacao de acesso da api. Http Status code:  $status_code \n Ambiente fora do ar, necessaria intervençao manual"
-                envia_mensagem 'Eu tentei, voltei o backup, mesmo assim deu merda, necessaria intervencao manual'
+                envia_mensagem "Eu tentei, voltei o backup, mesmo assim deu merda, necessaria intervencao manual"
                 envia_log
             fi
-            envia_mensagem 'Deploy terminado'
+            envia_mensagem "Deploy terminado"
         fi
 
     else
         echo "Falha no build. NPM INSTALL FALHOU. Sistema ainda no ar com versao antiga."
-        envia_mensagem 'Falha no build. NPM INSTALL FALHOU. Sistema ainda no ar com versao antiga. '
+        envia_mensagem "Falha no build. NPM INSTALL FALHOU. Sistema ainda no ar com versao antiga. "
         envia_log
     fi
 
 else
     echo "Git clone falhou. Sistema ainda no ar com versao antiga."
-    envia_mensagem 'Git clone falhou. Sistema ainda no ar com versao antiga.'
+    envia_mensagem "Git clone falhou. Sistema ainda no ar com versao antiga."
     envia_log
 fi

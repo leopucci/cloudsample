@@ -46,17 +46,17 @@ mkdir -p /opt/POCKETCLOUD/TEMP/
 cd /opt/POCKETCLOUD/TEMP
 mkdir $THEDATE
 cd $THEDATE
-envia_mensagem 'Clonando repositorio'
+envia_mensagem "Clonando repositorio"
 git clone https://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@github.com/leopucci/pocketcloud.git # --branch release_backend
 if [ $? -eq 0 ]; then
-    envia_mensagem 'Clone OK! Dando npm install'
+    envia_mensagem "Clone OK! Dando npm install"
     cd pocketcloud
     cd 4_website/
     cd pocketcloud
     cp /root/POCKETCLOUDCONF/envproducaoreactsite ./.env
     npm install
     if [ $? -eq 0 ]; then
-        envia_mensagem 'Npm Install OK, agora vai buildar'
+        envia_mensagem "Npm Install OK, agora vai buildar"
         npm run build
         if [ $? -eq 0 ]; then
             envia_mensagem "BUILD OK AGORA VAI COPIAR"
@@ -65,16 +65,16 @@ if [ $? -eq 0 ]; then
             rm -f /opt/nginxroot/htmlpubshr/locationdinamico
             ln -sf /opt/nginxroot/htmlpubshr/$THEDATE /opt/nginxroot/htmlpubshr/locationdinamico
             service nginx reload
-            envia_mensagem 'Feito... Esta no ar (?) Apagando diretorios antigos...'
+            envia_mensagem "Feito... Esta no ar (?) Apagando diretorios antigos..."
             status_code=$(curl --head --write-out %{http_code} --silent --output /dev/null https://www.pubshr.com/)
             if [[ "$status_code" -eq 200 ]]; then
                 envia_mensagem "Verificando acesso http - pingou ok! $status_code"
                 # Aqui eu consigo pegar o diretorio que tem no disco, verificar o status do pm2, se der merda consigo voltar o antigo
                 $(find /opt/nginxroot/htmlpubshr/* ! -name $THEDATE -maxdepth 0 -type d -exec rm -rf {} +)
-                envia_mensagem 'Deploy terminado'
+                envia_mensagem "Deploy terminado"
             else
                 envia_mensagem "Falha na verificacao de acesso do Frontend. Http Status code:  $status_code \n Ambiente fora do ar, necessaria intervençao manual"
-                envia_mensagem 'Voltando servidor pra pasta antiga...'
+                envia_mensagem "Voltando servidor pra pasta antiga..."
                 cd /opt/nginxroot/htmlpubshr/$RUNNINGFOLDER
                 rm -f /opt/nginxroot/htmlpubshr/locationdinamico
                 ln -sf /opt/nginxroot/htmlpubshr/$RUNNINGFOLDER /opt/nginxroot/htmlpubshr/locationdinamico
@@ -86,21 +86,21 @@ if [ $? -eq 0 ]; then
                     envia_mensagem "Verificando acesso http - pingou ok! $status_code"
                 else
                     envia_mensagem "Falha na verificacao de acesso do FrontEnd. Http Status code:  $status_code \n Ambiente fora do ar, necessaria intervençao manual"
-                    envia_mensagem 'Eu tentei, voltei o backup, mesmo assim deu merda, necessaria intervencao manual'
+                    envia_mensagem "Eu tentei, voltei o backup, mesmo assim deu merda, necessaria intervencao manual"
                     envia_log
                 fi
-                envia_mensagem 'Deploy terminado'
+                envia_mensagem "Deploy terminado"
             fi
         else
-            envia_mensagem 'Falha no build. NPM BUILD FALHOU. Sistema ainda no ar com versao antiga. '
+            envia_mensagem "Falha no build. NPM BUILD FALHOU. Sistema ainda no ar com versao antiga. "
             envia_log
         fi
     else
-        envia_mensagem 'NPM Install FALHOU. Sistema ainda no ar com versao antiga. '
+        envia_mensagem "NPM Install FALHOU. Sistema ainda no ar com versao antiga. "
         envia_log
     fi
 else
     echo "Git clone falhou. Sistema ainda no ar com versao antiga."
-    envia_mensagem 'Git clone falhou. Sistema ainda no ar com versao antiga.'
+    envia_mensagem "Git clone falhou. Sistema ainda no ar com versao antiga."
     envia_log
 fi
