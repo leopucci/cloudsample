@@ -115,7 +115,7 @@ app.post('/version', async (req, res) => {
     .replace(/T/, ' ') // replace T with a space
     .replace(/\..+/, ''); // delete the dot and everything after
 
-  res.send(`${date} <p>Name ${config.appName}  </p><p>Version ${config.appVersion}</p>`);
+  res.send(`${date} <p>Name ${config.appName} </p><p>Version ${config.appVersion}</p>`);
 });
 
 // send back a 404 error for any unknown api request
