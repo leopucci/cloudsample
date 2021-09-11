@@ -11,9 +11,11 @@ envia_mensagem() {
         sleep 1
     done
 }
-
-err_report() {
+envia_log() {
     screen -dm -S TESTE /opt/POCKETCLOUD/SCRIPTS/99_sendlog.sh 1 &
+}
+err_report() {
+    envia_log
     datahoravoltou=$(date +"%d-%m-%y %H:%M:%S")
 
     n=0
@@ -107,6 +109,7 @@ if [ $? -eq 0 ]; then
             else
                 envia_mensagem "Falha na verificacao de acesso da api. Http Status code:  $status_code \n Ambiente fora do ar, necessaria intervençao manual"
                 envia_mensagem 'Eu tentei, voltei o backup, mesmo assim deu merda, necessaria intervencao manual'
+                envia_log
             fi
             envia_mensagem 'Deploy terminado'
         fi
@@ -114,9 +117,11 @@ if [ $? -eq 0 ]; then
     else
         echo "Falha no build. NPM INSTALL FALHOU. Sistema ainda no ar com versao antiga."
         envia_mensagem 'Falha no build. NPM INSTALL FALHOU. Sistema ainda no ar com versao antiga. '
+        envia_log
     fi
 
 else
     echo "Git clone falhou. Sistema ainda no ar com versao antiga."
     envia_mensagem 'Git clone falhou. Sistema ainda no ar com versao antiga.'
+    envia_log
 fi

@@ -11,8 +11,11 @@ envia_mensagem() {
         sleep 1
     done
 }
-err_report() {
+envia_log() {
     screen -dm -S TESTE /opt/POCKETCLOUD/SCRIPTS/99_sendlog.sh 2 &
+}
+err_report() {
+    envia_log
     datahoravoltou=$(date +"%d-%m-%y %H:%M:%S")
 
     n=0
@@ -77,22 +80,27 @@ if [ $? -eq 0 ]; then
                 ln -sf /opt/nginxroot/htmlpubshr/$RUNNINGFOLDER /opt/nginxroot/htmlpubshr/locationdinamico
                 service nginx reload
                 rm -rf /opt/nginxroot/htmlpubshr/$THEDATE
+                sleep 1
                 status_code2=$(curl --head --write-out %{http_code} --silent --output /dev/null https://www.pubshr.com/)
                 if [[ "$status_code" -eq 200 ]]; then
                     envia_mensagem "Verificando acesso http - pingou ok! $status_code"
                 else
                     envia_mensagem "Falha na verificacao de acesso do FrontEnd. Http Status code:  $status_code \n Ambiente fora do ar, necessaria intervençao manual"
                     envia_mensagem 'Eu tentei, voltei o backup, mesmo assim deu merda, necessaria intervencao manual'
+                    envia_log
                 fi
                 envia_mensagem 'Deploy terminado'
             fi
         else
             envia_mensagem 'Falha no build. NPM BUILD FALHOU. Sistema ainda no ar com versao antiga. '
+            envia_log
         fi
     else
         envia_mensagem 'NPM Install FALHOU. Sistema ainda no ar com versao antiga. '
+        envia_log
     fi
 else
     echo "Git clone falhou. Sistema ainda no ar com versao antiga."
     envia_mensagem 'Git clone falhou. Sistema ainda no ar com versao antiga.'
+    envia_log
 fi
