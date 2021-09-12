@@ -34,7 +34,7 @@ app.use(helmet());
 // parse json request body
 // este verify: webhookMiddleware.extractRawBody  foi adicionado para que
 // ele preserve o raw, pro github hooks validar a assinatura la no arquivo ghwh.route.js
-app.use(express.json({ verify: webhookMiddleware.extractRawBody }));
+// app.use(express.json({ verify: webhookMiddleware.extractRawBody }));
 
 // parse urlencoded request body
 app.use(express.urlencoded({ extended: true }));
