@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Redirect } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { FormattedMessage } from "react-intl";
 import Avatar from "@material-ui/core/Avatar";
 import Box from "@material-ui/core/Box";
@@ -34,7 +34,8 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function ForgotPassword() {
+export default function VerifyEmail() {
+  const { email } = useParams();
   const isLoggedIn = useSelector(
     (state) => state.user.isLoggedIn && state.user.jwt !== null
   );
@@ -69,8 +70,12 @@ export default function ForgotPassword() {
           <Typography component="h1" variant="subtitle1">
             <FormattedMessage
               id="verifyEmailScreeen.ConfirmEmailH1Text"
-              defaultMessage="Your account has been created. To complete the process please check your email and click to confirm e-mail address"
+              defaultMessage="To complete the process please check <b>{ email }</b> and click to confirm e-mail address"
               description="Log In H1 Text"
+              values={{
+                b: (...chunks) => <b>{chunks}</b>,
+                email,
+              }}
             />
           </Typography>
         </Box>

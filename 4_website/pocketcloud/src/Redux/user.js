@@ -225,24 +225,10 @@ const signUp = (userObj, recaptcha) => (dispatch) => {
     },
   })
     .then((response) => {
-      // handle success
-      console.log("FOI");
-      if (response.data.user.id) {
-        console.log("TEM ID");
-        dispatch({
-          type: SIGN_UP_COMPLETE,
-        });
-        dispatch(
-          setUser({
-            email: response.data.user.email,
-            jwt: response.data.tokens,
-          })
-        );
-        // Auto login on successful register
-      } else {
-        console.log("NAO TEM ID");
-        console.log(response.data);
-      }
+      dispatch({
+        type: SIGN_UP_COMPLETE,
+      });
+      dispatch(push(`/verifyemail/${response.data.email}`));
     })
     .catch((error) => {
       // handle error
@@ -275,7 +261,7 @@ const forgotPassword = (userObj, recaptcha) => (dispatch) => {
   })
     .then(() => {
       // handle success
-      dispatch(push(`/verifyemail`));
+      dispatch(push(`/verifyemail/${userObj.email}`));
     })
     .catch((error) => {
       // handle error
