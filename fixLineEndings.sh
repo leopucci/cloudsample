@@ -1,3 +1,4 @@
+#/bin/bash
 #####################
 #
 # Use this with or without the .gitattributes snippet with this Gist
