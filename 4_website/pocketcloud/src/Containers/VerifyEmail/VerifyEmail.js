@@ -6,8 +6,8 @@ import Avatar from "@material-ui/core/Avatar";
 import Box from "@material-ui/core/Box";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import Grid from "@material-ui/core/Grid";
-import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
-import AllInboxIcon from "@material-ui/icons/AllInbox";
+// import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
+// import AllInboxIcon from "@material-ui/icons/AllInbox";
 import DraftsIcon from "@material-ui/icons/Drafts";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
@@ -36,9 +36,9 @@ const useStyles = makeStyles((theme) => ({
 
 export default function VerifyEmail() {
   const { email } = useParams();
-  const isLoggedIn = useSelector(
+  /* const isLoggedIn = useSelector(
     (state) => state.user.isLoggedIn && state.user.jwt !== null
-  );
+  ); */
   const loginError = useSelector((state) => state.user.loginError);
   // eslint-disable-next-line no-unused-vars
   const isLoginError = !!loginError;
