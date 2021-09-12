@@ -29,9 +29,6 @@ if (config.env !== 'test') {
 // set security HTTP headers
 app.use(helmet());
 
-// parse json request body
-// este verify: webhookMiddleware.extractRawBody  foi adicionado para que
-// ele preserve o raw, pro github hooks validar a assinatura la no arquivo ghwh.route.js
 app.use(express.json());
 
 // parse urlencoded request body
