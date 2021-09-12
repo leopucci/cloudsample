@@ -41,7 +41,7 @@ export default function App() {
         <Route path="/login" component={LogIn} />
         <Route path="/register" component={Register} />
         <Route path="/forgotpassword" component={ForgotPassword} />
-        <Route path="/verifyemail/:email" component={VerifyEmail} />
+        <Route path="/verifyemail/:email?" component={VerifyEmail} />
         <Route path="/version" component={Version} />
         <PrivateRoute path="/Home" component={Home} />
         <Route component={NotFound} />

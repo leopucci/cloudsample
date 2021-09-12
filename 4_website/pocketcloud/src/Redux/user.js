@@ -152,6 +152,13 @@ const signIn = (userObj, recaptcha) => (dispatch) => {
       console.log(error);
       let errorMessage = "Network Error";
       if (error.response) {
+        if (
+          error.response.data.message ===
+          "You need to confirm your e-mail address, please check your e-mail"
+        ) {
+          dispatch(push(`/verifyemail/${userObj.email}`));
+        }
+
         errorMessage = error.response.data.message;
         errorMessage =
           errorMessage === "WRONG_CREDENTIAL"

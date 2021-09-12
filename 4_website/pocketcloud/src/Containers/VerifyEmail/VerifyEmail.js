@@ -61,22 +61,30 @@ export default function VerifyEmail() {
         <Typography component="h1" variant="h5">
           <FormattedMessage
             id="verifyEmailScreeen.VerifyEmailH1Text"
-            defaultMessage="Open your e-mail"
+            defaultMessage="Confirm your e-mail address"
             description="Log In H1 Text"
           />
         </Typography>
 
         <Box mt={9}>
           <Typography component="h1" variant="subtitle1">
-            <FormattedMessage
-              id="verifyEmailScreeen.ConfirmEmailH1Text"
-              defaultMessage="To complete the process please check <b>{ email }</b> and click to confirm e-mail address"
-              description="Log In H1 Text"
-              values={{
-                b: (...chunks) => <b>{chunks}</b>,
-                email,
-              }}
-            />
+            {email ? (
+              <FormattedMessage
+                id="verifyEmailScreeen.ConfirmEmailH1Text"
+                defaultMessage="To complete the process please check <b>{ email }</b> and click to confirm e-mail address"
+                description="Log In H1 Text"
+                values={{
+                  b: (...chunks) => <b>{chunks}</b>,
+                  email,
+                }}
+              />
+            ) : (
+              <FormattedMessage
+                id="verifyEmailScreeen.ConfirmEmailH1Text"
+                defaultMessage="To complete the process please check your email and click to confirm e-mail address"
+                description="Log In H1 Text"
+              />
+            )}
           </Typography>
         </Box>
 
