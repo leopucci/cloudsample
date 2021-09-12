@@ -244,6 +244,10 @@ const loginUserWithEmailAndPassword = async (email, password) => {
     );
   }
 
+  if (user != null && 'isEmailVerified' in user && user.isEmailVerified === false) {
+    throw new ClientUnauthorizedError('You need to confirm your e-mail address, please check your e-mail');
+  }
+
   if (!user || !(await user.isPasswordMatch(password))) {
     throw new ClientUnauthorizedError('Incorrect email or password');
   }
