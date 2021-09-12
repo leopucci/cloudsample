@@ -7,6 +7,8 @@ import Box from "@material-ui/core/Box";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import Grid from "@material-ui/core/Grid";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
+import AllInboxIcon from "@material-ui/icons/AllInbox";
+import DraftsIcon from "@material-ui/icons/Drafts";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
@@ -47,18 +49,18 @@ export default function ForgotPassword() {
     dispatch(actions.logOut()); // reset state and clear any errors
   }, [dispatch]);
 
-  if (isLoggedIn) return <Redirect to="/Home" />;
+  // if (isLoggedIn) return <Redirect to="/Home" />;
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
       <div className={classes.paper}>
         <Avatar className={classes.avatar}>
-          <LockOutlinedIcon />
+          <DraftsIcon />
         </Avatar>
         <Typography component="h1" variant="h5">
           <FormattedMessage
-            id="forgotpwScreeen.ForgotPasswordH1Text"
-            defaultMessage="Forgot Password"
+            id="verifyEmailScreeen.VerifyEmailH1Text"
+            defaultMessage="Open your e-mail"
             description="Log In H1 Text"
           />
         </Typography>
@@ -66,8 +68,8 @@ export default function ForgotPassword() {
         <Box mt={9}>
           <Typography component="h1" variant="subtitle1">
             <FormattedMessage
-              id="forgotpwScreeen.ForgotPasswordH1Text"
-              defaultMessage="Please access your e-mail to login to your account"
+              id="verifyEmailScreeen.ConfirmEmailH1Text"
+              defaultMessage="Your account has been created. To complete the process please check your email and click to confirm e-mail address"
               description="Log In H1 Text"
             />
           </Typography>
