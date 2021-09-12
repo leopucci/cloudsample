@@ -5,8 +5,6 @@ const mongoSanitize = require('express-mongo-sanitize');
 const compression = require('compression');
 const cors = require('cors');
 const passport = require('passport');
-const httpStatus = require('http-status');
-const webhookMiddleware = require('x-hub-signature').middleware;
 const safeJsonStringify = require('safe-json-stringify');
 const config = require('./config/config');
 const morgan = require('./config/morgan');
@@ -34,7 +32,7 @@ app.use(helmet());
 // parse json request body
 // este verify: webhookMiddleware.extractRawBody  foi adicionado para que
 // ele preserve o raw, pro github hooks validar a assinatura la no arquivo ghwh.route.js
-// app.use(express.json({ verify: webhookMiddleware.extractRawBody }));
+app.use(express.json());
 
 // parse urlencoded request body
 app.use(express.urlencoded({ extended: true }));
