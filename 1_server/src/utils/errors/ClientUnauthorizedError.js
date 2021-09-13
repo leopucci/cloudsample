@@ -1,16 +1,11 @@
 const PocketCLoudHttpStatus = require('./PocketCLoudHttpStatus');
 
-class ClientError extends Error {
-  constructor(message, statusCode = PocketCLoudHttpStatus.CLIENT_ERROR_UNAUTHORIZED, isOperational = true, stack = '') {
+class ClientUnauthorizedError extends Error {
+  constructor(message, erroCode = 0) {
     super(message);
-    this.statusCode = statusCode;
-    this.isOperational = isOperational;
-    if (stack) {
-      this.stack = stack;
-    } else {
-      Error.captureStackTrace(this, this.constructor);
-    }
+    this.statusCode = PocketCLoudHttpStatus.CLIENT_ERROR_UNAUTHORIZED;
+    this.erroCode = erroCode;
   }
 }
 
-module.exports = ClientError;
+module.exports = ClientUnauthorizedError;

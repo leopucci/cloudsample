@@ -8,6 +8,7 @@ const tokenService = require('./token.service');
 const userService = require('./user.service');
 const Token = require('../models/token.model');
 const ClientError = require('../utils/errors/ClientError');
+const ReturnCodes = require('../utils/errors/ReturnCodes');
 const ClientUnauthorizedError = require('../utils/errors/ClientUnauthorizedError');
 const { enviaNotificacaoApi, enviaNotificacaoSite, canais } = require('../utils/notify');
 const { tokenTypes } = require('../config/tokens');
@@ -245,7 +246,10 @@ const loginUserWithEmailAndPassword = async (email, password) => {
   }
 
   if (user != null && 'isEmailVerified' in user && user.isEmailVerified === false) {
-    throw new ClientUnauthorizedError('You need to confirm your e-mail address, please check your e-mail');
+    throw new ClientUnauthorizedError(
+      'You need to confirm your e-mail address, please check your e-mail',
+      ReturnCodes.ErrorCodes.LOGIN_ERROR_EMAIL_NOT_VERIFIED
+    );
   }
 
   if (!user || !(await user.isPasswordMatch(password))) {
