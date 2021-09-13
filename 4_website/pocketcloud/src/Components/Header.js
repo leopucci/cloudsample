@@ -100,7 +100,7 @@ export default function Header({ isLoggedIn }) {
           noWrap
           className={classes.toolbarTitle}
         >
-          Pocket Cloud
+          The Cloud
         </Typography>
         <nav>
           <Link
