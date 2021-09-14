@@ -3,6 +3,8 @@
 // Ela vai se basear neste codigo, e nao se foi sucesso ou erro...
 // Isto aqui serve pra eu segmentar dentro do success http 200 e error quais os tipos de erro e como que a ui vai lidar.
 // É um casamento entre a UI e a API, sabendo exatamente o que cada coisa faz
+// Na hora que eu colocar varias linguas, da pra debugar o erro só pelo codigo, assim sei o que aconteceu porque tem o
+// codigo embutido na mensagem
 const ReturnCodes = {
   ErrorCodes: {
     LOGIN_ERROR_EMAIL_NOT_VERIFIED: 400,
