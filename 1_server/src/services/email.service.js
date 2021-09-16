@@ -80,7 +80,6 @@ const sendEmailConfirmationAndWelcome = async (to, token, firstName, locale) => 
   const locals = {
     locale,
     name: firstName,
-    token,
     confirmationUrl,
   };
 
@@ -98,7 +97,6 @@ const sendResetPasswordEmail = async (to, token, firstName, locale) => {
   const locals = {
     locale,
     name: firstName,
-    token,
     resetPasswordUrl,
   };
 
