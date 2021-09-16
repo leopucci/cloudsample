@@ -11,6 +11,7 @@
     "axios": "^0.21.1",
     "axios-progress-bar": "^1.2.0",
     "connected-react-router": "^6.9.1",
+    "cross-env": "^7.0.3",
     "history": "^4.10.1",
     "react": "^17.0.2",
     "react-apple-signin-auth": "^1.0.4",
@@ -31,8 +32,8 @@
     "web-vitals": "^1.0.1"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "dev": "react-scripts start",
+    "start": "cross-env PORT=4000 react-scripts start",
+    "dev": "cross-env PORT=4000 react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",

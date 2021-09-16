@@ -8,7 +8,7 @@ const { enviaNotificacaoPorId, enviaNotificacaoSite, enviaNotificacaoApi, canais
 const register = catchAsync(async (req, res) => {
   const user = await userService.createUser(req.body);
   const verifyEmailToken = await tokenService.generateVerifyEmailToken(user);
-  await emailService.sendWelcomeConfirmationEmail(user.email, verifyEmailToken, user.firstName, user.locale);
+  await emailService.sendEmailConfirmationAndWelcome(user.email, verifyEmailToken, user.firstName, user.locale);
   res.status(httpStatus.CREATED).send({ message: 'Account Created', email: user.email });
 });
 

@@ -167,7 +167,7 @@ const signIn = (userObj, recaptcha) => (dispatch) => {
           error.response.data.message ===
           "You need to confirm your e-mail address, please check your e-mail"
         ) {
-          dispatch(push(`/verifyemail/${userObj.email}`));
+          dispatch(push(`/openyourmailbox/${userObj.email}`));
         }
 
         errorMessage = error.response.data.message;
@@ -226,7 +226,7 @@ const googleSignIn = (userObj, recaptcha) => (dispatch) => {
     });
 };
 
-const signUp = (userObj, recaptcha) => (dispatch) => {
+const register = (userObj, recaptcha) => (dispatch) => {
   dispatch({
     type: SIGN_UP,
   });
@@ -246,7 +246,7 @@ const signUp = (userObj, recaptcha) => (dispatch) => {
       dispatch({
         type: SIGN_UP_COMPLETE,
       });
-      dispatch(push(`/verifyemail/${response.data.email}`));
+      dispatch(push(`/openyourmailbox/${response.data.email}`));
     })
     .catch((error) => {
       // handle error
@@ -279,7 +279,7 @@ const forgotPassword = (userObj, recaptcha) => (dispatch) => {
   })
     .then(() => {
       // handle success
-      dispatch(push(`/verifyemail/${userObj.email}`));
+      dispatch(push(`/openyourmailbox/${userObj.email}`));
     })
     .catch((error) => {
       // handle error
@@ -388,7 +388,7 @@ export const actions = {
   logOut,
   logIn: signIn,
   googleLogIn: googleSignIn,
-  signUp,
+  register,
   setLoginError,
   clearLoginError,
   setGoogleLogInError,
