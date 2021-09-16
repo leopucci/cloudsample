@@ -4,7 +4,9 @@ import { Route, Switch, Redirect } from "react-router-dom";
 
 import LogIn from "./LogIn/LogIn";
 import ForgotPassword from "./ForgotPassword/ForgotPassword";
-import VerifyEmail from "./VerifyEmail/VerifyEmail";
+import OpenYourMailBox from "./OpenYourMailBox/OpenYourMailBox";
+import ConfirmEmail from "./EmailActions/ConfirmEmail/ConfirmEmail";
+import ResetPassword from "./EmailActions/ResetPassword/ResetPassword";
 import Register from "./Register/Register";
 import Version from "./Version/Version";
 import Home from "./Home/Home";
@@ -41,7 +43,10 @@ export default function App() {
         <Route path="/login" component={LogIn} />
         <Route path="/register" component={Register} />
         <Route path="/forgotpassword" component={ForgotPassword} />
-        <Route path="/verifyemail/:email?" component={VerifyEmail} />
+        <Route path="/openyourmailbox/:email?" component={OpenYourMailBox} />
+
+        <Route path="/confirmemail/:token" component={ConfirmEmail} />
+        <Route path="/resetpassword/:token" component={ResetPassword} />
         <Route path="/version" component={Version} />
         <PrivateRoute path="/Home" component={Home} />
         <Route component={NotFound} />

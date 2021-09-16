@@ -34,7 +34,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function VerifyEmail() {
+export default function OpenYourMailBox() {
   const { email } = useParams();
   /* const isLoggedIn = useSelector(
     (state) => state.user.isLoggedIn && state.user.jwt !== null
@@ -60,7 +60,7 @@ export default function VerifyEmail() {
         </Avatar>
         <Typography component="h1" variant="h5">
           <FormattedMessage
-            id="verifyEmailScreeen.VerifyEmailH1Text"
+            id="openYourMailBoxxScreeen.openYourMailBoxxH1Text"
             defaultMessage="Confirm your e-mail address"
             description="Log In H1 Text"
           />
@@ -70,7 +70,7 @@ export default function VerifyEmail() {
           <Typography component="h1" variant="subtitle1">
             {email ? (
               <FormattedMessage
-                id="verifyEmailScreeen.ConfirmEmailH1Text"
+                id="openYourMailBoxxScreeen.ConfirmEmailH1Text"
                 defaultMessage="To complete the process please check <b>{ email }</b> and click to confirm e-mail address"
                 description="Log In H1 Text"
                 values={{
@@ -80,7 +80,7 @@ export default function VerifyEmail() {
               />
             ) : (
               <FormattedMessage
-                id="verifyEmailScreeen.ConfirmEmailH1Text"
+                id="openYourMailBoxxScreeen.ConfirmEmailH1Text"
                 defaultMessage="To complete the process please check your email and click to confirm e-mail address"
                 description="Log In H1 Text"
               />

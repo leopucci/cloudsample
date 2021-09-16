@@ -34,14 +34,11 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function ResetPassword() {
+export default function ConfirmEmail() {
   const { token } = useParams();
   /* const isLoggedIn = useSelector(
     (state) => state.user.isLoggedIn && state.user.jwt !== null
   ); */
-  const loginError = useSelector((state) => state.user.loginError);
-  // eslint-disable-next-line no-unused-vars
-  const isLoginError = !!loginError;
 
   const classes = useStyles();
   const dispatch = useDispatch();
@@ -61,7 +58,7 @@ export default function ResetPassword() {
         <Typography component="h1" variant="h5">
           <FormattedMessage
             id="emailConfirmationScreeen.emailConfirmationH1Text"
-            defaultMessage="Reseting password"
+            defaultMessage="Confirm your e-mail address"
             description="Log In H1 Text"
           />
         </Typography>
