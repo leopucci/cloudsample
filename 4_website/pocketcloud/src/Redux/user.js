@@ -13,6 +13,7 @@ export const SIGN_UP_COMPLETE = "redux/users/SIGN_UP_COMPLETE";
 export const SET_LOGIN_ERROR = "redux/users/SET_LOGIN_ERROR";
 export const CLEAR_LOGIN_ERROR = "redux/users/CLEAR_LOGIN_ERROR";
 export const SET_REGISTER_ERROR = "redux/users/SET_REGISTER_ERROR";
+export const CLEAR_REGISTER_ERROR = "redux/users/CLEAR_REGISTER_ERROR";
 
 // Reducer
 
@@ -86,6 +87,12 @@ const currentUser = (state = initialState, action) => {
         isFetching: false,
         registerError: action.payload.error,
       };
+    case CLEAR_REGISTER_ERROR:
+      return {
+        ...state,
+        isFetching: false,
+        registerError: null,
+      };
     default:
       return state;
   }
@@ -120,8 +127,12 @@ const setGoogleLogInError = (error) => ({
   payload: { error },
 });
 
-const setSignupError = (error) => ({
+const setRegisterError = (error) => ({
   type: SET_REGISTER_ERROR,
+  payload: { error },
+});
+const clearRegisterError = (error) => ({
+  type: CLEAR_REGISTER_ERROR,
   payload: { error },
 });
 
@@ -247,7 +258,7 @@ const signUp = (userObj, recaptcha) => (dispatch) => {
             ? "Username/Email is not available"
             : errorMessage;
       }
-      dispatch(setSignupError(errorMessage));
+      dispatch(setRegisterError(errorMessage));
     })
     .then(() => {
       // always executed
@@ -326,7 +337,7 @@ const logOut = (userObj) => (dispatch, getState) => {
               ? "Username/Email is not available"
               : errorMessage;
         }
-        dispatch(setSignupError(errorMessage));
+        dispatch(setRegisterError(errorMessage));
       });
   } else {
     // AQUI TEM UM ERRO EMBUTIDO QUE PRECISA SER LOGADO. ELE VAI DESLOGAR NO CLIENTE SEM DESLOGAR NA API
@@ -381,7 +392,8 @@ export const actions = {
   setLoginError,
   clearLoginError,
   setGoogleLogInError,
-  setSignupError,
+  setRegisterError,
+  clearRegisterError,
   forgotPassword,
   notify,
   refreshedToken,

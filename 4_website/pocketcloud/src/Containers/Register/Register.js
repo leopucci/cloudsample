@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Redirect, Link as RouterLink } from "react-router-dom";
-
+import { FormattedMessage } from "react-intl";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -53,7 +53,7 @@ export default function Register() {
     (state) => state.user.isLoggedIn && state.user.jwt !== null
   );
   const registerError = useSelector((state) => state.user.registerError);
-  const isSignupError = !!registerError;
+  const isRegisterError = !!registerError;
   const classes = useStyles();
   const dispatch = useDispatch();
 
@@ -74,7 +74,7 @@ export default function Register() {
   }, [dispatch]);
 
   const onClickRegister = async () => {
-    dispatch(actions.clearLoginError());
+    dispatch(actions.clearRegisterError());
     if (
       values.email === "" ||
       values.password === "" ||
@@ -83,7 +83,7 @@ export default function Register() {
       values.lastName === ""
     ) {
       dispatch(
-        actions.setSignupError("Please add Email and Password to continue")
+        actions.setRegisterError("Please add Email and Password to continue")
       );
     } else {
       if (!executeRecaptcha) {
@@ -92,7 +92,7 @@ export default function Register() {
       }
       const recaptcha = await executeRecaptcha("Register");
       if (recaptcha != null) {
-        dispatch(actions.signUp(values, recaptcha));
+        dispatch(actions.register(values, recaptcha));
       } else {
         dispatch(
           actions.notify("Recaptcha esta vindo em branco no register", 1)
@@ -102,7 +102,7 @@ export default function Register() {
   };
 
   const onSuccessGoogleLogin = async (response) => {
-    dispatch(actions.clearLoginError());
+    dispatch(actions.clearRegisterError());
     const recaptcha = await executeRecaptcha("LoginViaGoogle");
     dispatch(actions.googleLogIn(response, recaptcha));
   };
@@ -148,7 +148,7 @@ export default function Register() {
             </Grid>
             <Grid item xs={12}>
               <TextField
-                error={isSignupError}
+                error={isRegisterError}
                 variant="outlined"
                 margin="normal"
                 required
@@ -191,7 +191,35 @@ export default function Register() {
             <Grid item xs={12}>
               <FormControlLabel
                 control={<Checkbox value="allowExtraEmails" color="primary" />}
-                label="I want to receive inspiration, marketing promotions and updates via email."
+                label={
+                  <FormattedMessage
+                    id="forgotpwScreeen.ForgotPasswordH1Text"
+                    defaultMessage="I agree to Cloud <terms>Terms of Use</terms> and <privacy>Privacy Policy</privacy>"
+                    description="Log In H1 Text"
+                    values={{
+                      terms: (...chunks) => (
+                        <a
+                          className="external_link"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          href="https://policies.google.com/privacy"
+                        >
+                          {chunks}
+                        </a>
+                      ),
+                      privacy: (...chunks) => (
+                        <a
+                          className="external_link"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          href="https://policies.google.com/privacy"
+                        >
+                          {chunks}
+                        </a>
+                      ),
+                    }}
+                  />
+                }
               />
             </Grid>
           </Grid>
@@ -334,7 +362,7 @@ export default function Register() {
                 href="/#"
                 className={classes.link}
               >
-                Already have an account? Sign in
+                Already have an account? Log in
               </Link>
             </Grid>
           </Grid>
