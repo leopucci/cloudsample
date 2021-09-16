@@ -72,6 +72,8 @@ module.exports = {
       },
     },
     from: envVars.EMAIL_FROM,
-    baseUrl: envVars.EMAIL_WEBSITE_BASE_URL,
+    baseUrl: envVars.EMAIL_WEBSITE_BASE_URL.endsWith('/')
+      ? process.env.EMAIL_WEBSITE_BASE_URL.slice(0, -1)
+      : process.env.EMAIL_WEBSITE_BASE_URL,
   },
 };
