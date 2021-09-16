@@ -12,7 +12,7 @@ import DraftsIcon from "@material-ui/icons/Drafts";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
-import { actions } from "../../Redux/user";
+import { actions } from "../../../Redux/user";
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -34,8 +34,8 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function VerifyEmail() {
-  const { email } = useParams();
+export default function ResetPassword() {
+  const { token } = useParams();
   /* const isLoggedIn = useSelector(
     (state) => state.user.isLoggedIn && state.user.jwt !== null
   ); */
@@ -60,27 +60,27 @@ export default function VerifyEmail() {
         </Avatar>
         <Typography component="h1" variant="h5">
           <FormattedMessage
-            id="verifyEmailScreeen.VerifyEmailH1Text"
-            defaultMessage="Confirm your e-mail address"
+            id="emailConfirmationScreeen.emailConfirmationH1Text"
+            defaultMessage="Reseting password"
             description="Log In H1 Text"
           />
         </Typography>
 
         <Box mt={9}>
           <Typography component="h1" variant="subtitle1">
-            {email ? (
+            {token ? (
               <FormattedMessage
-                id="verifyEmailScreeen.ConfirmEmailH1Text"
-                defaultMessage="To complete the process please check <b>{ email }</b> and click to confirm e-mail address"
+                id="emailConfirmationScreeen.ConfirmEmailH1Text"
+                defaultMessage="To complete the process please check <b>{ token }</b> and click to confirm e-mail address"
                 description="Log In H1 Text"
                 values={{
                   b: (...chunks) => <b>{chunks}</b>,
-                  email,
+                  token,
                 }}
               />
             ) : (
               <FormattedMessage
-                id="verifyEmailScreeen.ConfirmEmailH1Text"
+                id="emailConfirmationScreeen.ConfirmEmailH1Text"
                 defaultMessage="To complete the process please check your email and click to confirm e-mail address"
                 description="Log In H1 Text"
               />
