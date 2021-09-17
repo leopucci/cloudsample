@@ -36,6 +36,12 @@ const useStyles = makeStyles((theme) => ({
 
 export default function ConfirmEmail() {
   const { token } = useParams();
+
+  // remove token from url to prevent http referer leakage
+  // Eu tentei fazer isto com o proprio router nao consegui.
+  // Tem um ponto de atencao aqui que é a troca do title, nao sei como fica em prod
+  window.history.pushState("", "Email Confirmation", "/confirmemail");
+
   /* const isLoggedIn = useSelector(
     (state) => state.user.isLoggedIn && state.user.jwt !== null
   ); */
