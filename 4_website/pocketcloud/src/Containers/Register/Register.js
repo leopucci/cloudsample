@@ -87,7 +87,12 @@ export default function Register() {
       );
     } else {
       if (!executeRecaptcha) {
-        dispatch(actions.notify("Execute recaptcha not yet available", 1));
+        dispatch(
+          actions.notify(
+            "Execute recaptcha nao esta disponivel pro Register",
+            1
+          )
+        );
         return;
       }
       const recaptcha = await executeRecaptcha("Register");
