@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { useDispatch } from "react-redux";
+import React, { useEffect, useCallback } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { FormattedMessage } from "react-intl";
 import Avatar from "@material-ui/core/Avatar";
@@ -12,6 +12,7 @@ import DraftsIcon from "@material-ui/icons/Drafts";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
+import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 import { actions } from "../../../Redux/user";
 
 const useStyles = makeStyles((theme) => ({
@@ -35,23 +36,43 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function ConfirmEmail() {
+  const classes = useStyles();
+  const dispatch = useDispatch();
+  const { executeRecaptcha } = useGoogleReCaptcha();
   const { token } = useParams();
-
   // remove token from url to prevent http referer leakage
   // Eu tentei fazer isto com o proprio router nao consegui.
   // Tem um ponto de atencao aqui que é a troca do title, nao sei como fica em prod
-  window.history.pushState("", "Email Confirmation", "/confirmemail");
+  window.history.pushState("", "Email Confirmation", "/confirmemail/");
 
-  /* const isLoggedIn = useSelector(
-    (state) => state.user.isLoggedIn && state.user.jwt !== null
-  ); */
+  // Create an event handler so you can call the verification on button click event or form submit
+  const handleReCaptchaVerify = useCallback(async () => {
+    if (!executeRecaptcha) {
+      console.log("Execute recaptcha not yet available");
+      return;
+    }
 
-  const classes = useStyles();
-  const dispatch = useDispatch();
+    const recaptchatoken = await executeRecaptcha("yourAction");
+    console.log(recaptchatoken);
 
+    if (token) {
+      if (recaptchatoken != null) {
+        dispatch(actions.confirmEmailTokenValidation(token, recaptchatoken));
+      } else {
+        dispatch(
+          actions.notify("Recaptcha esta vindo em branco no ConfirmEmail", 1)
+        );
+      }
+    }
+    // Do whatever you want with the token
+  }, []);
+
+  // You can use useEffect to trigger the verification as soon as the component being loaded
   useEffect(() => {
-    dispatch(actions.logOut()); // reset state and clear any errors
-  }, [dispatch]);
+    handleReCaptchaVerify();
+  }, [handleReCaptchaVerify]);
+
+  const isFetching = useSelector((state) => state.isFetching);
 
   // if (isLoggedIn) return <Redirect to="/Home" />;
   return (
@@ -71,7 +92,7 @@ export default function ConfirmEmail() {
 
         <Box mt={9}>
           <Typography component="h1" variant="subtitle1">
-            {token ? (
+            {isFetching ? (
               <FormattedMessage
                 id="emailConfirmationScreeen.ConfirmEmailH1Text"
                 defaultMessage="To complete the process please check <b>{ token }</b> and click to confirm e-mail address"
