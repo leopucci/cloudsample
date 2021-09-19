@@ -6,15 +6,23 @@ import api from "./api";
 // Actions
 export const SET_USER = "redux/users/SET_USER";
 export const LOG_OUT = "redux/users/LOG_OUT";
-export const SIGN_IN = "redux/users/SIGN_IN";
-export const SIGN_UP = "redux/users/SIGN_UP";
+export const LOG_IN = "redux/users/LOG_IN";
+export const REGISTER = "redux/users/REGISTER";
+export const REGISTER_COMPLETE = "redux/users/REGISTER_COMPLETE";
 export const REFRESHED_TOKEN = "redux/users/REFRESHED_TOKEN";
-export const SIGN_UP_COMPLETE = "redux/users/SIGN_UP_COMPLETE";
+
 export const SET_LOGIN_ERROR = "redux/users/SET_LOGIN_ERROR";
 export const CLEAR_LOGIN_ERROR = "redux/users/CLEAR_LOGIN_ERROR";
+
 export const SET_REGISTER_ERROR = "redux/users/SET_REGISTER_ERROR";
 export const CLEAR_REGISTER_ERROR = "redux/users/CLEAR_REGISTER_ERROR";
 
+export const FORGOT_PASSWORD_EMAIL_REQUEST =
+  "redux/users/FORGOT_PASSWORD_EMAIL_REQUEST";
+export const RESETING_PASSWORD_TOKEN_VALIDATION =
+  "redux/users/RESETING_PASSWORD_TOKEN_VALIDATION";
+export const CONFIRMING_EMAIL_TOKEN_VALIDATION =
+  "redux/users/CONFIRMING_EMAIL_TOKEN_VALIDATION";
 // Reducer
 
 const initialState = {
@@ -51,19 +59,19 @@ const currentUser = (state = initialState, action) => {
       };
     case LOG_OUT:
       return initialState;
-    case SIGN_IN:
+    case LOG_IN:
       return {
         ...state,
         isFetching: true,
         loginError: null,
       };
-    case SIGN_UP:
+    case REGISTER:
       return {
         ...state,
         isFetching: true,
         registerError: null,
       };
-    case SIGN_UP_COMPLETE:
+    case REGISTER_COMPLETE:
       return {
         ...state,
         isFetching: false,
@@ -92,6 +100,13 @@ const currentUser = (state = initialState, action) => {
         ...state,
         isFetching: false,
         registerError: null,
+      };
+    case RESETING_PASSWORD_TOKEN_VALIDATION:
+    case CONFIRMING_EMAIL_TOKEN_VALIDATION:
+    case FORGOT_PASSWORD_EMAIL_REQUEST:
+      return {
+        ...state,
+        isFetching: true,
       };
     default:
       return state;
@@ -138,7 +153,7 @@ const clearRegisterError = (error) => ({
 
 const signIn = (userObj, recaptcha) => (dispatch) => {
   dispatch({
-    type: SIGN_IN,
+    type: LOG_IN,
   });
   return api({
     method: "post",
@@ -186,7 +201,7 @@ const signIn = (userObj, recaptcha) => (dispatch) => {
 
 const googleSignIn = (userObj, recaptcha) => (dispatch) => {
   dispatch({
-    type: SIGN_IN,
+    type: LOG_IN,
   });
 
   console.log(userObj);
@@ -228,7 +243,7 @@ const googleSignIn = (userObj, recaptcha) => (dispatch) => {
 
 const register = (userObj, recaptcha) => (dispatch) => {
   dispatch({
-    type: SIGN_UP,
+    type: REGISTER,
   });
   api({
     method: "post",
@@ -244,7 +259,7 @@ const register = (userObj, recaptcha) => (dispatch) => {
   })
     .then((response) => {
       dispatch({
-        type: SIGN_UP_COMPLETE,
+        type: REGISTER_COMPLETE,
       });
       dispatch(push(`/openyourmailbox/${response.data.email}`));
     })
@@ -267,7 +282,7 @@ const register = (userObj, recaptcha) => (dispatch) => {
 
 const forgotPassword = (userObj, recaptcha) => (dispatch) => {
   dispatch({
-    type: SIGN_IN,
+    type: FORGOT_PASSWORD_EMAIL_REQUEST,
   });
   return api({
     method: "post",
@@ -300,6 +315,40 @@ const forgotPassword = (userObj, recaptcha) => (dispatch) => {
     });
 };
 
+const confirmEmailTokenValidation = (token, recaptcha) => (dispatch) => {
+  dispatch({
+    type: CONFIRMING_EMAIL_TOKEN_VALIDATION,
+  });
+  return api({
+    method: "post",
+    url: "/auth/verify-email",
+    data: {
+      token,
+      recaptcha,
+    },
+  })
+    .then(() => {
+      // handle success
+      dispatch(push(`/login`));
+    })
+    .catch((error) => {
+      // handle error
+      console.log(error);
+      let errorMessage = "Network Error";
+      if (error.response) {
+        errorMessage = error.response.data.message;
+        errorMessage =
+          errorMessage === "WRONG_CREDENTIAL"
+            ? "Incorrect email or password"
+            : errorMessage;
+        // User does not exist. Register for an account
+      }
+      dispatch(setLoginError(errorMessage));
+    })
+    .then(() => {
+      // always executed
+    });
+};
 // eslint-disable-next-line no-unused-vars
 const logOut = (userObj) => (dispatch, getState) => {
   const state = getState();
@@ -351,7 +400,7 @@ const notify =
   (message, channel = 1) =>
   (dispatch) => {
     dispatch({
-      type: SIGN_IN,
+      type: LOG_IN,
     });
     return api({
       method: "post",
@@ -397,4 +446,5 @@ export const actions = {
   forgotPassword,
   notify,
   refreshedToken,
+  confirmEmailTokenValidation,
 };
