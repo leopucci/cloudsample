@@ -1,4 +1,4 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-npx lint-staged -c "C:\pocketcloud\1_server\.lintstagedrc.json"
+cd 1_server && yarn lint-staged
