@@ -38,7 +38,7 @@ const { value: envVars, error } = envVarsSchema.prefs({ errors: { label: 'key' }
 if (error) {
   enviaNotificacaoApi(`STARTUP API: Config validation error: ${error.message}`, canais.PocketDeployApi);
   sleep(20000); // 20 seconds
-  throw new ApiError(error.message`Config validation error: ${error.message}`);
+  throw new ApiError(`Config validation error: ${error.message}`);
 }
 
 module.exports = {
