@@ -1,5 +1,5 @@
 const express = require('express');
-const passport = require('passport');
+// const passport = require('passport');
 const validate = require('../../middlewares/validate');
 const authValidation = require('../../validations/auth.validation');
 const authController = require('../../controllers/auth.controller');
@@ -23,9 +23,9 @@ router.post('/verify-email', validate(authValidation.verifyEmail), authControlle
 // entao estou refazendo no path /login/google e /login/apple
 // estas rotas permitem autenticacao toda no backend, sem o react no front.. o back gera os html de tela
 // mudou um pouco o formato do banco, preciso atualizar se for usar isto aqui pra alguma coisa
-router.get('/google', authController.authenticateGoogle);
-router.get('/google/callback', authController.authenticateGoogleCallback);
-router.get('/apple', passport.authenticate('apple'));
+// router.get('/google', authController.authenticateGoogle);
+// router.get('/google/callback', authController.authenticateGoogleCallback);
+// router.get('/apple', passport.authenticate('apple'));
 /*
 router.get(
   '/apple/callback',

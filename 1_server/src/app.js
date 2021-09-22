@@ -7,7 +7,8 @@ const cors = require('cors');
 const passport = require('passport');
 const config = require('./config/config');
 const morgan = require('./config/morgan');
-const { jwtStrategy, googleStrategy, appleStrategy } = require('./config/passport');
+// const { jwtStrategy, googleStrategy, appleStrategy } = require('./config/passport');
+const { jwtStrategy } = require('./config/passport');
 const { authLimiter } = require('./middlewares/rateLimiter');
 const routes = require('./routes/v1');
 const githubwebhookroute = require('./routes/github');
@@ -62,8 +63,8 @@ app.set('views', `${__dirname}/views`);
 // jwt authentication
 app.use(passport.initialize());
 passport.use('jwt', jwtStrategy);
-passport.use('google', googleStrategy);
-passport.use('apple', appleStrategy);
+// passport.use('google', googleStrategy);
+// passport.use('apple', appleStrategy);
 
 passport.serializeUser(function (user, done) {
   done(null, user);
