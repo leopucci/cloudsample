@@ -24,6 +24,17 @@ export const RESETING_PASSWORD_TOKEN_VALIDATION =
 export const CONFIRMING_EMAIL_TOKEN_VALIDATION =
   "redux/users/CONFIRMING_EMAIL_TOKEN_VALIDATION";
 // Reducer
+export const SET_CONFIRM_EMAIL_ERROR = "redux/users/SET_CONFIRM_EMAIL_ERROR";
+export const SET_CONFIRM_EMAIL_SUCCESS =
+  "redux/users/SET_CONFIRM_EMAIL_SUCCESS";
+export const CLEAR_CONFIRM_EMAIL_ERROR =
+  "redux/users/CLEAR_CONFIRM_EMAIL_ERROR";
+
+export const SET_RESET_PASSWORD_ERROR = "redux/users/SET_RESET_PASSWORD_ERROR";
+export const SET_RESET_PASSWORD_SUCCESS =
+  "redux/users/SET_RESET_PASSWORD_SUCCESS";
+export const CLEAR_RESET_PASSWORD_ERROR =
+  "redux/users/CLEAR_RESET_PASSWORD_ERROR";
 
 const initialState = {
   profileName: null,
@@ -32,6 +43,10 @@ const initialState = {
   jwt: null,
   loginError: null,
   registerError: null,
+  confirmEmailError: null,
+  confirmEmailSuccess: null,
+  resetPasswordError: null,
+  resetPasswordSuccess: null,
 };
 
 // functional programing
@@ -107,6 +122,50 @@ const currentUser = (state = initialState, action) => {
       return {
         ...state,
         isFetching: true,
+        confirmEmailError: null,
+        confirmEmailSuccess: null,
+      };
+    case SET_CONFIRM_EMAIL_ERROR:
+      return {
+        ...state,
+        isFetching: false,
+        confirmEmailError: action.payload.error,
+        confirmEmailSuccess: null,
+      };
+    case CLEAR_CONFIRM_EMAIL_ERROR:
+      return {
+        ...state,
+        isFetching: false,
+        confirmEmailError: null,
+        confirmEmailSuccess: null,
+      };
+    case SET_CONFIRM_EMAIL_SUCCESS:
+      return {
+        ...state,
+        isFetching: false,
+        confirmEmailError: null,
+        confirmEmailSuccess: true,
+      };
+    case SET_RESET_PASSWORD_ERROR:
+      return {
+        ...state,
+        isFetching: false,
+        resetPasswordError: action.payload.error,
+        resetPasswordSuccess: null,
+      };
+    case CLEAR_RESET_PASSWORD_ERROR:
+      return {
+        ...state,
+        isFetching: false,
+        resetPasswordError: null,
+        resetPasswordSuccess: null,
+      };
+    case SET_RESET_PASSWORD_SUCCESS:
+      return {
+        ...state,
+        isFetching: false,
+        resetPasswordError: null,
+        resetPasswordSuccess: true,
       };
     default:
       return state;
@@ -132,6 +191,36 @@ const setLoginError = (error) => ({
   type: SET_LOGIN_ERROR,
   payload: { error },
 });
+const setConfirmEmailError = (error) => ({
+  type: SET_CONFIRM_EMAIL_ERROR,
+  payload: { error },
+});
+
+const setConfirmEmailSuccess = () => ({
+  type: SET_CONFIRM_EMAIL_SUCCESS,
+  payload: {},
+});
+
+const clearConfirmEmailError = (error) => ({
+  type: CLEAR_CONFIRM_EMAIL_ERROR,
+  payload: { error },
+});
+
+const setResetPasswordError = (error) => ({
+  type: SET_RESET_PASSWORD_ERROR,
+  payload: { error },
+});
+
+const setResetPasswordSuccess = () => ({
+  type: SET_RESET_PASSWORD_SUCCESS,
+  payload: {},
+});
+
+const clearResetPasswordError = () => ({
+  type: CLEAR_RESET_PASSWORD_ERROR,
+  payload: {},
+});
+
 const clearLoginError = (error) => ({
   type: CLEAR_LOGIN_ERROR,
   payload: { error },
@@ -329,7 +418,7 @@ const confirmEmailTokenValidation = (token, recaptcha) => (dispatch) => {
   })
     .then(() => {
       // handle success
-      dispatch(push(`/login`));
+      dispatch(setConfirmEmailSuccess());
     })
     .catch((error) => {
       // handle error
@@ -343,12 +432,51 @@ const confirmEmailTokenValidation = (token, recaptcha) => (dispatch) => {
             : errorMessage;
         // User does not exist. Register for an account
       }
-      dispatch(setLoginError(errorMessage));
+      dispatch(setConfirmEmailError(errorMessage));
     })
     .then(() => {
       // always executed
     });
 };
+
+const resetPasswordApiRequest = (values, recaptcha) => (dispatch) => {
+  dispatch({
+    type: CONFIRMING_EMAIL_TOKEN_VALIDATION,
+  });
+  console.log(values);
+  return api({
+    method: "post",
+    url: "/auth/reset-password",
+    data: {
+      token: values.token,
+      recaptcha,
+      password: values.password,
+      confirmPassword: values.confirmPassword,
+    },
+  })
+    .then(() => {
+      // handle success
+      dispatch(setResetPasswordSuccess());
+    })
+    .catch((error) => {
+      // handle error
+      console.log(error);
+      let errorMessage = "Network Error";
+      if (error.response) {
+        errorMessage = error.response.data.message;
+        errorMessage =
+          errorMessage === "WRONG_CREDENTIAL"
+            ? "Incorrect email or password"
+            : errorMessage;
+        // User does not exist. Register for an account
+      }
+      dispatch(setResetPasswordError(errorMessage));
+    })
+    .then(() => {
+      // always executed
+    });
+};
+
 // eslint-disable-next-line no-unused-vars
 const logOut = (userObj) => (dispatch, getState) => {
   const state = getState();
@@ -443,8 +571,15 @@ export const actions = {
   setGoogleLogInError,
   setRegisterError,
   clearRegisterError,
+  setConfirmEmailError,
+  setConfirmEmailSuccess,
+  clearConfirmEmailError,
   forgotPassword,
   notify,
   refreshedToken,
   confirmEmailTokenValidation,
+  setResetPasswordError,
+  setResetPasswordSuccess,
+  clearResetPasswordError,
+  resetPasswordApiRequest,
 };
