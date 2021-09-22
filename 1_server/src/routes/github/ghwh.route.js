@@ -3,12 +3,7 @@ const httpError = require('http-errors');
 const httpStatus = require('http-status');
 const { signer } = require('x-hub-signature');
 const { execSync, spawn } = require('child_process');
-const {
-  enviaStringComoArquivoNoTelegram,
-  enviaNotificacaoSite,
-  enviaNotificacaoApi,
-  canais,
-} = require('../../utils/notify');
+const { enviaNotificacaoSite, enviaNotificacaoApi, canais } = require('../../utils/notify');
 const validate = require('../../middlewares/validate');
 const authValidation = require('../../validations/auth.validation');
 const catchAsync = require('../../utils/catchAsync');

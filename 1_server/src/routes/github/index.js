@@ -1,4 +1,5 @@
 const express = require('express');
+const logger = require('../../config/logger');
 const githubRoute = require('./ghwh.route');
 
 const router = express.Router();
@@ -11,7 +12,7 @@ const defaultRoutes = [
 ];
 
 defaultRoutes.forEach((route) => {
-  console.log(`Configuring ${route.path}`);
+  logger.info(`Configuring ${route.path}`);
   router.use(route.path, route.route);
 });
 
