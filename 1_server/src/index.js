@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const safeJsonStringify = require('safe-json-stringify');
-const { enviaNotificacaoSite, enviaNotificacaoApi } = require('./utils/notify');
+const { enviaNotificacaoApi } = require('./utils/notify');
 const app = require('./app');
 const config = require('./config/config');
 const logger = require('./config/logger');
@@ -31,7 +31,7 @@ const uncaughtExceptionHandler = (error) => {
   enviaNotificacaoApi(
     `Deu merda jovem, caiu lá no unexpectedErrorHandler voce programou bem mal... \n ${safeJsonStringify(error)}`
   );
-  console.error(error, 'Uncaught Exception thrown vai dar process.exit(1)');
+  logger.error(error, 'Uncaught Exception thrown vai dar process.exit(1)');
   exitHandler();
 };
 

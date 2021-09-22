@@ -36,7 +36,10 @@ const errorHandler = (err, req, res, next) => {
   const { erroCode } = err;
   let response;
   if (err instanceof ApiError) {
-    enviaNotificacaoApi(`ERRO 500\n${err.message}\n${err.stack}`, canais.PocketHttp500InternalServerError);
+    enviaNotificacaoApi(
+      `ERRO 500\nURL: ${req.originalUrl}\n${err.message}\n${err.stack}`,
+      canais.PocketHttp500InternalServerError
+    );
     logger.info(`ERROR 500: ${err.message}\n${err.stack}`);
 
     if (config.env === 'production' && !err.isOperational) {

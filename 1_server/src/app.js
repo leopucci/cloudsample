@@ -5,7 +5,6 @@ const mongoSanitize = require('express-mongo-sanitize');
 const compression = require('compression');
 const cors = require('cors');
 const passport = require('passport');
-const safeJsonStringify = require('safe-json-stringify');
 const config = require('./config/config');
 const morgan = require('./config/morgan');
 const { jwtStrategy, googleStrategy, appleStrategy } = require('./config/passport');

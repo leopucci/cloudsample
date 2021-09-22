@@ -1,9 +1,8 @@
-const passport = require('passport');
+// const passport = require('passport');
 const httpStatus = require('http-status');
-const ClientError = require('../utils/errors/ClientError');
 const catchAsync = require('../utils/catchAsync');
 const { authService, userService, tokenService, emailService } = require('../services');
-const { enviaNotificacaoPorId, enviaNotificacaoSite, enviaNotificacaoApi, canais } = require('../utils/notify');
+const { enviaNotificacaoPorId } = require('../utils/notify');
 
 const register = catchAsync(async (req, res) => {
   const user = await userService.createUser(req.body);
@@ -97,7 +96,11 @@ const forgotPassword = catchAsync(async (req, res) => {
 });
 
 const resetPassword = catchAsync(async (req, res) => {
-  await authService.resetPassword(req.query.token, req.body.password);
+  const { password, token, recaptcha } = req.body;
+  // RECAPTCHA DA TRHOW
+  await authService.verifyRecaptcha(recaptcha, req.ip);
+
+  await authService.resetPassword(token, password);
   res.status(httpStatus.NO_CONTENT).send();
 });
 
@@ -108,10 +111,15 @@ const sendVerificationEmail = catchAsync(async (req, res) => {
 });
 
 const verifyEmail = catchAsync(async (req, res) => {
-  await authService.verifyEmail(req.query.token);
+  const { token, recaptcha } = req.body;
+  // RECAPTCHA DA TRHOW
+  await authService.verifyRecaptcha(recaptcha, req.ip);
+
+  await authService.verifyEmail(token);
   res.status(httpStatus.NO_CONTENT).send();
 });
 
+/*
 const authenticateGoogle = async (req, res, next) => {
   return new Promise((resolve, reject) => {
     passport.authenticate('google', { session: false, scope: ['profile', 'email'] })(req, res, next);
@@ -145,7 +153,7 @@ const authenticateGoogleCallback = async (req, res, next) => {
     // next();
   })(req, res, next);
 };
-
+*/
 module.exports = {
   register,
   login,
@@ -158,7 +166,9 @@ module.exports = {
   resetPassword,
   sendVerificationEmail,
   verifyEmail,
+  /*
   authenticateGoogle,
   authenticateGoogleCallback,
+  */
   appleSignInWebHook,
 };

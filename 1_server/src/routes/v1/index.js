@@ -1,4 +1,5 @@
 const express = require('express');
+const logger = require('../../config/logger');
 const authRoute = require('./auth.route');
 const userRoute = require('./user.route');
 const docsRoute = require('./docs.route');
@@ -26,7 +27,7 @@ const devRoutes = [
 ];
 
 defaultRoutes.forEach((route) => {
-  console.log(`Configuring ${route.path}`);
+  logger.info(`Configuring ${route.path}`);
   router.use(route.path, route.route);
 });
 

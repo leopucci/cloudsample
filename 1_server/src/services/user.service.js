@@ -1,6 +1,6 @@
 const { User } = require('../models');
 const ClientError = require('../utils/errors/ClientError');
-const { enviaNotificacaoApi, enviaNotificacaoSite, canais } = require('../utils/notify');
+const { enviaNotificacaoSite, canais } = require('../utils/notify');
 /**
  * Create a user
  * @param {Object} userBody

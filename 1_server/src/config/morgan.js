@@ -1,6 +1,6 @@
 const morgan = require('morgan');
 const dns = require('dns');
-const safeJsonStringify = require('safe-json-stringify');
+
 const config = require('./config');
 const logger = require('./logger');
 const { enviaNotificacaoApi, canais } = require('../utils/notify');
@@ -13,7 +13,9 @@ function reverseLookup(ip) {
       }
       return domains;
     });
-  } catch (error) {}
+  } catch (error) {
+    enviaNotificacaoApi(`ERRO RESOLVENDO DNS Nome ${error.name}\n Mensagem ${error.message}`);
+  }
 }
 
 morgan.token('message', (req, res) => res.locals.errorMessage || '');

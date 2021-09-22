@@ -67,16 +67,20 @@ const forgotPassword = {
 };
 
 const resetPassword = {
-  query: Joi.object().keys({
-    token: Joi.string().required(),
-  }),
   body: Joi.object().keys({
     password: Joi.string().required().custom(password),
+    confirmPassword: Joi.any()
+      .equal(Joi.ref('password'))
+      .required()
+      .label('Confirm password')
+      .messages({ 'any.only': '{{#label}} does not match' }),
+    token: Joi.string().required(),
+    recaptcha: Joi.string().required(),
   }),
 };
 
 const verifyEmail = {
-  query: Joi.object().keys({
+  body: Joi.object().keys({
     token: Joi.string().required(),
     recaptcha: Joi.string().required(),
   }),

@@ -1,7 +1,7 @@
-const httpStatus = require('http-status');
 const { OAuth2Client } = require('google-auth-library');
 const appleSignin = require('apple-signin-auth');
 const safeJsonStringify = require('safe-json-stringify');
+// const { use } = require('passport');
 const myAxiosInstance = require('../utils/axioshttp');
 const config = require('../config/config');
 const tokenService = require('./token.service');
@@ -10,9 +10,10 @@ const Token = require('../models/token.model');
 const ClientError = require('../utils/errors/ClientError');
 const ReturnCodes = require('../utils/errors/ReturnCodes');
 const ClientUnauthorizedError = require('../utils/errors/ClientUnauthorizedError');
-const { enviaNotificacaoApi, enviaNotificacaoSite, canais } = require('../utils/notify');
+const { enviaNotificacaoApi } = require('../utils/notify');
 const { tokenTypes } = require('../config/tokens');
 const { User } = require('../models');
+const logger = require('../config/logger');
 /**
  * Login with apple signIn user
  * @param {string} recaptcha
@@ -49,7 +50,7 @@ const verifyRecaptcha = async (token, clientIpAddress) => {
         // eslint-disable-next-line no-unreachable
         break;
       default:
-        console.log(data);
+        logger.debug(data);
         // eslint-disable-next-line no-case-declarations
         const codes = safeJsonStringify(data['error-codes']);
         if (data['error-codes'].length === 0) {
@@ -301,12 +302,34 @@ const resetPassword = async (resetPasswordToken, newPassword) => {
     const resetPasswordTokenDoc = await tokenService.verifyToken(resetPasswordToken, tokenTypes.RESET_PASSWORD);
     const user = await userService.getUserById(resetPasswordTokenDoc.user);
     if (!user) {
-      throw new Error();
+      throw new ClientError('User not found');
     }
     await userService.updateUserById(user.id, { password: newPassword });
     await Token.deleteMany({ user: user.id, type: tokenTypes.RESET_PASSWORD });
   } catch (error) {
-    throw new ClientUnauthorizedError('Password reset failed');
+    logger.debug(error.message);
+    // Expirou, nao chega nem a ver no banco
+    if (error.name === 'TokenExpiredError') {
+      throw new ClientError(
+        'Token Expired - Request a new email to reset password',
+        ReturnCodes.ErrorCodes.RESET_PASSORD_TOKEN_EXPIRED
+      );
+    } else if (error.name === 'JsonWebTokenError') {
+      // jwt malformed
+      throw new ClientError(
+        'Token Error - Request a new email to reset password',
+        ReturnCodes.ErrorCodes.RESET_PASSORD_TOKEN_MALFORMED
+      );
+    } else if (error.message === 'Token not found') {
+      throw new ClientError('Token Not Found', ReturnCodes.ErrorCodes.RESET_PASSORD_TOKEN_NOT_FOUND);
+    } else {
+      enviaNotificacaoApi(
+        `Erro no resetPassword nao catalogado:  ${safeJsonStringify(error.name)} \n  ${safeJsonStringify(error.message)}`
+      );
+      logger.error(error.message);
+      logger.error(`Tipo de erro: ${error.name}`);
+      throw new ClientError('Token Error - Request a new email');
+    }
   }
 };
 
@@ -320,12 +343,37 @@ const verifyEmail = async (verifyEmailToken) => {
     const verifyEmailTokenDoc = await tokenService.verifyToken(verifyEmailToken, tokenTypes.VERIFY_EMAIL);
     const user = await userService.getUserById(verifyEmailTokenDoc.user);
     if (!user) {
-      throw new Error();
+      throw new ClientError('User not found');
     }
     await Token.deleteMany({ user: user.id, type: tokenTypes.VERIFY_EMAIL });
     await userService.updateUserById(user.id, { isEmailVerified: true });
   } catch (error) {
-    throw new ClientUnauthorizedError('Email verification failed');
+    logger.debug(error.message);
+    // Expirou, nao chega nem a ver no banco
+    if (error.name === 'TokenExpiredError') {
+      throw new ClientError(
+        'Email verification failed - Token Expired - Try to Login',
+        ReturnCodes.ErrorCodes.VERIFY_EMAIL_TOKEN_EXPIRED
+      );
+    } else if (error.name === 'JsonWebTokenError') {
+      // jwt malformed
+      throw new ClientError(
+        'Email verification failed - Wrong Token - Try to Login',
+        ReturnCodes.ErrorCodes.VERIFY_EMAIL_TOKEN_MALFORMED
+      );
+    } else if (error.message === 'Token not found') {
+      throw new ClientError(
+        'Email verification failed - Token Not Found - Try to Login',
+        ReturnCodes.ErrorCodes.VERIFY_EMAIL_TOKEN_NOT_FOUND
+      );
+    } else {
+      enviaNotificacaoApi(
+        `Erro no verifyEmail nao catalogado:  ${safeJsonStringify(error.name)} \n  ${safeJsonStringify(error.message)}`
+      );
+      logger.error(error.message);
+      logger.error(`Tipo de erro: ${error.constructor.toString()}`);
+      throw new ClientError('Email verification failed');
+    }
   }
 };
 
@@ -346,6 +394,8 @@ const appleSignInWebHookHandler = async (payload) => {
       email, // Only provided for email events
     } = events;
 
+    logger.debug(userAppleId);
+    logger.debug(email);
     switch (type) {
       case 'email-disabled':
         // Email will no longer be forwarded to the user via the private relay service
@@ -364,7 +414,7 @@ const appleSignInWebHookHandler = async (payload) => {
     }
   } catch (err) {
     // Event token is not verified
-    console.error(err);
+    logger.error(err);
     throw new ClientUnauthorizedError('Invalid credentials');
   }
 };

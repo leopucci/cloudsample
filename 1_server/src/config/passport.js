@@ -1,7 +1,10 @@
 const { Strategy: JwtStrategy, ExtractJwt } = require('passport-jwt');
+
+/*
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const AppleStrategy = require('passport-apple');
 const path = require('path');
+*/
 
 const config = require('./config');
 const { tokenTypes } = require('./tokens');
@@ -29,11 +32,13 @@ const jwtVerify = async (payload, done) => {
 
 const jwtStrategy = new JwtStrategy(jwtOptions, jwtVerify);
 
+/*
 const googleStrategyOptions = {
   clientID: '302957349711-djkd65scmbttrl3703eudbnnsp827jeh.apps.googleusercontent.com',
   clientSecret: '5_sP2_maMmzvNfKguTsqE93m',
   callbackURL: 'http://127.0.0.1:3000/v1/auth/google/callback',
 };
+
 
 const googleVerify = async (accessToken, refreshToken, profile, done) => {
   // se ja existir alguma conta com GMAIL no sistema,
@@ -88,9 +93,11 @@ const appleVerify = async (req, accessToken, refreshToken, idToken, profile, don
 };
 
 const appleStrategy = new AppleStrategy(appleStrategyOptions, appleVerify);
-
+*/
 module.exports = {
   jwtStrategy,
+  /*
   googleStrategy,
   appleStrategy,
+  */
 };
