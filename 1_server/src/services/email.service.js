@@ -5,6 +5,7 @@ const { I18n } = require('i18n');
 const safeJsonStringify = require('safe-json-stringify');
 const config = require('../config/config');
 const logger = require('../config/logger');
+const { enviaNotificacaoApi } = require('../utils/notify');
 
 const transport = nodemailer.createTransport(config.email.smtp);
 
@@ -62,6 +63,7 @@ const sendEmail = async (to, template, locals) => {
     })
     .then(logger.debug(`Email sent to ${to} with token ${locals.token}`))
     .catch((error) => {
+      enviaNotificacaoApi(`Erro enviando e-mail pra ${to} error${safeJsonStringify(error.message)}`);
       logger.error(`Erro enviando e-mail pra ${to} error${safeJsonStringify(error.message)}`);
     });
 
