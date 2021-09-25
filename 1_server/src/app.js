@@ -5,6 +5,7 @@ const mongoSanitize = require('express-mongo-sanitize');
 const compression = require('compression');
 const cors = require('cors');
 const passport = require('passport');
+const addRequestId = require('express-request-id')();
 const config = require('./config/config');
 const morgan = require('./config/morgan');
 // const { jwtStrategy, googleStrategy, appleStrategy } = require('./config/passport');
@@ -20,7 +21,7 @@ const app = express();
 // via header seja usado como real, entao eu nao preciso modificar ou pegar o ip de lugar diferente
 // e isto corrige os logs
 app.set('trust proxy', 'loopback');
-
+app.use(addRequestId);
 if (config.env !== 'test') {
   app.use(morgan.successHandler);
   app.use(morgan.errorHandler);
@@ -93,7 +94,7 @@ app.post('/ping', async (req, res) => {
     .replace(/T/, ' ') // replace T with a space
     .replace(/\..+/, ''); // delete the dot and everything after
 
-  res.send(`POST REQUEST ${date} \n PONG`);
+  res.send(`POST REQUEST ${date} \n PONG \n ReqID: ${req.id}`);
 });
 app.get('/ping', async (req, res) => {
   const date = new Date()
@@ -101,7 +102,7 @@ app.get('/ping', async (req, res) => {
     .replace(/T/, ' ') // replace T with a space
     .replace(/\..+/, ''); // delete the dot and everything after
 
-  res.send(`GET REQUEST ${date} \n PONG`);
+  res.send(`GET REQUEST ${date} \n PONG \n ReqID: ${req.id}`);
 });
 
 app.post('/version', async (req, res) => {

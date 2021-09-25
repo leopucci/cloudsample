@@ -1,7 +1,10 @@
 const mongoose = require('mongoose');
 const safeJsonStringify = require('safe-json-stringify');
+const addRequestId = require('express-request-id');
 const { enviaNotificacaoApi } = require('./utils/notify');
 const app = require('./app');
+
+app.use(addRequestId);
 const config = require('./config/config');
 const logger = require('./config/logger');
 

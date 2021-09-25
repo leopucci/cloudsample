@@ -37,10 +37,10 @@ const errorHandler = (err, req, res, next) => {
   let response;
   if (err instanceof ApiError) {
     enviaNotificacaoApi(
-      `ERRO 500\nURL: ${req.originalUrl}\n${err.message}\n${err.stack}`,
+      `ERRO 500\nURL: ${req.originalUrl}\nreq.Id:${req.id}\n${err.message}\n${err.stack}`,
       canais.PocketHttp500InternalServerError
     );
-    logger.info(`ERROR 500: ${err.message}\n${err.stack}`);
+    logger.info(`ERROR 500: ${err.message}\nreq.Id:${req.id}\n${err.stack} `);
 
     if (config.env === 'production' && !err.isOperational) {
       statusCode = httpStatus.INTERNAL_SERVER_ERROR;
@@ -50,6 +50,7 @@ const errorHandler = (err, req, res, next) => {
     response = {
       code: statusCode,
       message,
+      reqId: req.id || null,
     };
     res.status(statusCode).send(response);
     return;
@@ -63,6 +64,7 @@ const errorHandler = (err, req, res, next) => {
     response = {
       code: statusCode,
       message,
+      reqId: req.id || null,
       ...(erroCode && { erroCode }),
       ...(email || null),
     };
@@ -77,6 +79,7 @@ const errorHandler = (err, req, res, next) => {
     response = {
       code: statusCode,
       message,
+      reqId: req.id || null,
       ...(erroCode && { erroCode }),
     };
     res.status(statusCode).send(response);
@@ -90,6 +93,7 @@ const errorHandler = (err, req, res, next) => {
     response = {
       code: statusCode,
       message,
+      reqId: req.id || null,
       ...(erroCode && { erroCode }),
       //         ...(config.env === 'development' && { stack: err.stack }),
     };
@@ -105,9 +109,10 @@ const errorHandler = (err, req, res, next) => {
   response = {
     code: statusCode,
     message,
+    reqId: req.id || null,
   };
   res.status(statusCode).send(response);
-  enviaNotificacaoApi(`ERROR.js CAIU NO ERRO DEFAULT - CORRIJA\n${err.message}`, canais.PocketHttpErros);
+  enviaNotificacaoApi(`ERROR.js CAIU NO ERRO DEFAULT - CORRIJA\n${err.message}\nreq.Id:${req.id}`, canais.PocketHttpErros);
 };
 
 module.exports = {
