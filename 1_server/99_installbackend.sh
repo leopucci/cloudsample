@@ -82,6 +82,11 @@ if [ $? -eq 0 ]; then
         ##pm2 install leopucci/pm2-telegram-notify
         #pm2 set pm2-telegram-notify:telegram_url https://api.telegram.org/bot1942279280:AAEoxbNJvbJlG7ksHmI86pord-aMYxyFF60/sendMessage
         #pm2 set pm2-telegram-notify:chat_id g-1001507578888
+        echo "Resetting PM2 Metadata …"
+        pm2 reset all
+        #echo ‘Calling pm2-runtime …’
+        #pm2-runtime ecosystem.config.js --no-deamon --name MyApp
+        echo ‘pm2 now called’
         pm2 delete PktCloudApiPRODUCAO &
         sleep 1
         pm2 kill
