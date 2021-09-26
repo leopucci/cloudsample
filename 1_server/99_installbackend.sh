@@ -93,7 +93,6 @@ if [ $? -eq 0 ]; then
         sleep 1
         pm2 start ecosystem.config.producao.json
         pm2 save
-        exit
         envia_mensagem "Feito... Pm2 Esta no ar (?) Apagando diretorios antigos..."
         status_code=$(curl --retry 4 --retry-delay 1 --head --write-out %{http_code} --silent --output /dev/null https://api.pubshr.com/ping)
         if [[ "$status_code" -eq 200 ]]; then
