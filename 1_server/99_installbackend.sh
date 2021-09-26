@@ -48,7 +48,7 @@ cd /opt/POCKETCLOUD/TEMP
 mkdir $THEDATE
 cd $THEDATE
 envia_mensagem "Clonando repositorio"
-git clone https://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@github.com/leopucci/pocketcloud.git # --branch release_backend
+git clone https://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@github.com/leopucci/pocketcloud.git --branch release_backend
 if [ $? -eq 0 ]; then
     envia_mensagem "Clone OK! Dando npm install"
     cd pocketcloud
