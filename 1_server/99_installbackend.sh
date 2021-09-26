@@ -36,7 +36,13 @@ trap 'err_report $LINENO' ERR
 
 THEDATE=$(date +%Y%m%d_%H%M%S)
 RUNNINGUSER=$(whoami)
-RUNNINGFOLDER=$(basename /opt/POCKETCLOUD/BACKENDAPI/*)
+
+NUMOFFOLDERS=$(find /opt/POCKETCLOUD/BACKENDAPI/* -maxdepth 0 -type d -print | wc -l)
+if [ NUMOFFOLDERS -ne 1 ]; then
+    RUNNINGFOLDER="ERROR"
+else
+    RUNNINGFOLDER=$(basename /opt/POCKETCLOUD/BACKENDAPI/*)
+fi
 
 envia_mensagem "DEPLOY INICIADO  99_installbackend.sh %0A Commit trigger: $1 %0A From user $2 %0A Rodando como usuario: $RUNNINGUSER"
 
