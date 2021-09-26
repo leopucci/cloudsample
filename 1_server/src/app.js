@@ -5,7 +5,7 @@ const mongoSanitize = require('express-mongo-sanitize');
 const compression = require('compression');
 const cors = require('cors');
 const passport = require('passport');
-const addRequestId = require('express-request-id')();
+const addRequestId = require('express-request-id');
 const config = require('./config/config');
 const morgan = require('./config/morgan');
 // const { jwtStrategy, googleStrategy, appleStrategy } = require('./config/passport');
@@ -21,7 +21,6 @@ const app = express();
 // via header seja usado como real, entao eu nao preciso modificar ou pegar o ip de lugar diferente
 // e isto corrige os logs
 app.set('trust proxy', 'loopback');
-app.use(addRequestId);
 if (config.env !== 'test') {
   app.use(morgan.successHandler);
   app.use(morgan.errorHandler);
@@ -29,7 +28,7 @@ if (config.env !== 'test') {
 
 // set security HTTP headers
 app.use(helmet());
-
+app.use(addRequestId());
 app.use(express.json());
 
 // parse urlencoded request body
