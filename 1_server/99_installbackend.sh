@@ -38,7 +38,7 @@ THEDATE=$(date +%Y%m%d_%H%M%S)
 RUNNINGUSER=$(whoami)
 
 NUMOFFOLDERS=$(find /opt/POCKETCLOUD/BACKENDAPI/* -maxdepth 0 -type d -print | wc -l)
-if [ NUMOFFOLDERS -ne 1 ]; then
+if [ "$NUMOFFOLDERS" -ne 1 ]; then
     RUNNINGFOLDER="ERROR"
 else
     RUNNINGFOLDER=$(basename /opt/POCKETCLOUD/BACKENDAPI/*)
