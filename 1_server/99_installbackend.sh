@@ -16,11 +16,14 @@ envia_log() {
 }
 apaga_diretorios() {
     echo "Apagando temp"
+    envia_mensagem "Apagando temp $2"
     rm -rf /opt/POCKETCLOUD/TEMP/$2
     for f in /opt/POCKETCLOUD/BACKENDAPI/*; do
         if [ "$f" -eq "$2" ]; then
             echo "Ignorando diretorio atual $2"
+            envia_mensagem "Ignorando diretorio atual $2"
         else
+            envia_mensagem "Apagando backend $f"
             rm -rf /opt/POCKETCLOUD/BACKENDAPI/$f
         fi
     done
