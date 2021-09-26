@@ -14,6 +14,17 @@ envia_mensagem() {
 envia_log() {
     screen -dm -S TESTE /opt/POCKETCLOUD/SCRIPTS/99_sendlog.sh 1 &
 }
+apaga_diretorios() {
+    echo "Apagando temp"
+    rm -rf /opt/POCKETCLOUD/TEMP/$2
+    for f in /opt/POCKETCLOUD/BACKENDAPI/*; do
+        if [ "$f" -eq "$2" ]; then
+            echo "Ignorando diretorio atual $2"
+        else
+            rm -rf /opt/POCKETCLOUD/BACKENDAPI/$f
+        fi
+    done
+}
 err_report() {
     envia_log
     datahoravoltou=$(date +"%d-%m-%y %H:%M:%S")
@@ -98,7 +109,7 @@ if [ $? -eq 0 ]; then
         if [[ "$status_code" -eq 200 ]]; then
             envia_mensagem "Verificando acesso http - pingou ok! $status_code"
             # Aqui eu consigo pegar o diretorio que tem no disco, verificar o status do pm2, se der merda consigo voltar o antigo
-            $(find /opt/POCKETCLOUD/BACKENDAPI/* ! -name $THEDATE -maxdepth 0 -type d -exec rm -rf {} +)
+            apaga_diretorios $THEDATE
             envia_mensagem "Deploy terminado"
         else
             envia_mensagem "Falha na verificacao de acesso da api. Http Status code:  $status_code \n Ambiente fora do ar, necessaria intervençao manual"
