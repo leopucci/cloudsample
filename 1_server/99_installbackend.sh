@@ -98,6 +98,7 @@ if [ $? -eq 0 ]; then
             sleep 1
             cd /opt/POCKETCLOUD/BACKENDAPI/$RUNNINGFOLDER
             pm2 start ecosystem.config.producao.json
+            sleep 1
             pm2 save
             rm -rf /opt/POCKETCLOUD/BACKENDAPI/$THEDATE
             status_code2=$(curl --retry 4 --retry-delay 1 --head --write-out %{http_code} --silent --output /dev/null https://api.pubshr.com/ping)
