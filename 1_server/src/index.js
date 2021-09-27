@@ -77,6 +77,7 @@ process.on('SIGTERM', () => {
 
 process.on('SIGINT', function () {
   server.close(function () {
+    enviaNotificacaoApi(`Baixando aplicação recebeu SIGINT`, canais.PocketDeployApi);
     process.exit(0);
   });
 });
