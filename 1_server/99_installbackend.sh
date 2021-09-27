@@ -98,7 +98,7 @@ if [ $? -eq 0 ]; then
         #pm2 set pm2-telegram-notify:telegram_url https://api.telegram.org/bot1942279280:AAEoxbNJvbJlG7ksHmI86pord-aMYxyFF60/sendMessage
         #pm2 set pm2-telegram-notify:chat_id g-1001507578888
         echo "Resetting PM2 Metadata …"
-        pm2 delete all
+        pm2 delete all || true
         sleep 1
         #pm2 reset all
         #echo ‘Calling pm2-runtime …’
@@ -119,14 +119,14 @@ if [ $? -eq 0 ]; then
         else
             envia_mensagem "Falha na verificacao de acesso da api. Http Status code:  $status_code \n Ambiente fora do ar, necessaria intervençao manual"
             envia_mensagem "Voltando servidor pra pasta antiga....."
-            pm2 delete PktCloudApiPRODUCAO &
+            pm2 delete PktCloudApiPRODUCAO || true
             sleep 1
             pm2 kill
             sleep 1
             cd /opt/POCKETCLOUD/BACKENDAPI/$RUNNINGFOLDER
             pm2 start ecosystem.config.producao.json
             sleep 1
-            pm2 save
+            pm2 save --force
             rm -rf /opt/POCKETCLOUD/BACKENDAPI/$THEDATE
             status_code2=$(curl --retry 4 --retry-delay 1 --head --write-out %{http_code} --silent --output /dev/null https://api.pubshr.com/ping)
             if [[ "$status_code" -eq 200 ]]; then
