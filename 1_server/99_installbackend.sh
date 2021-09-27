@@ -101,6 +101,7 @@ if [ $? -eq 0 ]; then
         sleep 1
         pm2 delete all || true
         sleep 1
+        pm2 save --force
         NUMOFPROCESSES=$(ps -ef | grep BACKENDAPI | grep -v grep | awk '{print $2}' | wc -l)
         if [ $NUMOFPROCESSES -ne 0 ]; then
             ps -ef | grep BACKENDAPI | grep -v grep | awk '{print $2}' | xargs kill -9
@@ -129,6 +130,7 @@ if [ $? -eq 0 ]; then
             sleep 1
             pm2 kill
             sleep 1
+            pm2 save --force
             cd /opt/POCKETCLOUD/BACKENDAPI/$RUNNINGFOLDER
             pm2 start ecosystem.config.producao.json
             sleep 1

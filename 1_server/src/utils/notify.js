@@ -10,8 +10,7 @@ const PDFKit = require('pdfkit');
 const logger = require('../config/logger');
 
 const isDevelopment = () => {
-  const env = process.env.NODE_ENV || 'development';
-  const isDevelopmentProcess = env === 'development';
+  const isDevelopmentProcess = (process.env.NODE_ENV || 'development') === 'development';
   return isDevelopmentProcess;
 };
 const ambiente = () => {
