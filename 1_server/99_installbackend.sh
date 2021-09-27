@@ -98,22 +98,23 @@ if [ $? -eq 0 ]; then
         #pm2 set pm2-telegram-notify:telegram_url https://api.telegram.org/bot1942279280:AAEoxbNJvbJlG7ksHmI86pord-aMYxyFF60/sendMessage
         #pm2 set pm2-telegram-notify:chat_id g-1001507578888
         echo "Resetting PM2 Metadata …"
+        pm2 delete all
+        sleep 1
         pm2 reset all
         #echo ‘Calling pm2-runtime …’
         #pm2-runtime ecosystem.config.js --no-deamon --name MyApp
-        echo ‘pm2 now called’
-        pm2 delete PktCloudApiPRODUCAO &
+
         sleep 1
-        pm2 kill
-        sleep 1
+        #pm2 kill
+        # sleep 1
         pm2 start ecosystem.config.producao.json
-        pm2 save
         envia_mensagem "Feito... Pm2 Esta no ar (?) Apagando diretorios antigos..."
         status_code=$(curl --retry 4 --retry-delay 1 --head --write-out %{http_code} --silent --output /dev/null https://api.pubshr.com/ping)
         if [[ "$status_code" -eq 200 ]]; then
             envia_mensagem "Verificando acesso http - pingou ok! $status_code"
             # Aqui eu consigo pegar o diretorio que tem no disco, verificar o status do pm2, se der merda consigo voltar o antigo
             apaga_diretorios $THEDATE
+            pm2 save --force
             envia_mensagem "Deploy terminado"
         else
             envia_mensagem "Falha na verificacao de acesso da api. Http Status code:  $status_code \n Ambiente fora do ar, necessaria intervençao manual"
