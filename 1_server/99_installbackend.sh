@@ -44,7 +44,7 @@ err_report() {
         sleep 1
     done
 
-    echo "Error on  line $1 $2"
+    echo "Script de deploy falhou: Erro na linha $1 $2"
     exit
 }
 trap 'err_report $LINENO' ERR
