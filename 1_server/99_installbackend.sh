@@ -100,6 +100,7 @@ if [ $? -eq 0 ]; then
         echo "Resetting PM2 Metadata …"
         pm2 delete all || true
         sleep 1
+        pm2 save --force
         #pm2 reset all
         #echo ‘Calling pm2-runtime …’
         #pm2-runtime ecosystem.config.js --no-deamon --name MyApp
@@ -108,6 +109,7 @@ if [ $? -eq 0 ]; then
         #pm2 kill
         # sleep 1
         pm2 start ecosystem.config.producao.json
+        pm2 save --force
         envia_mensagem "Feito... Pm2 Esta no ar (?) Apagando diretorios antigos..."
         status_code=$(curl --retry 4 --retry-delay 1 --head --write-out %{http_code} --silent --output /dev/null https://api.pubshr.com/ping)
         if [[ "$status_code" -eq 200 ]]; then
