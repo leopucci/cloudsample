@@ -25,7 +25,7 @@ apaga_diretorios() {
         else
             envia_mensagem "Apagando backend $f"
             retornoRm=$(rm -rf "/opt/POCKETCLOUD/BACKENDAPI/$f")
-            echo retornoRm
+            echo $retornoRm
         fi
     done
 }
