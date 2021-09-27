@@ -23,8 +23,8 @@ apaga_diretorios() {
             echo "Ignorando diretorio atual $1"
             envia_mensagem "Ignorando diretorio atual $1"
         else
-            envia_mensagem "Apagando backend $f"
-            echo rm -rf "$f"
+            envia_mensagem "Apagando $f"
+            rm -rf "$f"
         fi
     done
 }
