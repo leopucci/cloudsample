@@ -24,7 +24,7 @@ apaga_diretorios() {
             envia_mensagem "Ignorando diretorio atual $1"
         else
             envia_mensagem "Apagando backend $f"
-            rm -rf /opt/POCKETCLOUD/BACKENDAPI/$f
+            rm -rf "/opt/POCKETCLOUD/BACKENDAPI/$f"
         fi
     done
 }
