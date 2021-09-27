@@ -101,11 +101,10 @@ if [ $? -eq 0 ]; then
         sleep 1
         pm2 delete all || true
         sleep 1
-        ps -ef | grep BACKENDAPI | grep -v grep | awk '{print $2}' | xargs kill -9
-        sleep 1
-        ps -ef | grep BACKENDAPI | grep -v grep | awk '{print $2}' | xargs kill -9
-        sleep 1
-        ps -ef | grep BACKENDAPI | grep -v grep | awk '{print $2}' | xargs kill -9
+        NUMOFPROCESSES=$(ps -ef | grep BACKENDAPI | grep -v grep | awk '{print $2}' | wc -l)
+        if [ $NUMOFPROCESSES -ne 0 ]; then
+            ps -ef | grep BACKENDAPI | grep -v grep | awk '{print $2}' | xargs kill -9
+        fi
         #pm2 reset all
         #echo ‘Calling pm2-runtime …’
         #pm2-runtime ecosystem.config.js --no-deamon --name MyApp
