@@ -15,8 +15,7 @@ const isDevelopment = () => {
   return isDevelopmentProcess;
 };
 const ambiente = () => {
-  const env = process.env.NODE_ENV || 'development';
-  const isDevelopmentProcess = env === 'development';
+  const isDevelopmentProcess = (process.env.NODE_ENV || 'development') === 'development';
   if (isDevelopmentProcess) {
     return 'Dev';
   }

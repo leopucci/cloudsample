@@ -81,4 +81,7 @@ process.on('SIGINT', function () {
   });
 });
 
-enviaNotificacaoApi(`Aplicação subiu sem erros`, canais.PocketDeployApi);
+const isDevelopmentProcess = (process.env.NODE_ENV || 'development') === 'development';
+if (!isDevelopmentProcess) {
+  enviaNotificacaoApi(`Aplicação subiu sem erros`, canais.PocketDeployApi);
+}
