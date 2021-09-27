@@ -86,7 +86,7 @@ if [ $? -eq 0 ]; then
     cp -R ./ /opt/POCKETCLOUD/BACKENDAPI/$THEDATE/
     cd /opt/POCKETCLOUD/BACKENDAPI/$THEDATE/
     rm -rf /opt/POCKETCLOUD/TEMP/$THEDATE
-    npm install --production
+    npm install
     if [ $? -eq 0 ]; then
         envia_mensagem "Npm Install OK, agora vai baixar e reapontar "
         echo "NPM INSTALL OK, AGORA COPIAR E APONTAR"
