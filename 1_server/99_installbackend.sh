@@ -100,7 +100,7 @@ if [ $? -eq 0 ]; then
         echo "Resetting PM2 Metadata …"
         pm2 delete all
         sleep 1
-        pm2 reset all
+        #pm2 reset all
         #echo ‘Calling pm2-runtime …’
         #pm2-runtime ecosystem.config.js --no-deamon --name MyApp
 
