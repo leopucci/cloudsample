@@ -1,14 +1,36 @@
 const mongoose = require('mongoose');
 const safeJsonStringify = require('safe-json-stringify');
-const addRequestId = require('express-request-id');
 const { enviaNotificacaoApi } = require('./utils/notify');
 const app = require('./app');
-
-app.use(addRequestId);
 const config = require('./config/config');
 const logger = require('./config/logger');
 
 let server;
+
+mongoose.connection.once('open', function () {
+  logger.info('MongoDB event open');
+  logger.debug(`MongoDB connected ${config.mongoose.url}`);
+
+  mongoose.connection.on('connected', function () {
+    logger.info('MongoDB event connected');
+  });
+
+  mongoose.connection.on('disconnected', function () {
+    logger.warn('MongoDB event disconnected');
+  });
+
+  mongoose.connection.on('reconnected', function () {
+    logger.info('MongoDB event reconnected');
+  });
+
+  mongoose.connection.on('error', function (err) {
+    logger.error(`MongoDB event error: ${err}`);
+  });
+
+  // return resolve();
+  //  return server.start();
+});
+
 mongoose.connect(config.mongoose.url, config.mongoose.options).then(() => {
   logger.info('Connected to MongoDB');
   server = app.listen(config.port, () => {

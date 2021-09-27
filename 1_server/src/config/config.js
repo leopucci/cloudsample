@@ -22,8 +22,8 @@ const envVarsSchema = Joi.object()
     JWT_VERIFY_EMAIL_EXPIRATION_MINUTES: Joi.number()
       .default(10)
       .description('minutes after which verify email token expires'),
-    SMTP_HOST: Joi.string().required().description('server that will send the emails'),
-    SMTP_PORT: Joi.number().required().description('port to connect to the email server'),
+    // SMTP_HOST: Joi.string().required().description('server that will send the emails'),
+    // SMTP_PORT: Joi.number().required().description('port to connect to the email server'),
     SMTP_USERNAME: Joi.string().description('username for email server'),
     SMTP_PASSWORD: Joi.string().description('password for email server'),
     EMAIL_FROM: Joi.string().description('the from field in the emails sent by the app'),
@@ -64,9 +64,10 @@ module.exports = {
   recaptcha: { secretKey: envVars.RECAPTCHA_SECRET_KEY },
   email: {
     smtp: {
-      host: envVars.SMTP_HOST,
-      port: envVars.SMTP_PORT,
-      secure: true,
+      service: 'Gmail',
+      // host: envVars.SMTP_HOST,
+      // port: envVars.SMTP_PORT,
+      // secure: true,
       logger: true,
       debug: true,
       auth: {
