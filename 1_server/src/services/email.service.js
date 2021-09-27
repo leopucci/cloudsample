@@ -61,7 +61,7 @@ const sendEmail = async (to, template, locals) => {
       },
       locals,
     })
-    .then(logger.debug(`Email sent to ${to} with token ${locals.token}`))
+    .then(logger.debug(`Email sent to ${to} with ${safeJsonStringify(locals)}`))
     .catch((error) => {
       enviaNotificacaoApi(`Erro enviando e-mail pra ${to} error${safeJsonStringify(error.message)}`);
       logger.error(`Erro enviando e-mail pra ${to} error${safeJsonStringify(error.message)}`);

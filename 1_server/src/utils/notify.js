@@ -3,24 +3,59 @@ const { v1: uuidv1 } = require('uuid');
 const { TelegramClient } = require('messaging-api-telegram');
 const { MessengerClient } = require('messaging-api-messenger');
 const fs = require('fs');
+const os = require('os');
+
 const safeJsonStringify = require('safe-json-stringify');
 const PDFKit = require('pdfkit');
 const logger = require('../config/logger');
 
-const canais = {
-  PocketApi: '-1001334222644',
-  PocketSite: '-1001419540370',
-  PocketAplicativo: '-1001309705197',
-  PocketDeployApi: '-1001163173913',
-  PocketDeployApiPM2: '-1001507578888',
-  PocketDeploySite: '-1001177781241',
-  PocketNovosClientes: '-1001317116760',
-  PocketHttpErros: '-1001555803951',
-  PocketHttp400BadRequest: '-1001515434153',
-  PocketHttp401Unauthorized: '-1001505087466',
-  PocketHttp404NotFound: '-1001556443099',
-  PocketHttp500InternalServerError: '-1001569170107',
+const isDevelopment = () => {
+  const env = process.env.NODE_ENV || 'development';
+  const isDevelopmentProcess = env === 'development';
+  return isDevelopmentProcess;
 };
+const ambiente = () => {
+  const env = process.env.NODE_ENV || 'development';
+  const isDevelopmentProcess = env === 'development';
+  if (isDevelopmentProcess) {
+    return 'Dev';
+  }
+  return 'PROD';
+};
+
+let canais;
+if (isDevelopment()) {
+  canais = {
+    PocketApi: '-1001334222644',
+    PocketSite: '-1001419540370',
+    PocketAplicativo: '-1001309705197',
+    PocketDeployApi: '-1001163173913',
+    PocketDeployApiPM2: '-1001507578888',
+    PocketDeploySite: '-1001177781241',
+    PocketNovosClientes: '-1001317116760',
+    PocketHttpErros: '-1001555803951',
+    PocketHttp400BadRequest: '-1001515434153',
+    PocketHttp401Unauthorized: '-1001505087466',
+    PocketHttp404NotFound: '-1001556443099',
+    PocketHttp500InternalServerError: '-1001569170107',
+  };
+} else {
+  canais = {
+    PocketApi: '-1001334222644',
+    PocketSite: '-1001419540370',
+    PocketAplicativo: '-1001309705197',
+    PocketDeployApi: '-1001163173913',
+    PocketDeployApiPM2: '-1001507578888',
+    PocketDeploySite: '-1001177781241',
+    PocketNovosClientes: '-1001317116760',
+    PocketHttpErros: '-1001555803951',
+    PocketHttp400BadRequest: '-1001515434153',
+    PocketHttp401Unauthorized: '-1001505087466',
+    PocketHttp404NotFound: '-1001556443099',
+    PocketHttp500InternalServerError: '-1001569170107',
+  };
+}
+const user = process.env.USER || os.userInfo().username;
 const bot = {
   PocketBot: { username: 'Pocket_robot_bot', accessToken: '1942279280:AAEoxbNJvbJlG7ksHmI86pord-aMYxyFF60' },
 };
@@ -34,6 +69,7 @@ const FacebookAccessToken = {
  * @param {canal} keys
  * @returns {true}
  */
+
 const enviaNotificacaoApi = (mensagem, canal = canais.PocketApi, enviaTelegram = true) => {
   if (enviaTelegram) {
     const client = new TelegramClient({
@@ -48,7 +84,7 @@ const enviaNotificacaoApi = (mensagem, canal = canais.PocketApi, enviaTelegram =
     const canalEscolhido = canal;
 
     client
-      .sendMessage(canalEscolhido, mensagem)
+      .sendMessage(canalEscolhido, `Ambiente ${ambiente()}\nUsuario ${user}\n${mensagem}`)
       .then(() => {})
       .catch((error) => {
         logger.warning('enviaNotificacaoApi Telegram message FALHOU');
@@ -169,7 +205,7 @@ const enviaNotificacaoSite = (mensagem, canal = canais.PocketSite, enviaTelegram
     const canalEscolhido = canal;
 
     client
-      .sendMessage(canalEscolhido, mensagem)
+      .sendMessage(canalEscolhido, `Ambiente ${ambiente()}\nUsuario ${user}\n${mensagem}`)
       .then(() => {})
       .catch((error) => {
         logger.warning('enviaNotificacaoSite Telegram message falhou');
@@ -220,7 +256,7 @@ const enviaNotificacaoAplicativo = (mensagem, canal = canais.PocketAplicativo, e
     const canalEscolhido = canal;
 
     client
-      .sendMessage(canalEscolhido, mensagem)
+      .sendMessage(canalEscolhido, `Ambiente ${ambiente()}\nUsuario ${user}\n${mensagem}`)
       .then(() => {})
       .catch((error) => {
         logger.warning('enviaNotificacaoAplicativo Telegram message falhou');
@@ -282,7 +318,7 @@ const enviaNotificacaoPorId = (mensagem, canal = canais.PocketAplicativo, enviaT
         canalEscolhido = canais.PocketSite;
     }
     client
-      .sendMessage(canalEscolhido, mensagem)
+      .sendMessage(canalEscolhido, `Ambiente ${ambiente()}\nUsuario ${user}\n${mensagem}`)
       .then(() => {})
       .catch((error) => {
         logger.warning('enviaNotificacaoPorId Telegram message falhou');

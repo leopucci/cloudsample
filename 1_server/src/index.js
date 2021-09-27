@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const safeJsonStringify = require('safe-json-stringify');
-const { enviaNotificacaoApi } = require('./utils/notify');
+const { enviaNotificacaoApi, canais } = require('./utils/notify');
 const app = require('./app');
 const config = require('./config/config');
 const logger = require('./config/logger');
@@ -80,3 +80,5 @@ process.on('SIGINT', function () {
     process.exit(0);
   });
 });
+
+enviaNotificacaoApi(`Aplicação subiu sem erros`, canais.PocketDeployApi);
