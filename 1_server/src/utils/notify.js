@@ -20,7 +20,7 @@ const ambiente = () => {
   if (isDevelopmentProcess) {
     return 'Dev';
   }
-  return 'PROD';
+  return 'PROD!';
 };
 
 let canais;
