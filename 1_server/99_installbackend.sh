@@ -24,6 +24,7 @@ apaga_diretorios() {
             envia_mensagem "Ignorando diretorio atual $1"
         else
             envia_mensagem "Apagando $f"
+            echo "Apagando $f"
             rm -rf "$f"
         fi
     done
