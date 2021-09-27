@@ -41,9 +41,7 @@ const sendEmail = async (to, template, locals) => {
     },
     // uncomment below to send emails in development/test env:
     // send: true
-    transport: {
-      transport,
-    },
+    transport,
     i18n,
     subjectPrefix: config.env === 'production' ? false : `[${config.env.toUpperCase()}] `,
     views: {
