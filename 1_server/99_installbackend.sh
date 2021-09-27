@@ -119,7 +119,8 @@ if [ $? -eq 0 ]; then
         else
             envia_mensagem "Falha na verificacao de acesso da api. Http Status code:  $status_code \n Ambiente fora do ar, necessaria intervençao manual"
             envia_mensagem "Voltando servidor pra pasta antiga....."
-            pm2 delete PktCloudApiPRODUCAO || true
+            pm2 stop PktCloudApiPRODUCAO || true
+            pm2 delete PktCloudApiPRODUCAO
             sleep 1
             pm2 kill
             sleep 1
