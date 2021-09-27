@@ -13,7 +13,7 @@ const transport = nodemailer.createTransport(config.email.smtp);
 if (config.env !== 'test') {
   transport
     .verify()
-    .then(() => logger.info('Connected to email server'))
+    .then(() => logger.info(`Connected to email server ${config.email.smtp.auth}`))
     .catch(() => logger.warn('Unable to connect to email server. Make sure you have configured the SMTP options in .env'));
 }
 
