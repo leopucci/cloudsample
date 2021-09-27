@@ -19,7 +19,7 @@ apaga_diretorios() {
     envia_mensagem "Apagando temp $1"
     rm -rf /opt/POCKETCLOUD/TEMP/$1
     for f in /opt/POCKETCLOUD/BACKENDAPI/*; do
-        if [ "$f" = "$1" ]; then
+        if [ "$f" = "/opt/POCKETCLOUD/BACKENDAPI/$1" ]; then
             echo "Ignorando diretorio atual $1"
             envia_mensagem "Ignorando diretorio atual $1"
         else
