@@ -108,6 +108,7 @@ if [ $? -eq 0 ]; then
         if [ $NUMOFPROCESSES -ne 0 ]; then
             ps -ef | grep BACKENDAPI | grep -v grep | awk '{print $2}' | xargs kill -9
         fi
+        rm -rf ~/.pm2
         #pm2 reset all
         #echo ‘Calling pm2-runtime …’
         #pm2-runtime ecosystem.config.js --no-deamon --name MyApp
