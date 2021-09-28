@@ -162,4 +162,4 @@ else
     envia_mensagem "Git clone falhou. Sistema ainda no ar com versao antiga."
     envia_log
 fi
-#ERRO ESTRANHO
+#ERROESTRANHO
