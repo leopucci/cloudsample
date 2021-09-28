@@ -33,6 +33,7 @@ verifica_lock() {
         envia_mensagem "DEPLOY RODANDO, segunda instancia bloqueada... se tiver problemas delete /opt/POCKETCLOUD/SCRIPTS/backend-lock.txt"
         exit
     else
+        envia_mensagem "Instalando lock /opt/POCKETCLOUD/SCRIPTS/backend-lock.txt"
         echo $1 >/opt/POCKETCLOUD/SCRIPTS/backend-lock.txt
     fi
 }
