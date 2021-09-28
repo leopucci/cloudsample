@@ -10,10 +10,10 @@ module.exports = {
     "plugin:prettier/recommended",
   ],
   parserOptions: {
+    ecmaVersion: 12,
     ecmaFeatures: {
       jsx: true,
     },
-    ecmaVersion: 12,
   },
   plugins: ["react", "@typescript-eslint", "formatjs"],
   rules: {
