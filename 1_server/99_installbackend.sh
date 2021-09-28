@@ -16,15 +16,16 @@ envia_log() {
 }
 mata_processos() {
     MATAPROCESSOSPM2=$(ps aux | grep PM2 | grep -v grep | awk '{print $2}' | wc -l)
-    NUMOFPROCESSES=$(ps -ef | grep BACKENDAPI | grep -v grep | awk '{print $2}' | wc -l)
-    PIDOFPROCESSES=$(ps -ef | grep BACKENDAPI | grep -v grep | awk '{print $2}')
+    PIDPROCESSOSPM2=$(ps aux | grep PM2 | grep -v grep | awk '{print $2}')
     if [ $MATAPROCESSOSPM2 -ne 0 ]; then
         envia_mensagem "Ainda tem processos PM2 no ar, matando $MATAPROCESSOSPM2"
-        ps aux | grep PM2 | grep -v grep | awk '{print $2}' | xargs kill -9
+        kill -9 $PIDPROCESSOSPM2 || true
     fi
+    NUMOFPROCESSES=$(ps -ef | grep BACKENDAPI | grep -v grep | awk '{print $2}' | wc -l)
+    PIDOFPROCESSES=$(ps -ef | grep BACKENDAPI | grep -v grep | awk '{print $2}')
     if [ $NUMOFPROCESSES -ne 0 ]; then
         envia_mensagem "Ainda tem processos no ar, matando $NUMOFPROCESSES"
-        ps -ef | grep BACKENDAPI | grep -v grep | awk '{print $2}' | xargs kill -9
+        kill -9 $PIDOFPROCESSES || true
     fi
 }
 verifica_lock() {
