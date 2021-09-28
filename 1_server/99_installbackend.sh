@@ -97,11 +97,24 @@ if [ $? -eq 0 ]; then
         pm2 save --force
         pm2 reset all || true
         pm2 kill || true
+        rm -rf ~/.pm2
         NUMOFPROCESSES=$(ps -ef | grep BACKENDAPI | grep -v grep | awk '{print $2}' | wc -l)
         if [ $NUMOFPROCESSES -ne 0 ]; then
             ps -ef | grep BACKENDAPI | grep -v grep | awk '{print $2}' | xargs kill -9
         fi
-        rm -rf ~/.pm2
+        NUMOFPROCESSES=$(ps -ef | grep BACKENDAPI | grep -v grep | awk '{print $2}' | wc -l)
+        if [ $NUMOFPROCESSES -ne 0 ]; then
+            ps -ef | grep BACKENDAPI | grep -v grep | awk '{print $2}' | xargs kill -9
+        fi
+        NUMOFPROCESSES=$(ps -ef | grep BACKENDAPI | grep -v grep | awk '{print $2}' | wc -l)
+        if [ $NUMOFPROCESSES -ne 0 ]; then
+            ps -ef | grep BACKENDAPI | grep -v grep | awk '{print $2}' | xargs kill -9
+        fi
+        NUMOFPROCESSES=$(ps -ef | grep BACKENDAPI | grep -v grep | awk '{print $2}' | wc -l)
+        if [ $NUMOFPROCESSES -ne 0 ]; then
+            ps -ef | grep BACKENDAPI | grep -v grep | awk '{print $2}' | xargs kill -9
+        fi
+
         #pm2 reset all
         #echo ‘Calling pm2-runtime …’
         #pm2-runtime ecosystem.config.js --no-deamon --name MyApp
@@ -109,6 +122,7 @@ if [ $? -eq 0 ]; then
         #pm2 kill
         # sleep 1
         pm2 update || true
+        envia_mensagem "instalando modulos de monitoramento"
         pm2 install pm2-server-monit
         pm2 install pm2-telegram-notification
         pm2 set pm2-telegram-notification:bot_token 1942279280:AAEoxbNJvbJlG7ksHmI86pord-aMYxyFF60
