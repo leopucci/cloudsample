@@ -84,5 +84,5 @@ process.on('SIGINT', function () {
 
 const isDevelopmentProcess = (process.env.NODE_ENV || 'development') === 'development';
 if (!isDevelopmentProcess) {
-  enviaNotificacaoApi(`Aplicação subiu sem erros`, canais.PocketDeployApi);
+  enviaNotificacaoApi(`APLICAÇAO NO AR!`, canais.PocketDeployApi);
 }
