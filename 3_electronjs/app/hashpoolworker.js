@@ -5,7 +5,7 @@ const fs = require('fs');
 var startTime, endTime;
 async function fileHasherThread(input) {
     file = input.pathId;
-    fullPath = input.fullPath
+    fullPath = input.fullPath;
     syncDir = input.syncDir;
 
     const createHashFromFile = file => new Promise((resolve, reject) => {

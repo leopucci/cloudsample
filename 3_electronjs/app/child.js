@@ -4,9 +4,9 @@ const chokidar = require('chokidar');
 const sqlite3 = require('better-sqlite3-sqleet');
 const uuidv4 = require('uuid');
 const workerpool = require('workerpool');
-var mqtt = require('mqtt')
-const https = require('https')
-const querystring = require('querystring')
+var mqtt = require('mqtt');
+const https = require('https');
+const querystring = require('querystring');
 // Check if Windows or Mac
 const isWinOS = process.platform === 'win32';
 const isMacOS = process.platform === 'darwin';
@@ -25,7 +25,7 @@ const {
     TYPE_ERROR,
     TYPE_STARTUP_SHOW_LOGIN_WINDOW,
     TYPE_STARTUP_SHOW_LOGGED_IN_WINDOW,
-} = require('./types.js')
+} = require('./types.js');
 
 
 process.on('message', (msg) => {
@@ -48,40 +48,40 @@ process.on('message', (msg) => {
 
 
 function sendMessageFor(token, channel) {
-    const baseUrl = `https://api.telegram.org/bot${token}`
+    const baseUrl = `https://api.telegram.org/bot${token}`;
 
     return message => {
         const urlParams = querystring.stringify({
             chat_id: channel,
             text: message,
             parse_mode: 'HTML'
-        })
+        });
 
-        return sendRequestSync(`${baseUrl}/sendMessage?${urlParams}`)
-    }
+        return sendRequestSync(`${baseUrl}/sendMessage?${urlParams}`);
+    };
 }
 
 function sendRequest(url) {
     return new Promise((resolve, reject) => {
         https.get(url, res => res.statusCode === 200 ? resolve(res) : reject(res))
-            .on('error', reject)
-    })
+            .on('error', reject);
+    });
 }
 function sendRequestSync(url) {
-    https.get(url, res => res.statusCode === 200)
+    https.get(url, res => res.statusCode === 200);
 }
 
 function sendMsg(message) {
-    const sendMessage = sendMessageFor('1621388212:AAHVIiVUPKYzNidK5PdvMAQdRfDhaNATLwo', '@startuphbase')
-    sendMessage(message)
+    const sendMessage = sendMessageFor('1621388212:AAHVIiVUPKYzNidK5PdvMAQdRfDhaNATLwo', '@startuphbase');
+    sendMessage(message);
 }
 
 
 
-sendMsg('CHILD ExecPath ' + process.execPath)
-sendMsg('CHILD argv ' + process.argv)
-sendMsg('CHILD cwd ' + process.cwd())
-sendMsg('CHILD -- INICIANDO...')
+sendMsg('CHILD ExecPath ' + process.execPath);
+sendMsg('CHILD argv ' + process.argv);
+sendMsg('CHILD cwd ' + process.cwd());
+sendMsg('CHILD -- INICIANDO...');
 const chokidarLogger = winston.createLogger({
     level: 'info',
     format: winston.format.json(),
@@ -187,19 +187,19 @@ workerPoolLogger.add(new winston.transports.Console({
 
 if (isWinOS) {
     const homedir = require('os').homedir();
-    const appData = process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share")
+    const appData = process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share");
     syncDir = homedir + '\\PocketCloud\\';
     dbDir = appData + '\\Pocket.Cloud\\app\\misc';
-    dbFile = dbDir + '\\misc.data'
+    dbFile = dbDir + '\\misc.data';
     dbExists = fs.existsSync(dbFile);
     sqliteLogger.info('HOME DIR ' + homedir);
     sqliteLogger.info('appData ' + appData);
 } else if (isMacOS) {
     const homedir = require('os').homedir();
-    const appData = process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share")
+    const appData = process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share");
     syncDir = homedir + '/Pocket.Cloud/';
     dbDir = appData + '/Pocket.Cloud/app/misc';
-    dbFile = dbDir + '/misc.data'
+    dbFile = dbDir + '/misc.data';
     dbExists = fs.existsSync(dbFile);
 }
 
@@ -209,7 +209,7 @@ if (isWinOS) {
 
 if (!dbExists) {
     sqliteLogger.info('banco nao existe');
-    fs.mkdirSync(dbDir, { recursive: true })
+    fs.mkdirSync(dbDir, { recursive: true });
 } else {
     sqliteLogger.info('banco existe: ' + dbFile);
 }
@@ -224,7 +224,7 @@ if (!dbExists) {
     db.exec('CREATE TABLE `instalation` ( `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,  `instalationId` TEXT, `machineId` TEXT )');
     db.exec('CREATE TABLE `userLogin` ( `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,  `userId` TEXT, `accessToken` TEXT,`refreshToken` TEXT  )');
     const stmt = db.prepare(`INSERT INTO instalation(instalationId,machineId) VALUES(?,?)`);
-    let machineId = machineIdSync.machineIdSync({ original: true })
+    let machineId = machineIdSync.machineIdSync({ original: true });
     info = stmt.run(uuidv4(), machineId);
     db.exec('CREATE TABLE `files` ( `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE,  `internalPath` TEXT, `fileName` TEXT, `internalDir` TEXT, `status` TEXT,`delayedHashTobeDone` INTEGER,`startupFileCount` INTEGER,`size` TEXT, `fullFileHash` TEXT)');
     //numa primeira execução, a idéia é baixar tudo do servidor. 
@@ -267,10 +267,10 @@ if (!loggedIn) {
     const watcher = chokidar.watch(syncDir, {
         awaitWriteFinish: true
 
-    })
+    });
     watcher
         .on('add', (path, stats) => {
-            process.send("ENTROU NA ADD File ${path} has been added: ` + stats.size + 'bytes'")
+            process.send("ENTROU NA ADD File ${path} has been added: ` + stats.size + 'bytes'");
             chokidarLogger.info(`File ${path} has been added: ` + stats.size + 'bytes');
             var fileIndex = '';
             var fileName = '';
@@ -405,21 +405,21 @@ if (!loggedIn) {
     watcher.on('change', (path, stats) => {
         startOrRestartHashingThread(syncDir, path);
 
-        chokidarLogger.info(`File ${path} has been changed ` + stats.size + 'bytes')
+        chokidarLogger.info(`File ${path} has been changed ` + stats.size + 'bytes');
     });
     watcher.on('unlink', path => {
-        chokidarLogger.info(`File ${path} has been removed `)
+        chokidarLogger.info(`File ${path} has been removed `);
     });
 
     // More possible events.
     watcher.on('addDir', (path, stats) => {
-        chokidarLogger.info(`Directory ${path} has been added ` + stats.size + 'bytes')
+        chokidarLogger.info(`Directory ${path} has been added ` + stats.size + 'bytes');
     });
     watcher.on('unlinkDir', path => {
-        chokidarLogger.info(`Directory ${path} has been removed2`)
+        chokidarLogger.info(`Directory ${path} has been removed2`);
     });
     watcher.on('error', error => {
-        chokidarLogger.info(`Watcher error: ${error}`)
+        chokidarLogger.info(`Watcher error: ${error}`);
     });
     watcher.on('ready', () => {
         //Aqui eu tenho que re-escanear o diretorio todo, e bater com o banco.
@@ -441,43 +441,43 @@ if (!loggedIn) {
     } catch (error) {
         sqliteLogger.error('Erro: ' + error);
     }
-    var client = mqtt.connect('mqtt://10.8.0.1', { username: 'usuariodeteste', password: 'leozin10', clientId: resultadoConsulta.instalationId + resultadoConsulta.machineId })
+    var client = mqtt.connect('mqtt://10.8.0.1', { username: 'usuariodeteste', password: 'leozin10', clientId: resultadoConsulta.instalationId + resultadoConsulta.machineId });
 
     client.on('connect', function () {
-        console.log("mqtt connect")
+        console.log("mqtt connect");
         client.subscribe('canaldeteste', function (err) {
             if (!err) {
                 //client.publish('presence', 'Hello mqtt')
-                console.log("mqtt subscribe")
+                console.log("mqtt subscribe");
             } else {
-                console.log(err)
+                console.log(err);
             }
-        })
-    })
+        });
+    });
 
     client.on('close', function () {
-        console.log("mqtt disconected")
-    })
+        console.log("mqtt disconected");
+    });
 
     client.on('offline', function () {
-        console.log("mqtt offline")
-    })
+        console.log("mqtt offline");
+    });
 
     client.on('reconnect', function () {
-        console.log("mqtt reconnecting started")
-    })
+        console.log("mqtt reconnecting started");
+    });
 
     client.on('error', function (error) {
-        console.log("mqtt error: " + error)
+        console.log("mqtt error: " + error);
 
-    })
+    });
 
 
     client.on('message', function (topic, message) {
         // message is Buffer
-        console.log('MQTT MESSAGE ' + message.toString())
-        client.end()
-    })
+        console.log('MQTT MESSAGE ' + message.toString());
+        client.end();
+    });
 
 
 }
@@ -638,7 +638,7 @@ function currentTasksHandler(id) {
                 case 'COMPLETED_OK':
                     contador = contador + 1;
                     workerPoolLogger.info("PROMISE FINALIZADA: tipo: " + result.tipo + " Path: " + result.path + " Tempo: " + result.timeSpent + " segundos Hash: " + result.hash);
-                    sendMsg("Hash feito para arquivo: " + result.path + " Hash: " + result.hash)
+                    sendMsg("Hash feito para arquivo: " + result.path + " Hash: " + result.hash);
                     break;
                 case 'ERROR_EBUSY':
                     workerPoolLogger.info("PROMISE FINALIZADA: tipo: " + result.tipo + " Tempo: " + result.timeSpent + " segundos Path: " + result.path);
