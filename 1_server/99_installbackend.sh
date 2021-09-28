@@ -165,8 +165,9 @@ if [ $? -eq 0 ]; then
             # Aqui eu consigo pegar o diretorio que tem no disco, verificar o status do pm2, se der merda consigo voltar o antigo
             apaga_diretorios $THEDATE
             pm2 save --force
-            envia_mensagem "Deploy terminado"
             remove_lock
+            envia_mensagem "Deploy terminado"
+
         else
             envia_mensagem "Falha na verificacao de acesso da api. Http Status code:  $status_code \n Ambiente fora do ar, necessaria intervençao manual"
             envia_mensagem "Voltando servidor pra pasta antiga....."
@@ -189,8 +190,9 @@ if [ $? -eq 0 ]; then
                 envia_mensagem "Eu tentei, voltei o backup, mesmo assim deu merda, necessaria intervencao manual"
                 envia_log
             fi
-            envia_mensagem "Deploy terminado"
             remove_lock
+            envia_mensagem "Deploy terminado"
+
         fi
 
     else
