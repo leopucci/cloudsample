@@ -19,22 +19,25 @@ mata_processos() {
     PIDPROCESSOSPM2=$(ps aux | grep PM2 | grep -v grep | awk '{print $2}')
     if [ $MATAPROCESSOSPM2 -ne 0 ]; then
         envia_mensagem "Ainda tem processos PM2 no ar, matando $MATAPROCESSOSPM2"
+        echo "Ainda tem processos PM2 no ar, matando $MATAPROCESSOSPM2"
         kill -9 $PIDPROCESSOSPM2 || true
     fi
     NUMOFPROCESSES=$(ps -ef | grep BACKENDAPI | grep -v grep | awk '{print $2}' | wc -l)
     PIDOFPROCESSES=$(ps -ef | grep BACKENDAPI | grep -v grep | awk '{print $2}')
     if [ $NUMOFPROCESSES -ne 0 ]; then
         envia_mensagem "Ainda tem processos no ar, matando $NUMOFPROCESSES"
+        echo "Ainda tem processos no ar, matando $NUMOFPROCESSES"
         kill -9 $PIDOFPROCESSES || true
     fi
 }
 verifica_lock() {
     if [ -e /opt/POCKETCLOUD/SCRIPTS/backend-lock.txt ]; then
-        echo "ok"
+        echo "DEPLOY RODANDO, segunda instancia bloqueada... se tiver problemas delete /opt/POCKETCLOUD/SCRIPTS/backend-lock.txt"
         envia_mensagem "DEPLOY RODANDO, segunda instancia bloqueada... se tiver problemas delete /opt/POCKETCLOUD/SCRIPTS/backend-lock.txt"
         exit
     else
         envia_mensagem "Instalando lock /opt/POCKETCLOUD/SCRIPTS/backend-lock.txt"
+        echo "Instalando lock /opt/POCKETCLOUD/SCRIPTS/backend-lock.txt"
         echo $1 >/opt/POCKETCLOUD/SCRIPTS/backend-lock.txt
     fi
 }
