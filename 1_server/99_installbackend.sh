@@ -114,6 +114,7 @@ if [ $? -eq 0 ]; then
 
         #pm2 kill
         # sleep 1
+        pm2 update || true
         pm2 start ecosystem.config.producao.json
         pm2 save --force
         envia_mensagem "Feito... Pm2 Esta no ar (?) Apagando diretorios antigos..."
