@@ -27,7 +27,20 @@ mata_processos() {
         ps -ef | grep BACKENDAPI | grep -v grep | awk '{print $2}' | xargs kill -9
     fi
 }
-
+verifica_lock() {
+    if [ -e /opt/POCKETCLOUD/SCRIPTS/backend-lock.txt ]; then
+        echo "ok"
+        envia_mensagem "DEPLOY RODANDO, segunda instancia bloqueada... se tiver problemas delete /opt/POCKETCLOUD/SCRIPTS/backend-lock.txt"
+        exit
+    else
+        echo $1 >/opt/POCKETCLOUD/SCRIPTS/backend-lock.txt
+    fi
+}
+remove_lock() {
+    if [ -e /opt/POCKETCLOUD/SCRIPTS/backend-lock.txt ]; then
+        rm -rf /opt/POCKETCLOUD/SCRIPTS/backend-lock.txt
+    fi
+}
 apaga_diretorios() {
     echo "Apagando temp"
     envia_mensagem "Apagando temp $1"
@@ -57,7 +70,7 @@ err_report() {
         n=$((n + 1))
         sleep 1
     done
-
+    remove_lock
     echo "Script de deploy falhou: Erro na linha $1 $2"
     exit
 }
@@ -144,6 +157,7 @@ if [ $? -eq 0 ]; then
             apaga_diretorios $THEDATE
             pm2 save --force
             envia_mensagem "Deploy terminado"
+            remove_lock
         else
             envia_mensagem "Falha na verificacao de acesso da api. Http Status code:  $status_code \n Ambiente fora do ar, necessaria intervençao manual"
             envia_mensagem "Voltando servidor pra pasta antiga....."
@@ -167,6 +181,7 @@ if [ $? -eq 0 ]; then
                 envia_log
             fi
             envia_mensagem "Deploy terminado"
+            remove_lock
         fi
 
     else
