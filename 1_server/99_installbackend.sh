@@ -38,6 +38,8 @@ verifica_lock() {
 }
 remove_lock() {
     if [ -e /opt/POCKETCLOUD/SCRIPTS/backend-lock.txt ]; then
+        echo "Removendo lock /opt/POCKETCLOUD/SCRIPTS/backend-lock.txt"
+        envia_mensagem "Removendo lock /opt/POCKETCLOUD/SCRIPTS/backend-lock.txt"
         rm -rf /opt/POCKETCLOUD/SCRIPTS/backend-lock.txt
     fi
 }
@@ -77,6 +79,7 @@ err_report() {
 trap 'err_report $LINENO' ERR
 
 THEDATE=$(date +%Y%m%d_%H%M%S)
+verifica_lock $THEDATE
 RUNNINGUSER=$(whoami)
 
 NUMOFFOLDERS=$(find /opt/POCKETCLOUD/BACKENDAPI/* -maxdepth 0 -type d -print | wc -l)
@@ -125,6 +128,7 @@ if [ $? -eq 0 ]; then
         pm2 reset all || true
         pm2 kill || true
         rm -rf ~/.pm2
+        envia_mensagem "Matando processos antigos"
         mata_processos
         sleep 1
         mata_processos
