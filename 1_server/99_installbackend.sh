@@ -90,13 +90,6 @@ if [ $? -eq 0 ]; then
     if [ $? -eq 0 ]; then
         envia_mensagem "Npm Install OK, agora vai baixar e reapontar "
         echo "NPM INSTALL OK, AGORA COPIAR E APONTAR"
-        #pm2 install pm2-server-monit
-        #pm2 install pm2-telegram-notification
-        #pm2 set pm2-telegram-notification:bot_token 1942279280:AAEoxbNJvbJlG7ksHmI86pord-aMYxyFF60
-        #pm2 set pm2-telegram-notification:chat_id g-1001507578888
-        ##pm2 install leopucci/pm2-telegram-notify
-        #pm2 set pm2-telegram-notify:telegram_url https://api.telegram.org/bot1942279280:AAEoxbNJvbJlG7ksHmI86pord-aMYxyFF60/sendMessage
-        #pm2 set pm2-telegram-notify:chat_id g-1001507578888
         pm2 stop all || true
         sleep 1
         pm2 delete all || true
@@ -116,6 +109,13 @@ if [ $? -eq 0 ]; then
         #pm2 kill
         # sleep 1
         pm2 update || true
+        pm2 install pm2-server-monit
+        pm2 install pm2-telegram-notification
+        pm2 set pm2-telegram-notification:bot_token 1942279280:AAEoxbNJvbJlG7ksHmI86pord-aMYxyFF60
+        pm2 set pm2-telegram-notification:chat_id g-1001507578888
+        pm2 install leopucci/pm2-telegram-notify
+        pm2 set pm2-telegram-notify:telegram_url https://api.telegram.org/bot1942279280:AAEoxbNJvbJlG7ksHmI86pord-aMYxyFF60/sendMessage
+        pm2 set pm2-telegram-notify:chat_id g-1001507578888
         pm2 start ecosystem.config.producao.json
         pm2 save --force
         envia_mensagem "Feito... Pm2 Esta no ar (?) Apagando diretorios antigos..."
