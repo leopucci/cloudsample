@@ -17,17 +17,17 @@ envia_log() {
 mata_processos() {
     MATAPROCESSOSPM2=$(ps aux | grep PM2 | grep -v grep | awk '{print $2}' | wc -l)
     PIDPROCESSOSPM2=$(ps aux | grep PM2 | grep -v grep | awk '{print $2}')
-    if [ $MATAPROCESSOSPM2 -ne 0 ]; then
+    if [ "$MATAPROCESSOSPM2" -ne 0 ]; then
         envia_mensagem "Ainda tem processos PM2 no ar, matando $MATAPROCESSOSPM2"
         echo "Ainda tem processos PM2 no ar, matando $MATAPROCESSOSPM2"
-        kill -9 $PIDPROCESSOSPM2 || true
+        kill -9 "$PIDPROCESSOSPM2" || true
     fi
     NUMOFPROCESSES=$(ps -ef | grep BACKENDAPI | grep -v grep | awk '{print $2}' | wc -l)
     PIDOFPROCESSES=$(ps -ef | grep BACKENDAPI | grep -v grep | awk '{print $2}')
-    if [ $NUMOFPROCESSES -ne 0 ]; then
+    if [ "$NUMOFPROCESSES" -ne 0 ]; then
         envia_mensagem "Ainda tem processos no ar, matando $NUMOFPROCESSES"
         echo "Ainda tem processos no ar, matando $NUMOFPROCESSES"
-        kill -9 $PIDOFPROCESSES || true
+        kill -9 "$PIDOFPROCESSES" || true
     fi
 }
 verifica_lock() {
@@ -38,7 +38,7 @@ verifica_lock() {
     else
         envia_mensagem "Instalando lock /opt/POCKETCLOUD/SCRIPTS/backend-lock.txt"
         echo "Instalando lock /opt/POCKETCLOUD/SCRIPTS/backend-lock.txt"
-        echo $1 >/opt/POCKETCLOUD/SCRIPTS/backend-lock.txt
+        echo "$1" >/opt/POCKETCLOUD/SCRIPTS/backend-lock.txt
     fi
 }
 remove_lock() {
@@ -65,7 +65,6 @@ apaga_diretorios() {
 }
 err_report() {
     envia_log
-    datahoravoltou=$(date +"%d-%m-%y %H:%M:%S")
 
     n=0
     until [ "$n" -ge 900000 ]; do
@@ -101,8 +100,8 @@ mkdir -p /opt/POCKETCLOUD/FRONTENDREACT/
 mkdir -p /opt/POCKETCLOUD/SCRIPTS/
 mkdir -p /opt/POCKETCLOUD/TEMP/
 cd /opt/POCKETCLOUD/TEMP
-mkdir $THEDATE
-cd $THEDATE
+mkdir "$THEDATE"
+cd "$THEDATE"
 envia_mensagem "Clonando repositorio"
 git clone https://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@github.com/leopucci/pocketcloud.git --branch release_backend --single-branch
 if [ $? -eq 0 ]; then
