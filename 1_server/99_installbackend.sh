@@ -131,7 +131,7 @@ if [ $? -eq 0 ]; then
         pm2 save --force
         pm2 reset all || true
         pm2 kill || true
-        rm -rf ~/.pm2
+        #rm -rf ~/.pm2
         envia_mensagem "Matando processos antigos"
         mata_processos
         sleep 1
@@ -148,13 +148,13 @@ if [ $? -eq 0 ]; then
         # sleep 1
         pm2 update || true
         envia_mensagem "instalando modulos de monitoramento"
-        pm2 install pm2-server-monit
-        pm2 install pm2-telegram-notification
-        pm2 set pm2-telegram-notification:bot_token 1942279280:AAEoxbNJvbJlG7ksHmI86pord-aMYxyFF60
-        pm2 set pm2-telegram-notification:chat_id g-1001507578888
-        pm2 install leopucci/pm2-telegram-notify
-        pm2 set pm2-telegram-notify:telegram_url https://api.telegram.org/bot1942279280:AAEoxbNJvbJlG7ksHmI86pord-aMYxyFF60/sendMessage
-        pm2 set pm2-telegram-notify:chat_id g-1001507578888
+        #pm2 install pm2-server-monit
+        #pm2 install pm2-telegram-notification
+        #pm2 set pm2-telegram-notification:bot_token 1942279280:AAEoxbNJvbJlG7ksHmI86pord-aMYxyFF60
+        #pm2 set pm2-telegram-notification:chat_id g-1001507578888
+        #pm2 install leopucci/pm2-telegram-notify
+        #pm2 set pm2-telegram-notify:telegram_url https://api.telegram.org/bot1942279280:AAEoxbNJvbJlG7ksHmI86pord-aMYxyFF60/sendMessage
+        #pm2 set pm2-telegram-notify:chat_id g-1001507578888
         pm2 start /opt/POCKETCLOUD/BACKENDAPI/$THEDATE/ecosystem.config.producao.json
         pm2 save --force
         envia_mensagem "Feito... Pm2 Esta no ar (?) Apagando diretorios antigos..."
