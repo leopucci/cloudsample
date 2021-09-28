@@ -102,6 +102,8 @@ if [ $? -eq 0 ]; then
         pm2 delete all || true
         sleep 1
         pm2 save --force
+        pm2 reset || true
+        pm2 kill || true
         NUMOFPROCESSES=$(ps -ef | grep BACKENDAPI | grep -v grep | awk '{print $2}' | wc -l)
         if [ $NUMOFPROCESSES -ne 0 ]; then
             ps -ef | grep BACKENDAPI | grep -v grep | awk '{print $2}' | xargs kill -9
