@@ -69,7 +69,7 @@ module.exports = {
       // port: envVars.SMTP_PORT,
       // secure: true,
       logger: true,
-      debug: true,
+      // debug: true,
       auth: {
         user: envVars.SMTP_USERNAME,
         pass: envVars.SMTP_PASSWORD,
