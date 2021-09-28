@@ -14,6 +14,20 @@ envia_mensagem() {
 envia_log() {
     screen -dm -S TESTE /opt/POCKETCLOUD/SCRIPTS/99_sendlog.sh 1 &
 }
+mata_processos() {
+    MATAPROCESSOSPM2=$(ps aux | grep PM2 | grep -v grep | awk '{print $2}' | wc -l)
+    NUMOFPROCESSES=$(ps -ef | grep BACKENDAPI | grep -v grep | awk '{print $2}' | wc -l)
+    PIDOFPROCESSES=$(ps -ef | grep BACKENDAPI | grep -v grep | awk '{print $2}')
+    if [ $MATAPROCESSOSPM2 -ne 0 ]; then
+        envia_mensagem "Ainda tem processos PM2 no ar, matando $MATAPROCESSOSPM2"
+        ps aux | grep PM2 | grep -v grep | awk '{print $2}' | xargs kill -9
+    fi
+    if [ $NUMOFPROCESSES -ne 0 ]; then
+        envia_mensagem "Ainda tem processos no ar, matando $NUMOFPROCESSES"
+        ps -ef | grep BACKENDAPI | grep -v grep | awk '{print $2}' | xargs kill -9
+    fi
+}
+
 apaga_diretorios() {
     echo "Apagando temp"
     envia_mensagem "Apagando temp $1"
@@ -69,7 +83,7 @@ cd /opt/POCKETCLOUD/TEMP
 mkdir $THEDATE
 cd $THEDATE
 envia_mensagem "Clonando repositorio"
-git clone https://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@github.com/leopucci/pocketcloud.git --branch release_backend
+git clone https://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@github.com/leopucci/pocketcloud.git --branch release_backend --single-branch
 if [ $? -eq 0 ]; then
     envia_mensagem "Clone OK! Dando npm install"
     cd pocketcloud
@@ -98,22 +112,12 @@ if [ $? -eq 0 ]; then
         pm2 reset all || true
         pm2 kill || true
         rm -rf ~/.pm2
-        NUMOFPROCESSES=$(ps -ef | grep BACKENDAPI | grep -v grep | awk '{print $2}' | wc -l)
-        if [ $NUMOFPROCESSES -ne 0 ]; then
-            ps -ef | grep BACKENDAPI | grep -v grep | awk '{print $2}' | xargs kill -9
-        fi
-        NUMOFPROCESSES=$(ps -ef | grep BACKENDAPI | grep -v grep | awk '{print $2}' | wc -l)
-        if [ $NUMOFPROCESSES -ne 0 ]; then
-            ps -ef | grep BACKENDAPI | grep -v grep | awk '{print $2}' | xargs kill -9
-        fi
-        NUMOFPROCESSES=$(ps -ef | grep BACKENDAPI | grep -v grep | awk '{print $2}' | wc -l)
-        if [ $NUMOFPROCESSES -ne 0 ]; then
-            ps -ef | grep BACKENDAPI | grep -v grep | awk '{print $2}' | xargs kill -9
-        fi
-        NUMOFPROCESSES=$(ps -ef | grep BACKENDAPI | grep -v grep | awk '{print $2}' | wc -l)
-        if [ $NUMOFPROCESSES -ne 0 ]; then
-            ps -ef | grep BACKENDAPI | grep -v grep | awk '{print $2}' | xargs kill -9
-        fi
+        mata_processos
+        sleep 1
+        mata_processos
+        sleep 1
+        mata_processos
+        mata_processos
 
         #pm2 reset all
         #echo ‘Calling pm2-runtime …’
