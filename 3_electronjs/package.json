@@ -29,7 +29,8 @@
   "devDependencies": {
     "electron": "^12.0.7",
     "electron-builder": "^22.11.7",
-    "node-sass": "^6.0.1"
+    "node-sass": "^6.0.1",
+    "prettier": "^2.4.1"
   },
   "dependencies": {
     "@felipebutcher/node-os-info": "^0.0.5",
@@ -44,7 +45,7 @@
     "loadavg-windows": "^1.1.1",
     "mqtt": "^4.2.6",
     "node-machine-id": "^1.1.12",
-    "open": "^7.4.2",
+    "open": "^7.4.2",  
     "uuid": "^3.4.0",
     "winston": "^3.3.3",
     "workerpool": "^6.1.4"
