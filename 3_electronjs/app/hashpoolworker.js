@@ -1,5 +1,6 @@
 /* Main part of worker function - worker_nlc_wink.js  */
 const workerpool = require('workerpool');
+const {chokidarLogger,sqliteLogger, workerPoolLogger} = require ("./logger");
 const crypto = require("crypto");
 const fs = require('fs');
 var startTime, endTime;
@@ -22,7 +23,7 @@ async function fileHasherThread(input) {
                 resolve({ tipo: 'COMPLETED_OK', path: file, timeSpent: seconds, hash: hash.digest('hex') });
             })
             .on('error', (err) => {
-                console.log('ERRO!: ' + err.name.split('Error: ') + ': ' + err.message);
+                workerPoolLogger.error('ERRO!: ' + err.name.split('Error: ') + ': ' + err.message);
                 endTime = new Date().getTime();
                 var time = endTime - startTime;
                 var seconds = (time / 1000);
@@ -38,7 +39,7 @@ async function fileHasherThread(input) {
 
 
 
-    console.log('WORKERPOOL THREAD: Executando Hash para: ' +  file);
+    workerPoolLogger.info('WORKERPOOL THREAD: Executando Hash para: ' +  file);
 
 
 

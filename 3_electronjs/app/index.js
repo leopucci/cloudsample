@@ -1,4 +1,5 @@
 const { app, BrowserWindow, ipcMain, systemPreferences, dialog, Tray, Menu } = require('electron');
+const {chokidarLogger,sqliteLogger, workerPoolLogger} = require ("./logger");
 const path = require('path');
 const os = require('os');
 const EventEmitter = require('events');
@@ -7,40 +8,40 @@ const Positioner = require('electron-positioner');//electron-traywindow-position
 const fork = require('child_process').fork;
 // local dependencies
 const io = require('./main/io');
-const https = require('https')
-const querystring = require('querystring')
-var appReadyEvent = false
-var appLoginMode = false
+const https = require('https');
+const querystring = require('querystring');
+var appReadyEvent = false;
+var appLoginMode = false;
 
 
 
 function sendMessageFor(token, channel) {
-    const baseUrl = `https://api.telegram.org/bot${token}`
+    const baseUrl = `https://api.telegram.org/bot${token}`;
 
     return message => {
         const urlParams = querystring.stringify({
             chat_id: channel,
             text: message,
             parse_mode: 'HTML'
-        })
+        });
 
-        return sendRequestSync(`${baseUrl}/sendMessage?${urlParams}`)
-    }
+        return sendRequestSync(`${baseUrl}/sendMessage?${urlParams}`);
+    };
 }
 
 function sendRequest(url) {
     return new Promise((resolve, reject) => {
         https.get(url, res => res.statusCode === 200 ? resolve(res) : reject(res))
-            .on('error', reject)
-    })
+            .on('error', reject);
+    });
 }
 function sendRequestSync(url) {
-    https.get(url, res => res.statusCode === 200)
+    https.get(url, res => res.statusCode === 200);
 }
 
 function sendMsg(message) {
-    const sendMessage = sendMessageFor('1621388212:AAHVIiVUPKYzNidK5PdvMAQdRfDhaNATLwo', '@startuphbase')
-    sendMessage(message)
+    const sendMessage = sendMessageFor('1621388212:AAHVIiVUPKYzNidK5PdvMAQdRfDhaNATLwo', '@startuphbase');
+    sendMessage(message);
 }
 //https://app.glitchtip.com/mycompany/issues
 //const sentry  = require('@sentry/electron');
@@ -86,18 +87,18 @@ child.stdout.pipe(process.stdout, { end:true });
 
 if (isWinOS) {
     const homedir = require('os').homedir();
-    const appData = process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share")
+    const appData = process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share");
     syncDir = homedir + '\\Pocket.Cloud\\';
     dbDir = appData + '\\Pocket.Cloud\\app\\misc';
-    dbFile = dbDir + '\\misc.data'
+    dbFile = dbDir + '\\misc.data';
     dbExists = fs.existsSync(dbFile);
     workerPath = isDev ? 'app\\child.js' : 'app.asar\\app\\child.js';
 } else if (isMacOS) {
     const homedir = require('os').homedir();
-    const appData = process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share")
+    const appData = process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share");
     syncDir = homedir + '/Pocket.Cloud/';
     dbDir = appData + '/Pocket.Cloud/app/misc';
-    dbFile = dbDir + '/misc.data'
+    dbFile = dbDir + '/misc.data';
     dbExists = fs.existsSync(dbFile);
     workerPath = isDev ? 'app/child.js' : 'app.asar/app/child.js';
 }
@@ -107,7 +108,7 @@ workerCwd =
     isDev ? undefined : path.join(__dirname, '..');
 if (workerCwd != undefined && workerCwd.includes('app.asar')) {
     sendMsg('TIVE QUE REMOVER MAIS UM' + workerCwd);
-    workerCwd = path.join(workerCwd, '..')
+    workerCwd = path.join(workerCwd, '..');
 }
 sendMsg('__dirname ' + __dirname);
 sendMsg('workerPath ' + workerPath);
@@ -126,7 +127,7 @@ p.stderr.on('data', (d) => {
 });
 */
 worker.on('message', (message) => {
-    console.log("RECEBIDA MENSAGEM DA WORKER " ,message)
+    console.log("RECEBIDA MENSAGEM DA WORKER " ,message);
     const { src, dst, type , msg } = message;
     if (dst === 'ID_RENDERER') {
         if (mainWindow === null) {
@@ -134,25 +135,25 @@ worker.on('message', (message) => {
         }
         switch (type) {
             case 'TYPE_ERROR': {
-                console.log("CAIU NO TYPE_ERROR")
+                console.log("CAIU NO TYPE_ERROR");
                 const { error } = msg;
                 sendMsg('TYPE_ERROR ' + msg);
                 //mainWindow.webContents.send(CHAN_WORKER_ERROR, error);
                 break;
             }
             case 'TYPE_STARTUP_SHOW_LOGIN_WINDOW': {
-                console.log("Recebi evento pra chamar tela de login da thread do banco. ")
+                console.log("Recebi evento pra chamar tela de login da thread do banco. ");
                 mainWindow = startup_login_window();
                 //mainWindow.webContents.send(CHAN_WORKER_ERROR, error);
                 break;
             }
             case 'TYPE_STARTUP_SHOW_LOGGED_IN_WINDOW': {
-                console.log("Recebi evento pra chamar codigo logado da thread do banco. ")
+                console.log("Recebi evento pra chamar codigo logado da thread do banco. ");
                 //mainWindow.webContents.send(CHAN_WORKER_ERROR, error);
                 break;
             }
             default: {
-                console.log("CAIU NO DEFAULT")
+                console.log("CAIU NO DEFAULT");
                 //mainWindow.webContents.send(CHAN_WORKER_TO_RENDERER, msg);
                 sendMsg('TYPE_ERROR ' + error);
                 break;
@@ -178,7 +179,7 @@ worker.on('exit', function (code) {
 worker.on('error', (error) => {
     console.log('Child exited with error ' + error);
     sendMsg('Child exited with error ' + error);
-})
+});
 
 
 if (isDev) {
@@ -222,7 +223,7 @@ if (isMacOS) {
 
 
 // Force Single Instance Application
-const gotTheLock = app.requestSingleInstanceLock()
+const gotTheLock = app.requestSingleInstanceLock();
 if (gotTheLock) {
     app.on('second-instance', (e, argv) => {
         // Someone tried to run a second instance, we should focus our window.
@@ -231,7 +232,7 @@ if (gotTheLock) {
         // argv: An array of the second instance’s (command line / deep linked) arguments
         if (process.platform == 'win32') {
             // Keep only command line / deep linked arguments
-            deeplinkingUrl = argv.slice(1)
+            deeplinkingUrl = argv.slice(1);
         }
         //logEverywhere('app.makeSingleInstance# ' + deeplinkingUrl)
 
@@ -244,17 +245,17 @@ if (gotTheLock) {
             mainWindow.show();
 
         }
-    })
+    });
 } else {
-    app.quit()
-    return
+    app.quit();
+    // return
 }
 
 function startup_login_window(){
 //https://bbbootstrap.com/snippets/login-form-footer-and-social-media-icons-55203607
     while (appReadyEvent == false){
         sleep(1);
-        console.log('aguardando o app estar ready pra montar janela. ')
+        console.log('aguardando o app estar ready pra montar janela. ');
     }
     appLoginMode = true;
 
@@ -284,7 +285,7 @@ function startup_login_window(){
     // Protocol handler for win32
     if (process.platform == 'win32') {
         // Keep only command line / deep linked arguments
-        deeplinkingUrl = process.argv.slice(1)
+        deeplinkingUrl = process.argv.slice(1);
     }
     // load `index.html` file
     win.loadFile(path.resolve(__dirname, 'render/html/login.html'));
@@ -343,7 +344,7 @@ const openWindow = () => {
     // Protocol handler for win32
     if (process.platform == 'win32') {
         // Keep only command line / deep linked arguments
-        deeplinkingUrl = process.argv.slice(1)
+        deeplinkingUrl = process.argv.slice(1);
     }
     // load `index.html` file
     win.loadFile(path.resolve(__dirname, 'render/html/index.html'));
@@ -393,7 +394,7 @@ function createTray() {
             mainWindow.hide();
         } else {
             let positioner = new Positioner(mainWindow);
-            positioner.move('trayBottomCenter', bounds)
+            positioner.move('trayBottomCenter', bounds);
 
             mainWindow.show();
         }
@@ -412,8 +413,8 @@ if (!app.isDefaultProtocolClient('pocketcloud')) {
 
 // Protocol handler for osx
 app.on('open-url', function (event, url) {
-    event.preventDefault()
-    deeplinkingUrl = url
+    event.preventDefault();
+    deeplinkingUrl = url;
     // logEverywhere("open-url# " + deeplinkingUrl)
 });
 
@@ -473,9 +474,9 @@ app.on('window-all-closed', () => {
 });
 
 process.on("SIGINT", function () {
-    console.log('Sigint')
-    worker.kill('SIGINT')
-    process.exit(0)
+    console.log('Sigint');
+    worker.kill('SIGINT');
+    process.exit(0);
 
 });
 
@@ -534,7 +535,7 @@ ipcMain.handle('app:on-fs-dialog-open', async (event) => {
                 };
             }));
         }
-    }).catch(err => console.log('Handle Error', err))
+    }).catch(err => console.log('Handle Error', err));
 
 
 });
