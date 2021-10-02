@@ -27,12 +27,19 @@
   },
   "homepage": "https://github.com/course-one/electron-lessons#readme",
   "devDependencies": {
-    "electron": "^12.0.7",
     "electron-builder": "^22.11.7",
     "node-sass": "^6.0.1",
-    "prettier": "^2.4.1"
+    "prettier": "^2.4.1",
+    "eslint": "^7.32.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.24.2",
+    "eslint-plugin-jest": "^24.5.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-security": "^1.4.0"
   },
   "dependencies": {
+    "electron": "^12.0.7",
     "@felipebutcher/node-os-info": "^0.0.5",
     "@sentry/electron": "^2.5.0",
     "better-sqlite3-sqleet": "^7.1.2",
@@ -41,11 +48,12 @@
     "electron-is-dev": "^2.0.0",
     "electron-positioner": "^4.1.0",
     "electron-updater": "^4.3.8",
+
     "fs-extra": "^9.1.0",
     "loadavg-windows": "^1.1.1",
     "mqtt": "^4.2.6",
     "node-machine-id": "^1.1.12",
-    "open": "^7.4.2",  
+    "open": "^7.4.2",
     "uuid": "^3.4.0",
     "winston": "^3.3.3",
     "workerpool": "^6.1.4"

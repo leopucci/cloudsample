@@ -7,25 +7,25 @@ const {
   Tray,
   Menu,
 } = require("electron");
-const {
-  mainLogger,
-  chokidarLogger,
-  sqliteLogger,
-  workerPoolLogger,
-} = require("./logger");
+const osInfo = require("@felipebutcher/node-os-info");
 const path = require("path");
 const os = require("os");
-const EventEmitter = require("events");
+const homedir = require("os").homedir();
 const { autoUpdater } = require("electron-updater");
-const Positioner = require("electron-positioner"); //electron-traywindow-positioner talvez seja melhor
-const fork = require("child_process").fork;
+const Positioner = require("electron-positioner"); // electron-traywindow-positioner talvez seja melhor
+// eslint-disable-next-line security/detect-child-process
+const { fork } = require("child_process");
+const fs = require("fs");
 // local dependencies
-const io = require("./main/io");
 const https = require("https");
 const querystring = require("querystring");
-var appReadyEvent = false;
-var appLoginMode = false;
-const fs = require("fs");
+
+let appReadyEvent = false;
+let appLoginMode = false;
+
+function sendRequestSync(url) {
+  https.get(url, (res) => res.statusCode === 200);
+}
 function sendMessageFor(token, channel) {
   const baseUrl = `https://api.telegram.org/bot${token}`;
 
@@ -40,17 +40,6 @@ function sendMessageFor(token, channel) {
   };
 }
 
-function sendRequest(url) {
-  return new Promise((resolve, reject) => {
-    https
-      .get(url, (res) => (res.statusCode === 200 ? resolve(res) : reject(res)))
-      .on("error", reject);
-  });
-}
-function sendRequestSync(url) {
-  https.get(url, (res) => res.statusCode === 200);
-}
-
 function sendMsg(message) {
   const sendMessage = sendMessageFor(
     "1621388212:AAHVIiVUPKYzNidK5PdvMAQdRfDhaNATLwo",
@@ -58,9 +47,9 @@ function sendMsg(message) {
   );
   sendMessage(message);
 }
-//https://app.glitchtip.com/mycompany/issues
-//const sentry  = require('@sentry/electron');
-//sentry.init({ dsn: "https://65a79bdaeaae4445bf6cc880618baa2d@app.glitchtip.com/343" });
+// https://app.glitchtip.com/mycompany/issues
+// const sentry  = require('@sentry/electron');
+// sentry.init({ dsn: "https://65a79bdaeaae4445bf6cc880618baa2d@app.glitchtip.com/343" });
 
 // One-liner for current directory
 
@@ -68,6 +57,8 @@ function sendMsg(message) {
 const isWinOS = process.platform === "win32";
 const isMacOS = process.platform === "darwin";
 const isDev = require("electron-is-dev");
+const { mainLogger } = require("./logger");
+const io = require("./main/io");
 
 /*
 const child  = spawn(process.execPath, [path.join(__dirname, 'child.js'), 'args'], {
@@ -96,46 +87,49 @@ child.on('exit', function(code) {
 child.stderr.pipe(process.stderr, { end:true });
 child.stdout.pipe(process.stdout, { end:true });
 */
+let syncDir;
+let dbDir;
+let dbFile;
+let dbExists;
+let workerPath;
 
 if (isWinOS) {
-  const homedir = require("os").homedir();
   const appData =
     process.env.APPDATA ||
-    (process.platform == "darwin"
-      ? process.env.HOME + "/Library/Preferences"
-      : process.env.HOME + "/.local/share");
-  syncDir = homedir + "\\Pocket.Cloud\\";
-  dbDir = appData + "\\Pocket.Cloud\\app\\misc";
-  dbFile = dbDir + "\\misc.data";
+    (process.platform === "darwin"
+      ? `${process.env.HOME}/Library/Preferences`
+      : `${process.env.HOME}/.local/share`);
+  syncDir = `${homedir}\\Pocket.Cloud\\`;
+  dbDir = `${appData}\\Pocket.Cloud\\app\\misc`;
+  dbFile = `${dbDir}\\misc.data`;
   dbExists = fs.existsSync(dbFile);
   workerPath = isDev ? "app\\child.js" : "app.asar\\app\\child.js";
 } else if (isMacOS) {
-  const homedir = require("os").homedir();
   const appData =
     process.env.APPDATA ||
-    (process.platform == "darwin"
-      ? process.env.HOME + "/Library/Preferences"
-      : process.env.HOME + "/.local/share");
-  syncDir = homedir + "/Pocket.Cloud/";
-  dbDir = appData + "/Pocket.Cloud/app/misc";
-  dbFile = dbDir + "/misc.data";
+    (process.platform === "darwin"
+      ? `${process.env.HOME}/Library/Preferences`
+      : `${process.env.HOME}/.local/share`);
+  syncDir = `${homedir}/Pocket.Cloud/`;
+  dbDir = `${appData}/Pocket.Cloud/app/misc`;
+  dbFile = `${dbDir}/misc.data`;
   dbExists = fs.existsSync(dbFile);
   workerPath = isDev ? "app/child.js" : "app.asar/app/child.js";
 }
 
-workerCwd = isDev ? undefined : path.join(__dirname, "..");
-if (workerCwd != undefined && workerCwd.includes("app.asar")) {
-  sendMsg("TIVE QUE REMOVER MAIS UM" + workerCwd);
+let workerCwd = isDev ? undefined : path.join(__dirname, "..");
+if (workerCwd !== undefined && workerCwd.includes("app.asar")) {
+  sendMsg(`TIVE QUE REMOVER MAIS UM${workerCwd}`);
   workerCwd = path.join(workerCwd, "..");
 }
 
-mainLogger.info("__dirname " + __dirname);
-mainLogger.info("workerPath " + workerPath);
-mainLogger.info("workerCwd " + workerCwd);
+mainLogger.info(`__dirname ${__dirname}`);
+mainLogger.info(`workerPath ${workerPath}`);
+mainLogger.info(`workerCwd ${workerCwd}`);
 const worker = fork(workerPath, [], {
   cwd: workerCwd,
-  //cwd: workerCwd, stdio: ['pipe', 'pipe', 'pipe', 'ipc'],
-  //cwd: workerCwd,
+  // cwd: workerCwd, stdio: ['pipe', 'pipe', 'pipe', 'ipc'],
+  // cwd: workerCwd,
 });
 /*
 p.stdout.on('data', (d) => {
@@ -156,8 +150,8 @@ worker.on("message", (message) => {
       case "TYPE_ERROR": {
         mainLogger.info("CAIU NO TYPE_ERROR");
         const { error } = msg;
-        sendMsg("TYPE_ERROR " + msg);
-        //mainWindow.webContents.send(CHAN_WORKER_ERROR, error);
+        sendMsg(`TYPE_ERROR ${msg}`);
+        // mainWindow.webContents.send(CHAN_WORKER_ERROR, error);
         break;
       }
       case "TYPE_STARTUP_SHOW_LOGIN_WINDOW": {
@@ -165,20 +159,20 @@ worker.on("message", (message) => {
           "Recebi evento pra chamar tela de login da thread do banco. "
         );
         mainWindow = startup_login_window();
-        //mainWindow.webContents.send(CHAN_WORKER_ERROR, error);
+        // mainWindow.webContents.send(CHAN_WORKER_ERROR, error);
         break;
       }
       case "TYPE_STARTUP_SHOW_LOGGED_IN_WINDOW": {
         mainLogger.info(
           "Recebi evento pra chamar codigo logado da thread do banco. "
         );
-        //mainWindow.webContents.send(CHAN_WORKER_ERROR, error);
+        // mainWindow.webContents.send(CHAN_WORKER_ERROR, error);
         break;
       }
       default: {
         mainLogger.info("CAIU NO DEFAULT");
-        //mainWindow.webContents.send(CHAN_WORKER_TO_RENDERER, msg);
-        sendMsg("TYPE_ERROR " + error);
+        // mainWindow.webContents.send(CHAN_WORKER_TO_RENDERER, msg);
+        sendMsg(`TYPE_ERROR ${error}`);
         break;
       }
     }
@@ -190,18 +184,18 @@ ipcMain.on("CHAN_RENDERER_TO_WORKER", (_event, msg) => {
 });
 
 worker.on("exit", function (code) {
-  if (code == 1) {
-    mainLogger.info("Child exited with code " + code);
-    sendMsg("Child exited with code " + code);
+  if (code === 1) {
+    mainLogger.info(`Child exited with code ${code}`);
+    sendMsg(`Child exited with code ${code}`);
   } else {
-    mainLogger.info("Child exited with code " + code);
-    sendMsg("Child exited with code " + code);
+    mainLogger.info(`Child exited with code ${code}`);
+    sendMsg(`Child exited with code ${code}`);
   }
   // callback();
 });
 worker.on("error", (error) => {
-  mainLogger.info("Child exited with error " + error);
-  sendMsg("Child exited with error " + error);
+  mainLogger.info(`Child exited with error ${error}`);
+  sendMsg(`Child exited with error ${error}`);
 });
 
 if (isDev) {
@@ -209,19 +203,19 @@ if (isDev) {
   mainLogger.info("Running in production");
 }
 
-//ATENCAO - Esta funcao esta sendo executada apos 30 segundos da inicialização do aplicativo.
-//Vai ficar de butuca pra hashear todos os arquivos de novo, de forma lenta.
-//Chokidar vai listar todos os arquivos na pasta, antes de começar a monitorar.
-//Esta lista de arquivos vai ser salva em um array? acho que eu posso usar o banco..
-//verifico se ja esta cadastrado no banco e se o tamanho bate.
-//se nao bater, espero 30 segundos e faço hash?
-//se bater, vai pro hash lento
-//acho que o jeito eh hashear pedaços, igual eu fiz no python.
-//faço hash só pra arquivo grande que eu faço hash parcial.. vou pensar isto agora, mas nao vou implementar tudo.
+// ATENCAO - Esta funcao esta sendo executada apos 30 segundos da inicialização do aplicativo.
+// Vai ficar de butuca pra hashear todos os arquivos de novo, de forma lenta.
+// Chokidar vai listar todos os arquivos na pasta, antes de começar a monitorar.
+// Esta lista de arquivos vai ser salva em um array? acho que eu posso usar o banco..
+// verifico se ja esta cadastrado no banco e se o tamanho bate.
+// se nao bater, espero 30 segundos e faço hash?
+// se bater, vai pro hash lento
+// acho que o jeito eh hashear pedaços, igual eu fiz no python.
+// faço hash só pra arquivo grande que eu faço hash parcial.. vou pensar isto agora, mas nao vou implementar tudo.
 //
 
-//o ponto de atençao são os arquivos que mudaram o tamanho.
-//se mudou o tamanho, dae eu vou fazer hash prioritario.
+// o ponto de atençao são os arquivos que mudaram o tamanho.
+// se mudou o tamanho, dae eu vou fazer hash prioritario.
 
 // check for updates
 autoUpdater.checkForUpdatesAndNotify();
@@ -245,14 +239,14 @@ if (gotTheLock) {
 
     // Protocol handler for win32
     // argv: An array of the second instance’s (command line / deep linked) arguments
-    if (process.platform == "win32") {
+    if (process.platform === "win32") {
       // Keep only command line / deep linked arguments
       deeplinkingUrl = argv.slice(1);
     }
-    //logEverywhere('app.makeSingleInstance# ' + deeplinkingUrl)
+    // logEverywhere('app.makeSingleInstance# ' + deeplinkingUrl)
 
     if (mainWindow) {
-      let positioner = new Positioner(mainWindow);
+      const positioner = new Positioner(mainWindow);
       if (gbounds != null) {
         positioner.move("trayBottomCenter", gbounds);
       }
@@ -266,8 +260,8 @@ if (gotTheLock) {
 }
 
 function startup_login_window() {
-  //https://bbbootstrap.com/snippets/login-form-footer-and-social-media-icons-55203607
-  while (appReadyEvent == false) {
+  // https://bbbootstrap.com/snippets/login-form-footer-and-social-media-icons-55203607
+  while (appReadyEvent === false) {
     sleep(1);
     mainLogger.info("aguardando o app estar ready pra montar janela. ");
   }
@@ -282,22 +276,22 @@ function startup_login_window() {
     title: "Pocket.Cloud",
     show: true,
     skipTaskbar: false,
-    //fullscreenable: false,
-    //maximizable: false,
-    //minimizable: false,
-    //transparent: true,
-    //frame: false,
+    // fullscreenable: false,
+    // maximizable: false,
+    // minimizable: false,
+    // transparent: true,
+    // frame: false,
     // resizable: false,
     // movable: false,
     autoHideMenuBar: true,
     center: true,
     // thickFrame: true,
-    //backgroundColor: darkMode ? '#1f1f1f' : '#ffffff',
+    // backgroundColor: darkMode ? '#1f1f1f' : '#ffffff',
   });
-  //win.setSkipTaskbar(true);
+  // win.setSkipTaskbar(true);
 
   // Protocol handler for win32
-  if (process.platform == "win32") {
+  if (process.platform === "win32") {
     // Keep only command line / deep linked arguments
     deeplinkingUrl = process.argv.slice(1);
   }
@@ -313,13 +307,13 @@ function startup_login_window() {
   tray = createTray();
 
   win.on("minimize", function (event) {
-    //event.preventDefault();
-    //win.hide();
+    // event.preventDefault();
+    // win.hide();
   });
 
   win.on("restore", function (event) {
     win.show();
-    //tray.destroy();
+    // tray.destroy();
   });
 
   return win; // return window
@@ -330,29 +324,29 @@ const openWindow = () => {
   const win = new BrowserWindow({
     width: 800,
     height: 500,
-    icon: __dirname + "resources/icon.png",
+    icon: `${__dirname}resources/icon.png`,
     webPreferences: {
       nodeIntegration: true,
     },
     title: "PocketCloud",
     show: false,
     skipTaskbar: true,
-    //fullscreenable: false,
-    //maximizable: false,
-    //minimizable: false,
-    //transparent: true,
-    //frame: false,
+    // fullscreenable: false,
+    // maximizable: false,
+    // minimizable: false,
+    // transparent: true,
+    // frame: false,
     // resizable: false,
     // movable: false,
-    //autoHideMenuBar: true,
-    //center: true,
+    // autoHideMenuBar: true,
+    // center: true,
     // thickFrame: true,
-    //backgroundColor: darkMode ? '#1f1f1f' : '#ffffff',
+    // backgroundColor: darkMode ? '#1f1f1f' : '#ffffff',
   });
-  //win.setSkipTaskbar(true);
+  // win.setSkipTaskbar(true);
 
   // Protocol handler for win32
-  if (process.platform == "win32") {
+  if (process.platform === "win32") {
     // Keep only command line / deep linked arguments
     deeplinkingUrl = process.argv.slice(1);
   }
@@ -370,25 +364,25 @@ const openWindow = () => {
 
   win.on("restore", function (event) {
     win.show();
-    //tray.destroy();
+    // tray.destroy();
   });
 
   return win; // return window
 };
 
 function createTray() {
-  let appIcon = new Tray(path.join(__dirname, "./resources/icon.png"));
+  const appIcon = new Tray(path.join(__dirname, "./resources/icon.png"));
 
   const contextMenu = Menu.buildFromTemplate([
     {
       label: "Show",
-      click: function () {
+      click() {
         mainWindow.show();
       },
     },
     {
       label: "Exit",
-      click: function () {
+      click() {
         app.isQuiting = true;
         app.quit();
       },
@@ -403,7 +397,7 @@ function createTray() {
     if (mainWindow.isVisible()) {
       mainWindow.hide();
     } else {
-      let positioner = new Positioner(mainWindow);
+      const positioner = new Positioner(mainWindow);
       positioner.move("trayBottomCenter", bounds);
 
       mainWindow.show();
@@ -426,19 +420,17 @@ app.on("open-url", function (event, url) {
   // logEverywhere("open-url# " + deeplinkingUrl)
 });
 
-const osInfo = require("@felipebutcher/node-os-info");
-
 setInterval(() => {
-  var idleSeconds;
-  var uptime = os.uptime();
-  //se o uptime for menor que 50 segundos,
-  //dae eu vou esperar... senao não...
+  let idleSeconds;
+  const uptime = os.uptime();
+  // se o uptime for menor que 50 segundos,
+  // dae eu vou esperar... senao não...
 
-  //vou largar assim.. chokidar watch chama...
-  //depois do sync, ele vai setar o ready...
-  //dae ele vai chamar depois de 3 segundos..
-  //aí ele vai remover os arquivos deletados (preciso criar este teste)
-  //depois ele vai hashear os arquivos delayed.
+  // vou largar assim.. chokidar watch chama...
+  // depois do sync, ele vai setar o ready...
+  // dae ele vai chamar depois de 3 segundos..
+  // aí ele vai remover os arquivos deletados (preciso criar este teste)
+  // depois ele vai hashear os arquivos delayed.
   if (uptime < 50) {
   } else {
     //
@@ -446,23 +438,23 @@ setInterval(() => {
   if (idleSeconds >= 20) {
   } else {
     osInfo.cpu((cpu) => {
-      var load = Math.round(cpu * 100);
+      const load = Math.round(cpu * 100);
 
       if (load < 20) {
         idleSeconds += 1;
       }
     });
   }
-  //console.log("Uptime: " + uptime);
+  // console.log("Uptime: " + uptime);
 }, 3000);
 
 // when app is ready, open a window
 app.on("ready", () => {
   appReadyEvent = true;
-  //mainWindow = openWindow();
+  // mainWindow = openWindow();
 
   // watch files
-  //io.watchFiles(mainWindow);
+  // io.watchFiles(mainWindow);
 });
 
 // when all windows are closed, quit the app
@@ -502,7 +494,7 @@ app.on("browser-window-blur", () => {
     isDialog = false;
   }
 });
-/************************/
+/** ********************* */
 
 // return list of files
 ipcMain.handle("app:get-files", () => {

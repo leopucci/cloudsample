@@ -1,9 +1,11 @@
 /* Main part of worker function - worker_nlc_wink.js  */
 const workerpool = require("workerpool");
-const { chokidarLogger, sqliteLogger, workerPoolLogger } = require("./logger");
 const crypto = require("crypto");
 const fs = require("fs");
-var startTime, endTime;
+const { chokidarLogger, sqliteLogger, workerPoolLogger } = require("./logger");
+
+let startTime;
+let endTime;
 async function fileHasherThread(input) {
   file = input.pathId;
   fullPath = input.fullPath;
@@ -18,8 +20,8 @@ async function fileHasherThread(input) {
         .on("data", (data) => hash.update(data))
         .on("end", () => {
           endTime = new Date().getTime();
-          var time = endTime - startTime;
-          var seconds = time / 1000;
+          const time = endTime - startTime;
+          const seconds = time / 1000;
           resolve({
             tipo: "COMPLETED_OK",
             path: file,
@@ -29,11 +31,11 @@ async function fileHasherThread(input) {
         })
         .on("error", (err) => {
           workerPoolLogger.error(
-            "ERRO!: " + err.name.split("Error: ") + ": " + err.message
+            `ERRO!: ${err.name.split("Error: ")}: ${err.message}`
           );
           endTime = new Date().getTime();
-          var time = endTime - startTime;
-          var seconds = time / 1000;
+          const time = endTime - startTime;
+          const seconds = time / 1000;
           if (err.message.indexOf("EBUSY") !== -1) {
             resolve({ tipo: "ERROR_EBUSY", timeSpent: seconds, path: file });
           } else {
@@ -47,13 +49,13 @@ async function fileHasherThread(input) {
         });
     });
 
-  workerPoolLogger.info("WORKERPOOL THREAD: Executando Hash para: " + file);
+  workerPoolLogger.info(`WORKERPOOL THREAD: Executando Hash para: ${file}`);
 
-  var result = await createHashFromFile(file);
+  const result = await createHashFromFile(file);
 
   return Promise.resolve(result);
 }
 // create the worker and register its functions
 workerpool.worker({
-  fileHasherThread: fileHasherThread,
+  fileHasherThread,
 });

@@ -2,14 +2,15 @@
 const workerpool = require("workerpool");
 const crypto = require("crypto");
 const fs = require("fs");
-//const sqlite3 = require('better-sqlite3-sqleet');
-//var db = new sqlite3(dbFile, { verbose: console.log });
-var startTime, endTime;
+// const sqlite3 = require('better-sqlite3-sqleet');
+// var db = new sqlite3(dbFile, { verbose: console.log });
+let startTime;
+let endTime;
 
 async function fileDeletionThread(input) {
-  file = input.db;
-  fullPath = input.fullPath;
-  syncDir = input.syncDir;
+  const file = input.db;
+  const { fullPath } = input;
+  const { syncDir } = input;
 
   const createHashFromFile = (file) =>
     new Promise((resolve, reject) => {
@@ -20,8 +21,8 @@ async function fileDeletionThread(input) {
         .on("data", (data) => hash.update(data))
         .on("end", () => {
           endTime = new Date().getTime();
-          var time = endTime - startTime;
-          var seconds = time / 1000;
+          const time = endTime - startTime;
+          const seconds = time / 1000;
           resolve({
             tipo: "COMPLETED_OK",
             path: file,
@@ -30,12 +31,10 @@ async function fileDeletionThread(input) {
           });
         })
         .on("error", (err) => {
-          console.log(
-            "ERRO!: " + err.name.split("Error: ") + ": " + err.message
-          );
+          console.log(`ERRO!: ${err.name.split("Error: ")}: ${err.message}`);
           endTime = new Date().getTime();
-          var time = endTime - startTime;
-          var seconds = time / 1000;
+          const time = endTime - startTime;
+          const seconds = time / 1000;
           if (err.message.indexOf("EBUSY") !== -1) {
             resolve({ tipo: "ERROR_EBUSY", timeSpent: seconds, path: file });
           } else {
@@ -49,7 +48,7 @@ async function fileDeletionThread(input) {
         });
     });
 
-  console.log("DELETE THREAD: Executando Hash para: " + file);
+  console.log(`DELETE THREAD: Executando Hash para: ${file}`);
 
   // var result = await createHashFromFile(file);
 
@@ -58,6 +57,6 @@ async function fileDeletionThread(input) {
 
 // create the worker and register its functions
 workerpool.worker({
-  fileHasherThread: fileHasherThread,
-  fileDeletionThread: fileDeletionThread,
+  fileHasherThread,
+  fileDeletionThread,
 });

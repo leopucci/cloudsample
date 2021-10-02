@@ -9,9 +9,9 @@ const mainLogger = winston.createLogger({
     // - Write all logs with level `error` and below to `error.log`
     // - Write all logs with level `info` and below to `combined.log`
     //
-    //new winston.transports.File({ filename: 'error.log', level: 'error' }),
-    //new winston.transports.File({ filename: 'combined.log' }),
-    //new winston.transports.Http({ host: 'localhost', port: 8080, level: 'error' }),
+    // new winston.transports.File({ filename: 'error.log', level: 'error' }),
+    // new winston.transports.File({ filename: 'combined.log' }),
+    // new winston.transports.Http({ host: 'localhost', port: 8080, level: 'error' }),
     new winston.transports.File({ filename: "mainlog.log" }),
     new winston.transports.Console(),
   ],
@@ -26,9 +26,9 @@ const childLogger = winston.createLogger({
     // - Write all logs with level `error` and below to `error.log`
     // - Write all logs with level `info` and below to `combined.log`
     //
-    //new winston.transports.File({ filename: 'error.log', level: 'error' }),
-    //new winston.transports.File({ filename: 'combined.log' }),
-    //new winston.transports.Http({ host: 'localhost', port: 8080, level: 'error' }),
+    // new winston.transports.File({ filename: 'error.log', level: 'error' }),
+    // new winston.transports.File({ filename: 'combined.log' }),
+    // new winston.transports.Http({ host: 'localhost', port: 8080, level: 'error' }),
     new winston.transports.File({ filename: "mainlog.log" }),
     new winston.transports.Console(),
   ],
@@ -43,8 +43,8 @@ const chokidarLogger = winston.createLogger({
     // - Write all logs with level `error` and below to `error.log`
     // - Write all logs with level `info` and below to `combined.log`
     //
-    //new winston.transports.File({ filename: 'error.log', level: 'error' }),
-    //new winston.transports.File({ filename: 'combined.log' }),
+    // new winston.transports.File({ filename: 'error.log', level: 'error' }),
+    // new winston.transports.File({ filename: 'combined.log' }),
     new winston.transports.Http({
       host: "localhost",
       port: 8080,
@@ -64,8 +64,8 @@ const sqliteLogger = winston.createLogger({
     // - Write all logs with level `error` and below to `error.log`
     // - Write all logs with level `info` and below to `combined.log`
     //
-    //new winston.transports.File({ filename: 'error.log', level: 'error' }),
-    //new winston.transports.File({ filename: 'combined.log' }),
+    // new winston.transports.File({ filename: 'error.log', level: 'error' }),
+    // new winston.transports.File({ filename: 'combined.log' }),
     new winston.transports.Http({
       host: "localhost",
       port: 8080,
@@ -84,8 +84,8 @@ const workerPoolLogger = winston.createLogger({
     // - Write all logs with level `error` and below to `error.log`
     // - Write all logs with level `info` and below to `combined.log`
     //
-    //new winston.transports.File({ filename: 'error.log', level: 'error' }),
-    //new winston.transports.File({ filename: 'combined.log' }),
+    // new winston.transports.File({ filename: 'error.log', level: 'error' }),
+    // new winston.transports.File({ filename: 'combined.log' }),
     new winston.transports.Http({
       host: "localhost",
       port: 8080,
@@ -95,7 +95,7 @@ const workerPoolLogger = winston.createLogger({
   ],
 });
 
-let alignColorsAndTimeChildLogger = winston.format.combine(
+const alignColorsAndTimeChildLogger = winston.format.combine(
   winston.format.colorize({
     all: true,
   }),
@@ -111,7 +111,7 @@ let alignColorsAndTimeChildLogger = winston.format.combine(
   )
 );
 
-let alignColorsAndTimeMainLogger = winston.format.combine(
+const alignColorsAndTimeMainLogger = winston.format.combine(
   winston.format.colorize({
     all: true,
   }),
@@ -127,7 +127,7 @@ let alignColorsAndTimeMainLogger = winston.format.combine(
   )
 );
 
-let alignColorsAndTimeWorkerPool = winston.format.combine(
+const alignColorsAndTimeWorkerPool = winston.format.combine(
   winston.format.colorize({
     all: true,
   }),
@@ -143,7 +143,7 @@ let alignColorsAndTimeWorkerPool = winston.format.combine(
   )
 );
 
-let alignColorsAndTimeSqlite = winston.format.combine(
+const alignColorsAndTimeSqlite = winston.format.combine(
   winston.format.colorize({
     all: true,
   }),
@@ -159,7 +159,7 @@ let alignColorsAndTimeSqlite = winston.format.combine(
   )
 );
 
-let alignColorsAndTimeChokidar = winston.format.combine(
+const alignColorsAndTimeChokidar = winston.format.combine(
   winston.format.colorize({
     all: true,
   }),
@@ -220,7 +220,6 @@ workerPoolLogger.add(
 
 module.exports = {
   childLogger,
-
   mainLogger,
   chokidarLogger,
   sqliteLogger,
