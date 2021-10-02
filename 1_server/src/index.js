@@ -51,18 +51,24 @@ const exitHandler = () => {
   }
 };
 
-const uncaughtExceptionHandler = (error) => {
+const uncaughtExceptionHandler = (error, origin) => {
   logger.error(error);
   enviaNotificacaoApi(
-    `Deu merda jovem, caiu lá no unexpectedErrorHandler voce programou bem mal... \n ${safeJsonStringify(error)}`
+    `Deu merda jovem, caiu lá no uncaughtExceptionHandler voce programou bem mal... \nOrigem: ${origin}\nStack ou mensagem: ${
+      error.stack || error.message
+    }`
   );
-  logger.error(error, 'Uncaught Exception thrown vai dar process.exit(1)');
+  logger.error(
+    `Uncaught Exception thrown vai dar process.exit(1)\n Origem: ${origin}\n Stack ou mensagem: ${error.stack}` ||
+      error.message
+  );
   exitHandler();
 };
 
-const unhandledRejectionHandler = (reason, p) => {
-  logger.error(reason, 'Unhandled Rejection at Promise', p);
-  enviaNotificacaoApi(`Caiu lá no unhandledRejectionHandler voce programou bem mal... \n ${safeJsonStringify(reason)}`);
+// https://nodejs.org/api/process.html#process_event_unhandledrejection
+const unhandledRejectionHandler = (reason, promise) => {
+  logger.error(`Caiu lá no unhandledRejectionHandler \n Promise: ${promise} \n Reason: ${reason}`);
+  enviaNotificacaoApi(`Caiu lá no unhandledRejectionHandler \n Promise: ${promise} \n Reason: ${reason}`);
 };
 
 process.on('uncaughtException', uncaughtExceptionHandler);
