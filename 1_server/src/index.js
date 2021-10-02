@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const safeJsonStringify = require('safe-json-stringify');
+// const safeJsonStringify = require('safe-json-stringify');
 const { enviaNotificacaoApi, canais } = require('./utils/notify');
 const app = require('./app');
 const config = require('./config/config');
@@ -77,6 +77,7 @@ process.on('unhandledRejection', unhandledRejectionHandler);
 process.on('SIGTERM', () => {
   logger.info('SIGTERM received');
   if (server) {
+    enviaNotificacaoApi(`Baixando aplicação recebeu SIGTERM`, canais.PocketDeployApi);
     server.close();
   }
 });
