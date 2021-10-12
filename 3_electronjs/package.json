@@ -4,8 +4,8 @@
   "description": "Pocket Cloud client for the cloud",
   "main": "app/index.js",
   "scripts": {
-    "start": "npm run build && electron .",
-    "build": "tsc",
+    "start": "npm run build && electron dist/index.js",
+    "build": "tsc && cp -R app/render dist",
     "sass:build": "node-sass app/scss -o app/css",
     "sass:watch": "node-sass -w app/render/scss -o app/render/css",
     "postinstall": "electron-builder install-app-deps",

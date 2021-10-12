@@ -106,10 +106,10 @@ if (isWinOS) {
       ? `${process.env.HOME}/Library/Preferences`
       : `${process.env.HOME}/.local/share`);
   syncDir = `${homedir}\\Pocket.Cloud\\`;
-  dbDir = `${appData}\\Pocket.Cloud\\app\\misc`;
+  dbDir = `${appData}\\Pocket.Cloud\\dist\\misc`;
   dbFile = `${dbDir}\\misc.data`;
   dbExists = fs.existsSync(dbFile);
-  workerPath = isDev ? "app\\child.js" : "app.asar\\app\\child.js";
+  workerPath = isDev ? "dist\\child.js" : "app.asar\\dist\\child.js";
 } else if (isMacOS) {
   const appData =
     process.env.APPDATA ||
@@ -232,11 +232,10 @@ let isDialog = false;
 let deeplinkingUrl;
 let gbounds: any;
 
+let darkMode;
 if (isMacOS) {
-  // @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'darkMode'.
   darkMode = systemPreferences.isDarkMode();
 } else if (isWinOS) {
-  // @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'darkMode'.
   darkMode = systemPreferences.isInvertedColorScheme();
 }
 
