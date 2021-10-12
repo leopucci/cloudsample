@@ -5,7 +5,7 @@
   "main": "app/index.js",
   "scripts": {
     "start": "npm run build && electron dist/index.js",
-    "build": "tsc && cp -R app/render dist",
+    "build": "tsc && cp -R app/render/assets dist/render && cp -R app/render/css dist/render && cp -R app/render/html dist/render && cp -R app/render/scss dist/render && cp -R app/resources dist",
     "sass:build": "node-sass app/scss -o app/css",
     "sass:watch": "node-sass -w app/render/scss -o app/render/css",
     "postinstall": "electron-builder install-app-deps",

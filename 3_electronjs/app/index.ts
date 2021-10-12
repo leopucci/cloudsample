@@ -382,7 +382,7 @@ const openWindow = () => {
 };
 
 function createTray() {
-  const appIcon = new Tray(path.join(__dirname, "./resources/icon.png"));
+  const appIcon = new Tray(path.join(__dirname, "dist/resources/icon.png"));
 
   const contextMenu = Menu.buildFromTemplate([
     {
