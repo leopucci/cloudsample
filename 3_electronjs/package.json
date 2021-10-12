@@ -4,7 +4,8 @@
   "description": "Pocket Cloud client for the cloud",
   "main": "app/index.js",
   "scripts": {
-    "start": "electron .",
+    "start": "npm run build && electron .",
+    "build": "tsc",
     "sass:build": "node-sass app/scss -o app/css",
     "sass:watch": "node-sass -w app/render/scss -o app/render/css",
     "postinstall": "electron-builder install-app-deps",
@@ -27,6 +28,7 @@
   },
   "homepage": "https://github.com/course-one/electron-lessons#readme",
   "devDependencies": {
+    "@types/electron": "^1.6.10",
     "electron-builder": "^22.11.7",
     "eslint": "^7.32.0",
     "eslint-config-airbnb-base": "^14.2.1",
@@ -55,7 +57,7 @@
     "mqtt": "^4.2.6",
     "node-machine-id": "^1.1.12",
     "open": "^7.4.2",
-    "typescript": "^4.4.3",
+    "typescript": "^4.4.4",
     "uuid": "^3.4.0",
     "winston": "^3.3.3",
     "workerpool": "^6.1.4"

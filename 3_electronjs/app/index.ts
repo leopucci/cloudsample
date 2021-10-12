@@ -26,7 +26,7 @@ const querystring = require("querystring");
 
 let appReadyEvent = false;
 let appLoginMode = false;
-
+/*
 function sendRequestSync(url: any) {
   https.get(url, (res: any) => res.statusCode === 200);
 }
@@ -51,6 +51,7 @@ function sendMsg(message: any) {
   );
   sendMessage(message);
 }
+*/
 // https://app.glitchtip.com/mycompany/issues
 // const sentry  = require('@sentry/electron');
 // sentry.init({ dsn: "https://65a79bdaeaae4445bf6cc880618baa2d@app.glitchtip.com/343" });
@@ -124,7 +125,7 @@ if (isWinOS) {
 
 let workerCwd = isDev ? undefined : path.join(__dirname, "..");
 if (workerCwd !== undefined && workerCwd.includes("app.asar")) {
-  sendMsg(`TIVE QUE REMOVER MAIS UM${workerCwd}`);
+  // sendMsg(`TIVE QUE REMOVER MAIS UM${workerCwd}`);
   workerCwd = path.join(workerCwd, "..");
 }
 
@@ -155,7 +156,7 @@ worker.on("message", (message: any) => {
       case "TYPE_ERROR": {
         mainLogger.info("CAIU NO TYPE_ERROR");
         const { error } = msg;
-        sendMsg(`TYPE_ERROR ${msg}`);
+        // sendMsg(`TYPE_ERROR ${msg}`);
         // mainWindow.webContents.send(CHAN_WORKER_ERROR, error);
         break;
       }
@@ -192,16 +193,16 @@ ipcMain.on("CHAN_RENDERER_TO_WORKER", (_event: any, msg: any) => {
 worker.on("exit", function (code: any) {
   if (code === 1) {
     mainLogger.info(`Child exited with code ${code}`);
-    sendMsg(`Child exited with code ${code}`);
+    // sendMsg(`Child exited with code ${code}`);
   } else {
     mainLogger.info(`Child exited with code ${code}`);
-    sendMsg(`Child exited with code ${code}`);
+    // sendMsg(`Child exited with code ${code}`);
   }
   // callback();
 });
 worker.on("error", (error: any) => {
   mainLogger.info(`Child exited with error ${error}`);
-  sendMsg(`Child exited with error ${error}`);
+  // sendMsg(`Child exited with error ${error}`);
 });
 
 if (isDev) {

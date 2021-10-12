@@ -44,12 +44,10 @@ exports.displayFiles = (files = []) => {
   // @ts-expect-error ts-migrate(2531) FIXME: Object is possibly 'null'.
   fileListElem.innerHTML = "";
 
-  files.forEach((file) => {
+  files.forEach((file : any) => {
     const itemDomElem = document.createElement("div");
-    // @ts-expect-error ts-migrate(2339) FIXME: Property 'name' does not exist on type 'never'.
     itemDomElem.setAttribute("id", file.name); // set `id` attribute
     itemDomElem.setAttribute("class", "app__files__item"); // set `class` attribute
-    // @ts-expect-error ts-migrate(2339) FIXME: Property 'path' does not exist on type 'never'.
     itemDomElem.setAttribute("data-filepath", file.path); // set `data-filepath` attribute
 
     itemDomElem.innerHTML = `

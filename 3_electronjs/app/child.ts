@@ -62,6 +62,7 @@ process.on("message", (msg) => {
   });
 });
 
+/*
 // @ts-expect-error ts-migrate(2393) FIXME: Duplicate function implementation.
 function sendMessageFor(token: any, channel: any) {
   const baseUrl = `https://api.telegram.org/bot${token}`;
@@ -97,7 +98,7 @@ function sendMsg(message: any) {
   );
   sendMessage(message);
 }
-
+*/
 childLogger.info(`CHILD ExecPath ${process.execPath}`);
 childLogger.info(`CHILD argv ${process.argv}`);
 childLogger.info(`CHILD cwd ${process.cwd()}`);
@@ -607,9 +608,11 @@ function currentTasksHandler(id: any) {
           workerPoolLogger.info(
             `PROMISE FINALIZADA: tipo: ${result.tipo} Path: ${result.path} Tempo: ${result.timeSpent} segundos Hash: ${result.hash}`
           );
+          /*
           sendMsg(
             `Hash feito para arquivo: ${result.path} Hash: ${result.hash}`
           );
+          */
           break;
         case "ERROR_EBUSY":
           workerPoolLogger.info(
