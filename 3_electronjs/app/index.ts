@@ -1,6 +1,8 @@
+// @ts-expect-error ts-migrate(6200) FIXME: Definitions of the following identifiers conflict ... Remove this comment to see the full error message
 const {
   app,
   BrowserWindow,
+  // @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'ipcMain'.
   ipcMain,
   systemPreferences,
   dialog,
@@ -8,7 +10,9 @@ const {
   Menu,
 } = require("electron");
 const osInfo = require("@felipebutcher/node-os-info");
+// @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'path'.
 const path = require("path");
+// @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'os'.
 const os = require("os");
 const homedir = require("os").homedir();
 const { autoUpdater } = require("electron-updater");
@@ -23,13 +27,13 @@ const querystring = require("querystring");
 let appReadyEvent = false;
 let appLoginMode = false;
 
-function sendRequestSync(url) {
-  https.get(url, (res) => res.statusCode === 200);
+function sendRequestSync(url: any) {
+  https.get(url, (res: any) => res.statusCode === 200);
 }
-function sendMessageFor(token, channel) {
+function sendMessageFor(token: any, channel: any) {
   const baseUrl = `https://api.telegram.org/bot${token}`;
 
-  return (message) => {
+  return (message: any) => {
     const urlParams = querystring.stringify({
       chat_id: channel,
       text: message,
@@ -40,7 +44,7 @@ function sendMessageFor(token, channel) {
   };
 }
 
-function sendMsg(message) {
+function sendMsg(message: any) {
   const sendMessage = sendMessageFor(
     "1621388212:AAHVIiVUPKYzNidK5PdvMAQdRfDhaNATLwo",
     "@startuphbase"
@@ -57,6 +61,7 @@ function sendMsg(message) {
 const isWinOS = process.platform === "win32";
 const isMacOS = process.platform === "darwin";
 const isDev = require("electron-is-dev");
+// @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'mainLogger... Remove this comment to see the full error message
 const { mainLogger } = require("./logger");
 const io = require("./main/io");
 
@@ -139,7 +144,7 @@ p.stderr.on('data', (d) => {
     console.log('data', '[stderr-main-fork] ' + d.toString());
 });
 */
-worker.on("message", (message) => {
+worker.on("message", (message: any) => {
   mainLogger.info("RECEBIDA MENSAGEM DA WORKER ", message);
   const { src, dst, type, msg } = message;
   if (dst === "ID_RENDERER") {
@@ -172,6 +177,7 @@ worker.on("message", (message) => {
       default: {
         mainLogger.info("CAIU NO DEFAULT");
         // mainWindow.webContents.send(CHAN_WORKER_TO_RENDERER, msg);
+        // @ts-expect-error ts-migrate(2552) FIXME: Cannot find name 'error'. Did you mean 'Error'?
         sendMsg(`TYPE_ERROR ${error}`);
         break;
       }
@@ -179,11 +185,11 @@ worker.on("message", (message) => {
   }
 });
 
-ipcMain.on("CHAN_RENDERER_TO_WORKER", (_event, msg) => {
+ipcMain.on("CHAN_RENDERER_TO_WORKER", (_event: any, msg: any) => {
   worker.send(msg);
 });
 
-worker.on("exit", function (code) {
+worker.on("exit", function (code: any) {
   if (code === 1) {
     mainLogger.info(`Child exited with code ${code}`);
     sendMsg(`Child exited with code ${code}`);
@@ -193,7 +199,7 @@ worker.on("exit", function (code) {
   }
   // callback();
 });
-worker.on("error", (error) => {
+worker.on("error", (error: any) => {
   mainLogger.info(`Child exited with error ${error}`);
   sendMsg(`Child exited with error ${error}`);
 });
@@ -219,22 +225,24 @@ if (isDev) {
 
 // check for updates
 autoUpdater.checkForUpdatesAndNotify();
-let mainWindow;
+let mainWindow: any;
 let tray = null;
 let isDialog = false;
 let deeplinkingUrl;
-let gbounds;
+let gbounds: any;
 
 if (isMacOS) {
+  // @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'darkMode'.
   darkMode = systemPreferences.isDarkMode();
 } else if (isWinOS) {
+  // @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'darkMode'.
   darkMode = systemPreferences.isInvertedColorScheme();
 }
 
 // Force Single Instance Application
 const gotTheLock = app.requestSingleInstanceLock();
 if (gotTheLock) {
-  app.on("second-instance", (e, argv) => {
+  app.on("second-instance", (e: any, argv: any) => {
     // Someone tried to run a second instance, we should focus our window.
 
     // Protocol handler for win32
@@ -297,7 +305,10 @@ function startup_login_window() {
   }
   // load `index.html` file
   win.loadFile(path.resolve(__dirname, "render/html/login.html"));
-  win.webContents.setWindowOpenHandler(({ url }) => {
+  win.webContents.setWindowOpenHandler(({
+    url
+  }: any) => {
+    // @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'shell'.
     shell.openExternal(url);
     return { action: "deny" };
   });
@@ -306,12 +317,12 @@ function startup_login_window() {
 
   tray = createTray();
 
-  win.on("minimize", function (event) {
+  win.on("minimize", function (event: any) {
     // event.preventDefault();
     // win.hide();
   });
 
-  win.on("restore", function (event) {
+  win.on("restore", function (event: any) {
     win.show();
     // tray.destroy();
   });
@@ -357,12 +368,12 @@ const openWindow = () => {
 
   tray = createTray();
 
-  win.on("minimize", function (event) {
+  win.on("minimize", function (event: any) {
     event.preventDefault();
     win.hide();
   });
 
-  win.on("restore", function (event) {
+  win.on("restore", function (event: any) {
     win.show();
     // tray.destroy();
   });
@@ -389,10 +400,10 @@ function createTray() {
     },
   ]);
 
-  appIcon.on("double-click", function (event) {
+  appIcon.on("double-click", function (event: any) {
     mainWindow.show();
   });
-  appIcon.on("click", (e, bounds) => {
+  appIcon.on("click", (e: any, bounds: any) => {
     gbounds = bounds;
     if (mainWindow.isVisible()) {
       mainWindow.hide();
@@ -414,14 +425,14 @@ if (!app.isDefaultProtocolClient("pocketcloud")) {
 }
 
 // Protocol handler for osx
-app.on("open-url", function (event, url) {
+app.on("open-url", function (event: any, url: any) {
   event.preventDefault();
   deeplinkingUrl = url;
   // logEverywhere("open-url# " + deeplinkingUrl)
 });
 
 setInterval(() => {
-  let idleSeconds;
+  let idleSeconds: any;
   const uptime = os.uptime();
   // se o uptime for menor que 50 segundos,
   // dae eu vou esperar... senao não...
@@ -437,7 +448,7 @@ setInterval(() => {
   }
   if (idleSeconds >= 20) {
   } else {
-    osInfo.cpu((cpu) => {
+    osInfo.cpu((cpu: any) => {
       const load = Math.round(cpu * 100);
 
       if (load < 20) {
@@ -502,26 +513,28 @@ ipcMain.handle("app:get-files", () => {
 });
 
 // listen to file(s) add event
-ipcMain.handle("app:on-file-add", (event, files = []) => {
+ipcMain.handle("app:on-file-add", (event: any, files = []) => {
   io.addFiles(files);
 });
 
 // open filesystem dialog to choose files
-ipcMain.handle("app:on-fs-dialog-open", async (event) => {
+ipcMain.handle("app:on-fs-dialog-open", async (event: any) => {
   mainLogger.info("Ipc answered, calling dialog");
   isDialog = true;
   await dialog
     .showOpenDialogSync(mainWindow, {
       properties: ["openFile", "multiSelections"],
     })
-    .then((fileNames) => {
+    .then((fileNames: any) => {
       if (fileNames === undefined) {
         mainLogger.info("No file selected");
       } else {
         mainLogger.info("file:", fileNames[0]);
+        // @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'replyField'.
         replyField.value = fileNames[0];
         io.addFiles(
-          files.map((filepath) => {
+          // @ts-expect-error ts-migrate(2552) FIXME: Cannot find name 'files'. Did you mean 'File'?
+          files.map((filepath: any) => {
             return {
               name: path.parse(filepath).base,
               path: filepath,
@@ -530,32 +543,32 @@ ipcMain.handle("app:on-fs-dialog-open", async (event) => {
         );
       }
     })
-    .catch((err) => mainLogger.info("Handle Error", err));
+    .catch((err: any) => mainLogger.info("Handle Error", err));
 });
 
 /*-----*/
 
 // listen to file delete event
-ipcMain.on("app:on-file-delete", (event, file) => {
+ipcMain.on("app:on-file-delete", (event: any, file: any) => {
   io.deleteFile(file.filepath);
 });
 
 // listen to file open event
-ipcMain.on("app:on-file-open", (event, file) => {
+ipcMain.on("app:on-file-open", (event: any, file: any) => {
   io.openFile(file.filepath);
 });
 
 // listen to file copy event
-ipcMain.on("app:on-file-copy", (event, file) => {
+ipcMain.on("app:on-file-copy", (event: any, file: any) => {
   event.sender.startDrag({
     file: file.filepath,
     icon: path.resolve(__dirname, "./resources/paper.png"),
   });
 });
 
-function msleep(n) {
+function msleep(n: any) {
   Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, n);
 }
-function sleep(n) {
+function sleep(n: any) {
   msleep(n * 1000);
 }

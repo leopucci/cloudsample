@@ -1,4 +1,5 @@
 const dragDrop = require("drag-drop");
+// @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'ipcRendere... Remove this comment to see the full error message
 const { ipcRenderer } = require("electron");
 
 // local dependencies
@@ -12,15 +13,16 @@ ipcRenderer.invoke("app:get-files").then((files = []) => {
 });
 
 // handle file delete event
-ipcRenderer.on("app:delete-file", (event, filename) => {
+ipcRenderer.on("app:delete-file", (event: any, filename: any) => {
+  // @ts-expect-error ts-migrate(2531) FIXME: Object is possibly 'null'.
   document.getElementById(filename).remove();
 });
 
 /** ************************** */
 
 // add files drop listener
-dragDrop("#uploader", (files) => {
-  const _files = files.map((file) => {
+dragDrop("#uploader", (files: any) => {
+  const _files = files.map((file: any) => {
     return {
       name: file.name,
       path: file.path,
@@ -36,6 +38,7 @@ dragDrop("#uploader", (files) => {
 });
 
 // open filesystem dialog
+// @ts-expect-error ts-migrate(2339) FIXME: Property 'openDialog' does not exist on type 'Wind... Remove this comment to see the full error message
 window.openDialog = () => {
   console.log("calling ipc to open dialog ");
   ipcRenderer.invoke("app:on-fs-dialog-open").then(() => {

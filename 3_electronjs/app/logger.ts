@@ -1,5 +1,6 @@
 const winston = require("winston");
 
+// @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'mainLogger... Remove this comment to see the full error message
 const mainLogger = winston.createLogger({
   level: "info",
   format: winston.format.json(),
@@ -17,6 +18,7 @@ const mainLogger = winston.createLogger({
   ],
 });
 
+// @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'childLogge... Remove this comment to see the full error message
 const childLogger = winston.createLogger({
   level: "info",
   format: winston.format.json(),
@@ -34,6 +36,7 @@ const childLogger = winston.createLogger({
   ],
 });
 
+// @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'chokidarLo... Remove this comment to see the full error message
 const chokidarLogger = winston.createLogger({
   level: "info",
   format: winston.format.json(),
@@ -55,6 +58,7 @@ const chokidarLogger = winston.createLogger({
   ],
 });
 
+// @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'sqliteLogg... Remove this comment to see the full error message
 const sqliteLogger = winston.createLogger({
   level: "info",
   format: winston.format.json(),
@@ -75,6 +79,7 @@ const sqliteLogger = winston.createLogger({
   ],
 });
 
+// @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'workerPool... Remove this comment to see the full error message
 const workerPoolLogger = winston.createLogger({
   level: "info",
   format: winston.format.json(),
@@ -106,8 +111,7 @@ const alignColorsAndTimeChildLogger = winston.format.combine(
     format: "YY-MM-DD HH:MM:SS",
   }),
   winston.format.printf(
-    (info) =>
-      ` ${info.label}  ${info.timestamp}  ${info.level} : ${info.message}`
+    (info: any) => ` ${info.label}  ${info.timestamp}  ${info.level} : ${info.message}`
   )
 );
 
@@ -122,8 +126,7 @@ const alignColorsAndTimeMainLogger = winston.format.combine(
     format: "YY-MM-DD HH:MM:SS",
   }),
   winston.format.printf(
-    (info) =>
-      ` ${info.label}  ${info.timestamp}  ${info.level} : ${info.message}`
+    (info: any) => ` ${info.label}  ${info.timestamp}  ${info.level} : ${info.message}`
   )
 );
 
@@ -138,8 +141,7 @@ const alignColorsAndTimeWorkerPool = winston.format.combine(
     format: "YY-MM-DD HH:MM:SS",
   }),
   winston.format.printf(
-    (info) =>
-      ` ${info.label}  ${info.timestamp}  ${info.level} : ${info.message}`
+    (info: any) => ` ${info.label}  ${info.timestamp}  ${info.level} : ${info.message}`
   )
 );
 
@@ -154,8 +156,7 @@ const alignColorsAndTimeSqlite = winston.format.combine(
     format: "YY-MM-DD HH:MM:SS",
   }),
   winston.format.printf(
-    (info) =>
-      ` ${info.label}  ${info.timestamp}  ${info.level} : ${info.message}`
+    (info: any) => ` ${info.label}  ${info.timestamp}  ${info.level} : ${info.message}`
   )
 );
 
@@ -170,8 +171,7 @@ const alignColorsAndTimeChokidar = winston.format.combine(
     format: "YY-MM-DD HH:MM:SS",
   }),
   winston.format.printf(
-    (info) =>
-      ` ${info.label}  ${info.timestamp}  ${info.level} : ${info.message}`
+    (info: any) => ` ${info.label}  ${info.timestamp}  ${info.level} : ${info.message}`
   )
 );
 

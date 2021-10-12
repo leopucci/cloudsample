@@ -1,14 +1,22 @@
+// @ts-expect-error ts-migrate(6200) FIXME: Definitions of the following identifiers conflict ... Remove this comment to see the full error message
 const {
+  // @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'childLogge... Remove this comment to see the full error message
   childLogger,
+  // @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'chokidarLo... Remove this comment to see the full error message
   chokidarLogger,
+  // @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'sqliteLogg... Remove this comment to see the full error message
   sqliteLogger,
+  // @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'workerPool... Remove this comment to see the full error message
   workerPoolLogger,
 } = require("./logger");
+// @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'fs'.
 const fs = require("fs");
+// @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'chokidar'.
 const chokidar = require("chokidar");
 const homedir = require("os").homedir();
 const Sqlite3 = require("better-sqlite3-sqleet");
 const uuidv4 = require("uuid");
+// @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'workerpool... Remove this comment to see the full error message
 const workerpool = require("workerpool");
 const mqtt = require("mqtt");
 const https = require("https");
@@ -16,8 +24,8 @@ const querystring = require("querystring");
 // Check if Windows or Mac
 const isWinOS = process.platform === "win32";
 const isMacOS = process.platform === "darwin";
-const currentTasksForHash = [];
-const currentTasksForDelete = [];
+const currentTasksForHash: any = [];
+const currentTasksForDelete: any = [];
 let chokidarInitialScanEnded = false;
 const databaseStartupFinished = false;
 let loggedIn = false;
@@ -25,11 +33,17 @@ let loggedIn = false;
 const machineIdSync = require("node-machine-id");
 const {
   ID_RENDERER,
+  // @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'CHAN_RENDE... Remove this comment to see the full error message
   CHAN_RENDERER_TO_WORKER,
+  // @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'CHAN_WORKE... Remove this comment to see the full error message
   CHAN_WORKER_TO_RENDERER,
+  // @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'CHAN_WORKE... Remove this comment to see the full error message
   CHAN_WORKER_ERROR,
+  // @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'TYPE_ERROR... Remove this comment to see the full error message
   TYPE_ERROR,
+  // @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'TYPE_START... Remove this comment to see the full error message
   TYPE_STARTUP_SHOW_LOGIN_WINDOW,
+  // @ts-expect-error ts-migrate(2451) FIXME: Cannot redeclare block-scoped variable 'TYPE_START... Remove this comment to see the full error message
   TYPE_STARTUP_SHOW_LOGGED_IN_WINDOW,
 } = require("./types.js");
 
@@ -39,6 +53,7 @@ process.on("message", (msg) => {
 
   childLogger.info("Got message:", msg);
 
+  // @ts-expect-error ts-migrate(2722) FIXME: Cannot invoke an object which is possibly 'undefin... Remove this comment to see the full error message
   process.send({
     src: "ID_WORKER",
     dst: ID_RENDERER,
@@ -47,10 +62,11 @@ process.on("message", (msg) => {
   });
 });
 
-function sendMessageFor(token, channel) {
+// @ts-expect-error ts-migrate(2393) FIXME: Duplicate function implementation.
+function sendMessageFor(token: any, channel: any) {
   const baseUrl = `https://api.telegram.org/bot${token}`;
 
-  return (message) => {
+  return (message: any) => {
     const urlParams = querystring.stringify({
       chat_id: channel,
       text: message,
@@ -61,18 +77,20 @@ function sendMessageFor(token, channel) {
   };
 }
 
-function sendRequest(url) {
+function sendRequest(url: any) {
   return new Promise((resolve, reject) => {
     https
-      .get(url, (res) => (res.statusCode === 200 ? resolve(res) : reject(res)))
+      .get(url, (res: any) => res.statusCode === 200 ? resolve(res) : reject(res))
       .on("error", reject);
   });
 }
-function sendRequestSync(url) {
-  https.get(url, (res) => res.statusCode === 200);
+// @ts-expect-error ts-migrate(2393) FIXME: Duplicate function implementation.
+function sendRequestSync(url: any) {
+  https.get(url, (res: any) => res.statusCode === 200);
 }
 
-function sendMsg(message) {
+// @ts-expect-error ts-migrate(2393) FIXME: Duplicate function implementation.
+function sendMsg(message: any) {
   const sendMessage = sendMessageFor(
     "1621388212:AAHVIiVUPKYzNidK5PdvMAQdRfDhaNATLwo",
     "@startuphbase"
@@ -85,7 +103,7 @@ childLogger.info(`CHILD argv ${process.argv}`);
 childLogger.info(`CHILD cwd ${process.cwd()}`);
 childLogger.info("CHILD -- INICIANDO...");
 
-let syncDir;
+let syncDir: any;
 let dbDir;
 let dbFile;
 let dbExists;
@@ -155,6 +173,7 @@ try {
   resultadoConsulta = stmt.get();
   if (resultadoConsulta == undefined) {
     loggedIn = false;
+    // @ts-expect-error ts-migrate(2722) FIXME: Cannot invoke an object which is possibly 'undefin... Remove this comment to see the full error message
     process.send({
       src: "ID_WORKER",
       dst: "ID_RENDERER",
@@ -163,6 +182,7 @@ try {
     });
   } else {
     loggedIn = true;
+    // @ts-expect-error ts-migrate(2722) FIXME: Cannot invoke an object which is possibly 'undefin... Remove this comment to see the full error message
     process.send({
       src: "ID_WORKER",
       dst: "ID_RENDERER",
@@ -190,7 +210,8 @@ if (!loggedIn) {
   const watcher = chokidar.watch(syncDir, {
     awaitWriteFinish: true,
   });
-  watcher.on("add", (path, stats) => {
+  watcher.on("add", (path: any, stats: any) => {
+    // @ts-expect-error ts-migrate(2722) FIXME: Cannot invoke an object which is possibly 'undefin... Remove this comment to see the full error message
     process.send(
       "ENTROU NA ADD File ${path} has been added: ` + stats.size + 'bytes'"
     );
@@ -203,14 +224,18 @@ if (!loggedIn) {
     let internalDir = "";
     if (isWinOS) {
       internalPath = path.substr(syncDir.length);
+      // @ts-expect-error ts-migrate(2322) FIXME: Type 'number' is not assignable to type 'string'.
       fileIndex = internalPath.lastIndexOf("\\") + 1;
+      // @ts-expect-error ts-migrate(2362) FIXME: The left-hand side of an arithmetic operation must... Remove this comment to see the full error message
       internalDir = internalPath.substring(0, fileIndex - 1);
+      // @ts-expect-error ts-migrate(2345) FIXME: Argument of type 'string' is not assignable to par... Remove this comment to see the full error message
       fileName = internalPath.substr(fileIndex);
       filePureName = fileName.split(".")[0];
       filePureType = fileName.split(".")[1];
     } else {
       internalPath = path.substr(syncDir.length);
       fileIndex = path.lastIndexOf("/") + 1;
+      // @ts-expect-error ts-migrate(2362) FIXME: The left-hand side of an arithmetic operation must... Remove this comment to see the full error message
       internalDir = internalPath.substring(0, fileIndex - 1);
       fileName = path.substr(fileIndex);
       filePureName = fileName.split(".")[0];
@@ -344,23 +369,23 @@ if (!loggedIn) {
     }
   });
 
-  watcher.on("change", (path, stats) => {
+  watcher.on("change", (path: any, stats: any) => {
     startOrRestartHashingThread(syncDir, path);
 
     chokidarLogger.info(`File ${path} has been changed ${stats.size}bytes`);
   });
-  watcher.on("unlink", (path) => {
+  watcher.on("unlink", (path: any) => {
     chokidarLogger.info(`File ${path} has been removed `);
   });
 
   // More possible events.
-  watcher.on("addDir", (path, stats) => {
+  watcher.on("addDir", (path: any, stats: any) => {
     chokidarLogger.info(`Directory ${path} has been added ${stats.size}bytes`);
   });
-  watcher.on("unlinkDir", (path) => {
+  watcher.on("unlinkDir", (path: any) => {
     chokidarLogger.info(`Directory ${path} has been removed2`);
   });
-  watcher.on("error", (error) => {
+  watcher.on("error", (error: any) => {
     chokidarLogger.info(`Watcher error: ${error}`);
   });
   watcher.on("ready", () => {
@@ -392,7 +417,7 @@ if (!loggedIn) {
 
   client.on("connect", function () {
     childLogger.info("mqtt connect");
-    client.subscribe("canaldeteste", function (err) {
+    client.subscribe("canaldeteste", function (err: any) {
       if (!err) {
         // client.publish('presence', 'Hello mqtt')
         childLogger.info("mqtt subscribe");
@@ -414,11 +439,11 @@ if (!loggedIn) {
     childLogger.info("mqtt reconnecting started");
   });
 
-  client.on("error", function (error) {
+  client.on("error", function (error: any) {
     childLogger.info(`mqtt error: ${error}`);
   });
 
-  client.on("message", function (topic, message) {
+  client.on("message", function (topic: any, message: any) {
     // message is Buffer
     childLogger.info(`MQTT MESSAGE ${message.toString()}`);
     client.end();
@@ -449,18 +474,21 @@ function delayedHashAoIniciar() {
   // loopa no banco pegando da tabela os arquivos que mudaram de tamanho.
 }
 
-function isHashBeingDone(id) {
+function isHashBeingDone(id: any) {
+  // @ts-expect-error ts-migrate(7006) FIXME: Parameter 'task' implicitly has an 'any' type.
   return currentTasksForHash.findIndex((task) => task.pathId === id);
 }
 
-function isDeleteBeingDone(id) {
+function isDeleteBeingDone(id: any) {
+  // @ts-expect-error ts-migrate(7006) FIXME: Parameter 'task' implicitly has an 'any' type.
   return currentTasksForDelete.findIndex((task) => task.pathId === id);
 }
 
-function executaHashTaskNaThread(path, pathId, syncDir) {
+function executaHashTaskNaThread(path: any, pathId: any, syncDir: any) {
   const task = {
     fullPath: path,
     pathId,
+    // @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'HasherPool'.
     promise: HasherPool.exec("fileHasherThread", [
       { fullPath: path, pathId, syncDir },
     ]),
@@ -468,20 +496,27 @@ function executaHashTaskNaThread(path, pathId, syncDir) {
   currentTasksForHash.push(task);
 }
 
-function executaDeleteTaskNaThread(path, syncDir) {
+function executaDeleteTaskNaThread(path: any, syncDir: any) {
   const task = {
+    // @ts-expect-error ts-migrate(2552) FIXME: Cannot find name 'pathId'. Did you mean 'path'?
     pathId,
+    // @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'StartupDeletionPool'.
     promise: StartupDeletionPool.exec("fileDeletionThread", [
+      // @ts-expect-error ts-migrate(2552) FIXME: Cannot find name 'pathId'. Did you mean 'path'?
       { db, pathId, syncDir },
     ]),
   };
   currentTasksForDelete.push(task);
 
+  // @ts-expect-error ts-migrate(2552) FIXME: Cannot find name 'pathId'. Did you mean 'path'?
   currentTasksHandlerOfDeletetaks(pathId);
 }
-function startOrRestartHashingThread(syncDir, path) {
+function startOrRestartHashingThread(syncDir: any, path: any) {
+  // @ts-expect-error ts-migrate(2552) FIXME: Cannot find name 'pathId'. Did you mean 'path'?
   pathId = path.split(syncDir)[1];
+  // @ts-expect-error ts-migrate(2552) FIXME: Cannot find name 'pathId'. Did you mean 'path'?
   if (isHashBeingDone(pathId) != -1) {
+    // @ts-expect-error ts-migrate(2552) FIXME: Cannot find name 'pathId'. Did you mean 'path'?
     cancelHashTaskInProcess(pathId);
   }
 
@@ -494,15 +529,20 @@ function startOrRestartHashingThread(syncDir, path) {
 
   // create a new task for the queue containing the id and the promise
 
+  // @ts-expect-error ts-migrate(2552) FIXME: Cannot find name 'pathId'. Did you mean 'path'?
   executaHashTaskNaThread(path, pathId, syncDir);
 
   // Run the promise handler
+  // @ts-expect-error ts-migrate(2552) FIXME: Cannot find name 'pathId'. Did you mean 'path'?
   currentTasksHandler(pathId);
 }
 
-function startOrRestartDeleteThread(syncDir, path) {
+function startOrRestartDeleteThread(syncDir: any, path: any) {
+  // @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'pathId'.
   pathId = path.split(syncDir)[1];
+  // @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'pathId'.
   if (isDeleteBeingDone(pathId) != -1) {
+    // @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'pathId'.
     cancelDeleteTaskInProcess(pathId);
   }
 
@@ -514,14 +554,17 @@ function startOrRestartDeleteThread(syncDir, path) {
   // in currentTasksHandler()
 
   // create a new task for the queue containing the id and the promise
+  // @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'pathId'.
   pathId = "StartupDelete";
+  // @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'pathId'.
   executaDeleteTaskNaThread(path, pathId, syncDir);
 
   // Run the promise handler
+  // @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'pathId'.
   currentTasksHandlerOfDeletetaks(pathId);
 }
 
-function cancelHashTaskInProcess(path) {
+function cancelHashTaskInProcess(path: any) {
   const index = isHashBeingDone(path);
   workerPoolLogger.info(`HASH SERVICE: Hasher for ${path} already running`);
   currentTasksForHash[index].promise.cancel(); // cancel promise
@@ -530,7 +573,7 @@ function cancelHashTaskInProcess(path) {
   // workerPoolLogger.info(currentTasks);
 }
 
-function cancelDeleteTaskInProcess(path) {
+function cancelDeleteTaskInProcess(path: any) {
   const index = isHashBeingDone(path);
   workerPoolLogger.info(`DELETE SERVICE: Delete for ${path} already running`);
   currentTasksForDelete[index].promise.cancel(); // cancel promise
@@ -540,7 +583,7 @@ function cancelDeleteTaskInProcess(path) {
 }
 
 let contador = 0;
-function currentTasksHandler(id) {
+function currentTasksHandler(id: any) {
   // workerPoolLogger.info(currentTasks);
   //  const TIMEOUT = 30000;
   // Isto aqui eh uma proteçao, para que o id seja correto.
@@ -550,13 +593,14 @@ function currentTasksHandler(id) {
   } else {
     position = currentTasksForHash
       .reverse()
+      // @ts-expect-error ts-migrate(7006) FIXME: Parameter 'task' implicitly has an 'any' type.
       .findIndex((task) => (task.pathId = id));
   }
   currentTasksForHash[position].promise
     // .timeout(TIMEOUT)
     // when the promise is resolved patch the tokens with 'training': 'uptodate',
     // patch the Model with a new updated date, and then write out the training file
-    .then((result) => {
+    .then((result: any) => {
       switch (result.tipo) {
         case "COMPLETED_OK":
           contador += 1;
@@ -582,9 +626,11 @@ function currentTasksHandler(id) {
           workerPoolLogger.info(`Erro mensagem nao reconhecida`);
       }
 
+      // @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'HasherPool'.
       workerPoolLogger.info(HasherPool.stats());
 
       // remove finished task from runningTasks queue array
+      // @ts-expect-error ts-migrate(7006) FIXME: Parameter 'task' implicitly has an 'any' type.
       const index = currentTasksForHash.findIndex((task) => (task.pathId = id));
       currentTasksForHash.splice(index, 1);
       workerPoolLogger.info(
@@ -594,8 +640,9 @@ function currentTasksHandler(id) {
       // Logic on successful resolve here
       // result is a json file which is saved to disk
     })
-    .catch((err) => {
+    .catch((err: any) => {
       workerPoolLogger.error("HASH SERVICE WORKERPOOL ERROR:", err);
+      // @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'HasherPool'.
       workerPoolLogger.info(HasherPool.stats());
     })
     // WorkerPool seems to terminate its process by itself when all jobs have finished,
@@ -603,8 +650,11 @@ function currentTasksHandler(id) {
     .then(function () {
       workerPoolLogger.info("HASH SERVICE WORKERPOOL: All workers finished.");
       workerPoolLogger.info(`Contador = ${contador}`);
+      // @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'HasherPool'.
       if (HasherPool == null) {
+        // @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'HasherPool'.
         HasherPool.terminate();
+        // @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'HasherPool'.
         HasherPool = workerpool.pool(`${__dirname}/hashpoolworker.js`, {
           maxWorkers: 9,
           workerType: "thread",
@@ -614,7 +664,7 @@ function currentTasksHandler(id) {
     });
 }
 
-function currentTasksHandlerOfDeletetaks(id) {
+function currentTasksHandlerOfDeletetaks(id: any) {
   // workerPoolLogger.info(currentTasks);
   //  const TIMEOUT = 30000;
   // Isto aqui eh uma proteçao, para que o id seja correto.
@@ -624,13 +674,14 @@ function currentTasksHandlerOfDeletetaks(id) {
   } else {
     position = currentTasksForDelete
       .reverse()
+      // @ts-expect-error ts-migrate(7006) FIXME: Parameter 'task' implicitly has an 'any' type.
       .findIndex((task) => (task.pathId = id));
   }
   currentTasksForDelete[position].promise
     // .timeout(TIMEOUT)
     // when the promise is resolved patch the tokens with 'training': 'uptodate',
     // patch the Model with a new updated date, and then write out the training file
-    .then((result) => {
+    .then((result: any) => {
       switch (result.tipo) {
         case "COMPLETED_OK":
           contador += 1;
@@ -653,10 +704,12 @@ function currentTasksHandlerOfDeletetaks(id) {
           workerPoolLogger.info(`Erro mensagem nao reconhecida`);
       }
 
+      // @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'StartupDeletionPool'.
       workerPoolLogger.info(StartupDeletionPool.stats());
 
       // remove finished task from runningTasks queue array
       const index = currentTasksForDelete.findIndex(
+        // @ts-expect-error ts-migrate(7006) FIXME: Parameter 'task' implicitly has an 'any' type.
         (task) => (task.pathId = id)
       );
       currentTasksForDelete.splice(index, 1);
@@ -667,8 +720,9 @@ function currentTasksHandlerOfDeletetaks(id) {
       // Logic on successful resolve here
       // result is a json file which is saved to disk
     })
-    .catch((err) => {
+    .catch((err: any) => {
       workerPoolLogger.error("STARTUP DELETE SERVICE WORKERPOOL ERROR:", err);
+      // @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'StartupDeletionPool'.
       workerPoolLogger.info(StartupDeletionPool.stats());
     })
     // WorkerPool seems to terminate its process by itself when all jobs have finished,
@@ -678,8 +732,11 @@ function currentTasksHandlerOfDeletetaks(id) {
         "STARTUP DELETE SERVICE WORKERPOOL: All workers finished."
       );
       workerPoolLogger.info(`Contador = ${contador}`);
+      // @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'StartupDeletionPool'.
       if (StartupDeletionPool == null) {
+        // @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'StartupDeletionPool'.
         StartupDeletionPool.terminate();
+        // @ts-expect-error ts-migrate(2304) FIXME: Cannot find name 'StartupDeletionPool'.
         StartupDeletionPool = workerpool.pool(
           `${__dirname}/startupdeleteworker.js`,
           { maxWorkers: 9, workerType: "thread", maxQueueSize: 200000 }
@@ -688,7 +745,7 @@ function currentTasksHandlerOfDeletetaks(id) {
     });
 }
 
-function exitHandler(options, exitCode) {
+function exitHandler(options: any, exitCode: any) {
   if (options.cleanup) childLogger.info("exitHandler clean");
   if (exitCode || exitCode === 0) childLogger.info(`Exit code ${exitCode}`);
   db.close();
