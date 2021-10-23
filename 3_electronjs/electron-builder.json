@@ -46,7 +46,7 @@
     },
     "win": {
         "target": "nsis",
-        "icon": "resources/paper.png",
+        "icon": "resources/paper.png"
     },
 	"nsis": {
       "perMachine" : true,
