@@ -1,4 +1,0 @@
-﻿{
-    "connectionString": "mongodb://root:leozin10@localhost/pocketcloud?authSource=admin",
-    "secret": "AyGMYRq9GMEtD8PxI9uYOZ0EK4VrW7ufBdStuP4qjoZdOnqUwRoTpdULWISHlS2"
-}
