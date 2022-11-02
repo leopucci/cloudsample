@@ -1,8 +1,6 @@
-https://bignerdranch.com/blog/live-updates-with-queues-websockets-and-push-notifications-part-1-rabbitmq-queues-and-workers/
-https://www.freecodecamp.org/news/how-to-secure-your-websocket-connections-d0be0996c556/
+This is a modified version of the boilerplate with recaptcha comunicating with react website for lgoin/logout/confirm-email/reset-password and e-mail render.
 
-mongo tem realtime database, as vezes pro flutter.
-https://blog.usejournal.com/using-mongodb-as-realtime-db-with-nodejs-c6f52c266750
+
 
 # RESTful API Node Server Boilerplate
 
