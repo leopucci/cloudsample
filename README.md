@@ -1,4 +1,4 @@
-# This is a modified version of the boilerplate with recaptcha comunicating with react website for lgoin/logout/confirm-email/reset-password and e-mail render.
+# This is a modified version of the boilerplate with recaptcha comunicating with react website for login/logout/confirm-email/reset-password and e-mail render.
 
 
 
